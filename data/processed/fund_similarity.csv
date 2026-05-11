@@ -1,0 +1,137 @@
+fund_a,fund_b,common_stocks,similarity_score
+Axis Large Cap Fund,Canara Robeco Large Cap Fund,36,71.85
+Canara Robeco Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,39,67.76
+Canara Robeco Large Cap Fund,UTI Large Cap Fund,33,66.56
+Mirae Asset Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,37,64.08
+Canara Robeco Large Cap Fund,Bandhan Large Cap Fund,32,63.99
+Nippon India Large Cap Fund,Canara Robeco Large Cap Fund,35,63.86
+Mirae Asset Large Cap Fund,Bandhan Large Cap Fund,35,63.43
+Canara Robeco Large Cap Fund,LIC MF Large Cap Fund,26,63.18
+Mirae Asset Large Cap Fund,Canara Robeco Large Cap Fund,30,63.01
+Axis Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,32,62.71
+Aditya Birla Sun Life Large Cap Fund,Bandhan Large Cap Fund,31,62.4
+UTI Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,31,62.17
+Mirae Asset Large Cap Fund,LIC MF Large Cap Fund,28,61.34
+LIC MF Large Cap Fund,Bandhan Large Cap Fund,26,60.68
+Nippon India Large Cap Fund,Mirae Asset Large Cap Fund,34,60.41
+Mirae Asset Large Cap Fund,UTI Large Cap Fund,31,60.28
+Axis Large Cap Fund,Bandhan Large Cap Fund,29,59.94
+Axis Large Cap Fund,UTI Large Cap Fund,28,59.79
+Nippon India Large Cap Fund,UTI Large Cap Fund,33,59.15
+Axis Large Cap Fund,LIC MF Large Cap Fund,26,58.97
+Axis Large Cap Fund,Mirae Asset Large Cap Fund,32,58.92
+Nippon India Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,34,58.76
+HDFC Large Cap Fund,Canara Robeco Large Cap Fund,30,57.78
+Canara Robeco Large Cap Fund,Baroda BNP Paribas Large Cap Fund,28,57.67
+Franklin India Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,25,57.13
+Bandhan Large Cap Fund,Baroda BNP Paribas Large Cap Fund,27,57.02
+SBI Large Cap Fund,Canara Robeco Large Cap Fund,27,56.39
+Canara Robeco Large Cap Fund,Franklin India Large Cap Fund,30,56.15
+Aditya Birla Sun Life Large Cap Fund,LIC MF Large Cap Fund,22,55.97
+Kotak Large Cap Fund,Canara Robeco Large Cap Fund,31,55.55
+Aditya Birla Sun Life Large Cap Fund,Baroda BNP Paribas Large Cap Fund,26,55.26
+Canara Robeco Large Cap Fund,Invesco India Largecap Fund,31,54.94
+Canara Robeco Large Cap Fund,Tata Large Cap Fund,22,54.64
+UTI Large Cap Fund,Bandhan Large Cap Fund,26,54.57
+UTI Large Cap Fund,LIC MF Large Cap Fund,22,54.47
+Nippon India Large Cap Fund,Bandhan Large Cap Fund,29,54.18
+SBI Large Cap Fund,Tata Large Cap Fund,19,54.1
+SBI Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,29,54.05
+Axis Large Cap Fund,Baroda BNP Paribas Large Cap Fund,25,53.35
+HDFC Large Cap Fund,Axis Large Cap Fund,25,53.17
+Axis Large Cap Fund,Tata Large Cap Fund,22,53.17
+Kotak Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,34,53.14
+SBI Large Cap Fund,UTI Large Cap Fund,22,52.99
+SBI Large Cap Fund,Nippon India Large Cap Fund,26,52.91
+Tata Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,23,52.89
+Nippon India Large Cap Fund,Axis Large Cap Fund,32,52.74
+Nippon India Large Cap Fund,LIC MF Large Cap Fund,22,52.72
+HDFC Large Cap Fund,UTI Large Cap Fund,23,52.65
+Mirae Asset Large Cap Fund,Tata Large Cap Fund,22,52.63
+UTI Large Cap Fund,Baroda BNP Paribas Large Cap Fund,25,52.6
+HDFC Large Cap Fund,Aditya Birla Sun Life Large Cap Fund,26,52.58
+SBI Large Cap Fund,Mirae Asset Large Cap Fund,25,52.48
+Nippon India Large Cap Fund,Tata Large Cap Fund,21,52.47
+Nippon India Large Cap Fund,Franklin India Large Cap Fund,27,52.19
+HDFC Large Cap Fund,Mirae Asset Large Cap Fund,23,52.17
+Mirae Asset Large Cap Fund,Baroda BNP Paribas Large Cap Fund,26,52.08
+Axis Large Cap Fund,Invesco India Largecap Fund,24,52.04
+UTI Large Cap Fund,Franklin India Large Cap Fund,25,51.99
+SBI Large Cap Fund,Axis Large Cap Fund,24,51.98
+Kotak Large Cap Fund,LIC MF Large Cap Fund,24,51.69
+Axis Large Cap Fund,Franklin India Large Cap Fund,23,51.63
+LIC MF Large Cap Fund,Baroda BNP Paribas Large Cap Fund,20,51.11
+Tata Large Cap Fund,UTI Large Cap Fund,21,50.98
+HDFC Large Cap Fund,Bandhan Large Cap Fund,24,50.46
+Axis Large Cap Fund,Kotak Large Cap Fund,29,50.4
+Tata Large Cap Fund,Baroda BNP Paribas Large Cap Fund,22,50.35
+SBI Large Cap Fund,Bandhan Large Cap Fund,21,50.29
+Nippon India Large Cap Fund,Baroda BNP Paribas Large Cap Fund,25,50.05
+Mirae Asset Large Cap Fund,Kotak Large Cap Fund,33,49.99
+Mirae Asset Large Cap Fund,Franklin India Large Cap Fund,23,49.58
+HDFC Large Cap Fund,Tata Large Cap Fund,19,49.2
+Franklin India Large Cap Fund,LIC MF Large Cap Fund,18,49.12
+Franklin India Large Cap Fund,Bandhan Large Cap Fund,22,48.99
+SBI Large Cap Fund,LIC MF Large Cap Fund,15,48.85
+SBI Large Cap Fund,Baroda BNP Paribas Large Cap Fund,19,48.52
+HDFC Large Cap Fund,SBI Large Cap Fund,19,47.86
+UTI Large Cap Fund,Invesco India Largecap Fund,21,47.82
+HDFC Large Cap Fund,Franklin India Large Cap Fund,22,47.54
+Tata Large Cap Fund,Bandhan Large Cap Fund,16,47.42
+Kotak Large Cap Fund,UTI Large Cap Fund,27,47.29
+SBI Large Cap Fund,Franklin India Large Cap Fund,16,47.2
+HDFC Large Cap Fund,LIC MF Large Cap Fund,18,46.75
+HDFC Large Cap Fund,Baroda BNP Paribas Large Cap Fund,22,46.62
+Tata Large Cap Fund,Franklin India Large Cap Fund,15,46.2
+Tata Large Cap Fund,LIC MF Large Cap Fund,14,45.9
+Kotak Large Cap Fund,Baroda BNP Paribas Large Cap Fund,27,45.69
+Franklin India Large Cap Fund,Baroda BNP Paribas Large Cap Fund,23,45.44
+HDFC Large Cap Fund,Nippon India Large Cap Fund,24,45.36
+Nippon India Large Cap Fund,Kotak Large Cap Fund,27,45.29
+Bandhan Large Cap Fund,Invesco India Largecap Fund,24,44.45
+Aditya Birla Sun Life Large Cap Fund,DSP Large Cap Fund,17,44.42
+HDFC Large Cap Fund,Invesco India Largecap Fund,20,44.37
+Kotak Large Cap Fund,Tata Large Cap Fund,22,44.12
+Tata Large Cap Fund,DSP Large Cap Fund,15,43.99
+Kotak Large Cap Fund,Bandhan Large Cap Fund,25,43.93
+UTI Large Cap Fund,DSP Large Cap Fund,15,43.7
+Canara Robeco Large Cap Fund,DSP Large Cap Fund,17,43.64
+Nippon India Large Cap Fund,DSP Large Cap Fund,17,43.64
+Aditya Birla Sun Life Large Cap Fund,Invesco India Largecap Fund,22,43.25
+Mirae Asset Large Cap Fund,DSP Large Cap Fund,16,42.16
+Franklin India Large Cap Fund,Invesco India Largecap Fund,18,41.43
+Kotak Large Cap Fund,Franklin India Large Cap Fund,24,41.23
+Mirae Asset Large Cap Fund,Invesco India Largecap Fund,20,41.1
+SBI Large Cap Fund,Invesco India Largecap Fund,18,40.87
+SBI Large Cap Fund,DSP Large Cap Fund,14,40.39
+Tata Large Cap Fund,Invesco India Largecap Fund,14,40.36
+Axis Large Cap Fund,DSP Large Cap Fund,16,40.02
+DSP Large Cap Fund,Bandhan Large Cap Fund,13,39.93
+SBI Large Cap Fund,Kotak Large Cap Fund,22,39.81
+Kotak Large Cap Fund,Invesco India Largecap Fund,19,39.8
+LIC MF Large Cap Fund,Invesco India Largecap Fund,14,39.4
+HDFC Large Cap Fund,DSP Large Cap Fund,14,39.31
+Nippon India Large Cap Fund,Invesco India Largecap Fund,22,39.28
+DSP Large Cap Fund,LIC MF Large Cap Fund,14,38.26
+Invesco India Largecap Fund,Baroda BNP Paribas Large Cap Fund,16,38.15
+Franklin India Large Cap Fund,DSP Large Cap Fund,12,36.28
+HDFC Large Cap Fund,Kotak Large Cap Fund,21,34.57
+Kotak Large Cap Fund,DSP Large Cap Fund,15,32.9
+DSP Large Cap Fund,Baroda BNP Paribas Large Cap Fund,14,31.45
+DSP Large Cap Fund,Invesco India Largecap Fund,9,30.8
+HDFC Large Cap Fund,ICICI Prudential Bluechip Fund,0,0.0
+ICICI Prudential Bluechip Fund,UTI Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Canara Robeco Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Tata Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Mirae Asset Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Axis Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Nippon India Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Kotak Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Aditya Birla Sun Life Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Baroda BNP Paribas Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Bandhan Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Invesco India Largecap Fund,0,0.0
+ICICI Prudential Bluechip Fund,Franklin India Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,DSP Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,LIC MF Large Cap Fund,0,0.0
+ICICI Prudential Bluechip Fund,SBI Large Cap Fund,0,0.0

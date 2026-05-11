@@ -1,0 +1,928 @@
+fund_name,category,fund_house,scheme_id,stock_name,sector,allocation_percent,value,change_3m_percent,change_6m_percent,change_1y_percent,scrape_date,source
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,ICICI BANK ,FINANCIAL,9.39,"3,330 Cr",9.0,9.17,10.12,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,HDFC BANK ,FINANCIAL,8.0,"2,834 Cr",9.34,9.51,10.19,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,BHARTI AIRTEL ,COMMUNICATION,5.99,"2,124 Cr",6.18,5.85,5.72,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,RELIANCE INDUSTRIES ,ENERGY,5.4,"1,915 Cr",6.09,4.8,4.04,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,KOTAK MAHINDRA BANK ,FINANCIAL,5.13,"1,820 Cr",4.42,3.82,4.41,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,TITAN COMPANY ,CONSUMER DISCRETIONARY,4.59,"1,628 Cr",4.11,3.38,2.02,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,INFOSYS ,TECHNOLOGY,3.99,"1,415 Cr",3.15,3.25,4.73,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,TORRENT PHARMACEUTICALS ,HEALTHCARE,3.79,"1,342 Cr",3.02,2.84,0.2,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,AXIS BANK ,FINANCIAL,3.51,"1,243 Cr",3.35,3.17,5.21,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,BAJAJ AUTO ,AUTOMOBILE,3.09,"1,094 Cr",2.75,2.71,1.77,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,LUPIN ,HEALTHCARE,3.01,"1,068 Cr",2.4,2.31,1.89,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,BAJAJ FINSERV ,FINANCIAL,2.64,935.1 Cr,2.09,2.13,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,AMBUJA CEMENTS ,MATERIALS,2.52,894.52 Cr,3.05,3.32,0.68,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,NTPC ,ENERGY,2.33,827.19 Cr,2.41,3.74,5.41,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,CHOLAMANDALAM INVESTMENT AND FINANCE COMPANY ,FINANCIAL,2.0,709.82 Cr,2.2,2.21,1.74,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,ETERNAL ,SERVICES,1.95,692.97 Cr,2.06,2.56,1.42,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,TATA MOTORS ,AUTOMOBILE,1.91,677.33 Cr,1.76,,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,STATE BANK OF INDIA,FINANCIAL,1.76,622.64 Cr,1.54,1.45,1.14,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,INTERGLOBE AVIATION ,SERVICES,1.67,591.23 Cr,1.51,1.51,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,UNITED SPIRITS ,CONSUMER STAPLES,1.64,582.04 Cr,1.7,1.62,0.55,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,MANKIND PHARMA ,HEALTHCARE,1.55,549.48 Cr,1.48,1.5,1.23,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,VISHAL MEGA MART ,SERVICES,1.46,518.83 Cr,1.27,1.48,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,TATA CONSUMER PRODUCTS ,CONSUMER STAPLES,1.45,513.07 Cr,1.48,1.49,1.4,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,HAVELLS INDIA ,CAPITAL GOODS,1.45,515.43 Cr,1.52,1.03,0.77,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,MAX HEALTHCARE INSTITUTE ,HEALTHCARE,1.36,483.12 Cr,0.98,,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,INDUSIND BANK ,FINANCIAL,1.31,464.87 Cr,1.31,1.19,1.11,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,LARSEN & TOUBRO ,CONSTRUCTION,1.29,458.79 Cr,1.32,1.25,5.87,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,MARUTI SUZUKI INDIA ,AUTOMOBILE,1.25,442.35 Cr,1.48,1.72,0.45,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,EICHER MOTORS ,AUTOMOBILE,1.16,412.39 Cr,1.13,1.15,0.93,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,HYUNDAI MOTOR INDIA ,AUTOMOBILE,1.1,389.04 Cr,1.24,1.48,1.03,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,ICICI PRUDENTIAL ASSET MANAGEMENT COMPANY ,UNCLASSIFIED,1.08,384.23 Cr,0.62,,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,SRF ,CHEMICALS,0.95,338.4 Cr,1.05,1.02,1.13,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,SWIGGY ,SERVICES,0.84,298.32 Cr,0.64,,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,MAHINDRA & MAHINDRA ,AUTOMOBILE,0.82,292.15 Cr,0.9,0.89,0.73,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,ADANI PORTS AND SPECIAL ECONOMIC ZONE ,SERVICES,0.81,286.8 Cr,1.38,1.4,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,DABUR INDIA ,CONSUMER STAPLES,0.8,282.62 Cr,0.85,0.88,0.97,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,TATA MOTORS PASSENGER VEHICLES ,AUTOMOBILE,0.62,219.31 Cr,0.84,3.05,3.2,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,0.59,208.21 Cr,2.56,2.52,2.91,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,TATA CAPITAL ,FINANCIAL,0.52,183.31 Cr,0.29,,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,CG POWER AND INDUSTRIAL SOLUTIONS ,CAPITAL GOODS,0.5,177.22 Cr,0.29,0.35,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,DLF ,CONSTRUCTION,0.3,106.81 Cr,0.36,0.39,0.57,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,CUMMINS INDIA ,CAPITAL GOODS,0.29,103.51 Cr,0.25,0.24,0.19,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,BILLIONBRAINS GARAGE VENTURES ,FINANCIAL,0.24,86.7 Cr,0.22,,,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,HINDALCO INDUSTRIES ,METALS & MINING,0.22,79.21 Cr,1.25,1.14,1.09,2026-05-11,ETMoney
+HDFC Large Cap Fund,Large Cap,HDFC Mutual Fund,31883,SBI LIFE INSURANCE COMPANY ,INSURANCE,0.2,70.48 Cr,0.2,0.19,0.39,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,KENVUE INC.,CONSUMER STAPLES,2.67,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,SALESFORCE COM.,TECHNOLOGY,2.66,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,BROWN-FORMAN CORP,CONSUMER STAPLES,2.61,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,CLOROX COMPANY,CONSUMER STAPLES,2.61,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,TYLER TECHNOLOGIES INC,TECHNOLOGY,2.59,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,DANAHER CORPORATION,HEALTHCARE,2.49,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,CONSTELLATION BRANDS INC.,CONSUMER STAPLES,2.48,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,BROADRIDGE FINANCIAL SOLUTIONS INC,TECHNOLOGY,2.41,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,OTIS WORLDWIDE CORP,CAPITAL GOODS,2.39,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,NXP SEMICONDUCTOR,CAPITAL GOODS,2.38,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,UNITED PARCEL SERVICES INC,SERVICES,2.36,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,AGILENT TECHNOLOGIES INC,HEALTHCARE,2.35,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,GE HEALTHCARE TECHNOLOGIES INC,HEALTHCARE,2.33,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,ZIMMER BIOMET HOLDINGS,HEALTHCARE,2.31,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,MICROSOFT CORPORTION (US),TECHNOLOGY,2.3,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,MONDELEZ INTERNATIONAL,CONSUMER STAPLES,2.26,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,FORTINET INC,TECHNOLOGY,2.26,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,NIKE INC.,CONSUMER DISCRETIONARY,2.23,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,MARKETAXESS HOLDINGS INC,FINANCIAL,2.21,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,AIRBNB INC,SERVICES,2.2,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,TRANSUNION,FINANCIAL,2.19,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,BRISTOL-MYERS SQUIBB CO,HEALTHCARE,2.09,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,ESTEE LAUDER STOCK,CONSUMER STAPLES,2.08,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,MASCO CORP,CONSTRUCTION,2.0,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,WORKDAY INC.,TECHNOLOGY,2.0,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,ADOBE INC,TECHNOLOGY,1.98,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,ZOETIS INC,HEALTHCARE,1.87,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,HUNTINGTON INGALLS INDUSTRIES INC. (US),CAPITAL GOODS,1.79,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,ALPHABET INC CLASS C,SERVICES,1.76,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,THE BOEING CO,CAPITAL GOODS,1.49,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,IDEX CORPORATION (FOREIGN),CAPITAL GOODS,1.48,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,AMAZON. COM INC. (USA),SERVICES,1.46,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,THERMO FISHER SCIENTIFIC INC.,HEALTHCARE,1.45,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,APPLIED MATERIALS INC. (USA),CAPITAL GOODS,1.43,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,PEPSICO INC,CONSUMER STAPLES,1.41,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,NORTHROP GRUMMAN CO. (US),CAPITAL GOODS,1.4,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,LPL FINANCIAL HOLDINGS INC. (LPLA),FINANCIAL,1.35,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,FREEPORT MCMORAN COPPER & GOLD ,OTHERS,1.32,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,MOTOROLA SOLUTIONS INC,COMMUNICATION,1.3,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,WEST PHARMACEUTICAL SERVICES INC,HEALTHCARE,1.3,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,HERSHEY FOOD CORPORATION,CONSUMER STAPLES,1.26,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,SERVICENOW INC,TECHNOLOGY,1.26,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,U.S. BANCORP,FINANCIAL,1.22,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,CHARLES SCHWAB CORPORATION,FINANCIAL,1.2,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,THE WALT DISNEY COMPANY,SERVICES,1.1,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,CHIPOTLE MEXICAN GRILL INC,SERVICES,1.1,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,EQUIFAX INC,FINANCIAL,1.09,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,COPART INC.,SERVICES,1.09,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,ENTEGRIS INC,CAPITAL GOODS,0.91,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,COSTAR GROUP INC.,CONSTRUCTION,0.77,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,PALO ALTO NETWORKS INC. COMMON STOCK,TECHNOLOGY,0.63,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,BLACKSTONE GROUP INC (BX),FINANCIAL,0.57,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,VEEVA SYSTEMS INC.,HEALTHCARE,0.55,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,ORACLE CORPORATION (US),TECHNOLOGY,0.5,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,BROADCOM INC,CAPITAL GOODS,0.49,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,DATADOG INC,TECHNOLOGY,0.45,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,EPAM SYSTEMS INC,TECHNOLOGY,0.41,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,CAMPBELL SOUP CO.,CONSUMER STAPLES,0.36,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,FAIR ISAAC CORPORATION,TECHNOLOGY,0.36,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,JACK HENRY & ASSOCIATES INC,TECHNOLOGY,0.2,--,,,,2026-05-11,ETMoney
+ICICI Prudential Bluechip Fund,Large Cap,ICICI Prudential Mutual Fund,14566,YUM CHINA HOLDINGS INC.,SERVICES,0.01,--,,,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,HDFC BANK ,FINANCIAL,9.05,"4,425 Cr",7.22,9.25,10.24,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,ICICI BANK ,FINANCIAL,8.1,"3,961 Cr",6.97,7.4,7.92,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,RELIANCE INDUSTRIES ,ENERGY,6.73,"3,292 Cr",6.89,7.49,5.68,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,LARSEN & TOUBRO ,CONSTRUCTION,5.3,"2,593 Cr",5.41,5.13,5.23,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,STATE BANK OF INDIA,FINANCIAL,3.82,"1,871 Cr",3.36,3.16,2.7,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,ASIAN PAINTS ,MATERIALS,3.67,"1,797 Cr",4.11,3.69,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,HDFC LIFE INSURANCE CO ,INSURANCE,3.5,"1,712 Cr",2.98,2.61,1.26,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,INFOSYS ,TECHNOLOGY,3.43,"1,678 Cr",3.88,3.98,4.36,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,KOTAK MAHINDRA BANK ,FINANCIAL,3.32,"1,625 Cr",3.62,3.47,4.04,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,AXIS BANK ,FINANCIAL,3.26,"1,596 Cr",3.12,2.95,2.45,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,TATA MOTORS ,AUTOMOBILE,3.07,"1,500 Cr",2.83,,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,BHARTI AIRTEL ,COMMUNICATION,2.66,"1,301 Cr",2.75,2.6,2.96,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,AVENUE SUPERMARTS ,SERVICES,2.49,"1,218 Cr",2.08,2.46,1.22,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,2.47,"1,208 Cr",2.47,1.95,1.72,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,DIVI'S LABORATORIES ,HEALTHCARE,2.47,"1,208 Cr",3.13,2.94,3.19,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,PAGE INDUSTRIES ,TEXTILES,2.06,"1,007 Cr",2.04,2.44,2.74,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,THERMAX ,CAPITAL GOODS,1.93,945.6 Cr,1.57,1.74,1.28,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,VARUN BEVERAGES ,CONSUMER STAPLES,1.92,941.04 Cr,2.15,1.32,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,TATA STEEL ,METALS & MINING,1.84,901.74 Cr,1.51,1.78,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,TECH MAHINDRA ,TECHNOLOGY,1.84,899.6 Cr,1.85,1.48,0.61,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,CHOLAMANDALAM INVESTMENT AND FINANCE COMPANY ,FINANCIAL,1.83,894.1 Cr,2.01,2.34,2.86,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,SHREE CEMENT ,MATERIALS,1.79,874.76 Cr,1.81,2.1,1.7,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,MANKIND PHARMA ,HEALTHCARE,1.67,816.94 Cr,1.6,1.88,1.38,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,HINDUSTAN UNILEVER ,CONSUMER STAPLES,1.43,701.68 Cr,1.9,2.18,2.1,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,VEDANTA ,METALS & MINING,1.41,688.28 Cr,1.14,1.1,1.28,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,ETERNAL ,SERVICES,1.36,664.04 Cr,2.04,2.53,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,HINDALCO INDUSTRIES ,METALS & MINING,1.33,648.84 Cr,1.75,1.59,1.52,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,1.22,597.44 Cr,,,1.65,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,ICICI PRUDENTIAL ASSET MANAGEMENT COMPANY ,UNCLASSIFIED,1.16,567.43 Cr,1.48,,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,ICICI PRUDENTIAL LIFE INSURANCE COMPANY ,INSURANCE,1.05,515.76 Cr,1.12,0.83,0.86,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,SCHAEFFLER INDIA ,CAPITAL GOODS,1.03,505.54 Cr,0.91,1.05,0.9,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,SONA BLW PRECISION FORGINGS ,AUTOMOBILE,0.98,481.5 Cr,0.86,0.78,0.93,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,BRITANNIA INDUSTRIES ,CONSUMER STAPLES,0.96,471.32 Cr,2.51,3.49,3.07,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,EICHER MOTORS ,AUTOMOBILE,0.91,445.08 Cr,1.83,4.08,3.33,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,INTERGLOBE AVIATION ,SERVICES,0.89,433.78 Cr,,,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,ICICI LOMBARD GENERAL INSURANCE COMPANY ,INSURANCE,0.89,436.9 Cr,0.9,0.91,0.75,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,BRAINBEES SOLUTIONS ,CONSUMER DISCRETIONARY,0.86,422.93 Cr,0.32,0.43,0.46,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,GAIL (INDIA) ,ENERGY,0.82,399.35 Cr,0.89,0.97,0.42,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,PI INDUSTRIES ,CHEMICALS,0.63,307.36 Cr,0.66,0.75,0.78,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,MOTHERSON SUMI WIRING INDIA ,AUTOMOBILE,0.5,243.89 Cr,0.57,0.57,0.46,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,DLF ,CONSTRUCTION,0.34,--,,1.24,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,SKF INDIA (INDUSTRIAL) ,CAPITAL GOODS,0.34,164.88 Cr,0.37,,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,SKF INDIA ,CAPITAL GOODS,0.23,111.89 Cr,0.26,0.71,0.62,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,CIPLA ,HEALTHCARE,0.18,89.24 Cr,0.78,0.83,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,BHARAT PETROLEUM CORPORATION ,ENERGY,0.06,28.55 Cr,0.07,,,2026-05-11,ETMoney
+SBI Large Cap Fund,Large Cap,SBI Mutual Fund,2893,KWALITY WALL'S (INDIA) ,CONSUMER STAPLES,0.02,10.31 Cr,0.03,,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,HDFC BANK ,FINANCIAL,8.98,"4,175 Cr",8.84,8.0,9.03,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,ICICI BANK ,FINANCIAL,7.11,"3,307 Cr",5.85,4.79,6.1,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,RELIANCE INDUSTRIES ,ENERGY,5.5,"2,558 Cr",6.03,6.03,6.36,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,AXIS BANK ,FINANCIAL,3.9,"1,813 Cr",3.9,4.38,4.84,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,LARSEN & TOUBRO ,CONSTRUCTION,3.84,"1,786 Cr",3.53,3.47,3.91,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,INFOSYS ,TECHNOLOGY,3.13,"1,453 Cr",3.05,3.1,2.76,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,STATE BANK OF INDIA,FINANCIAL,2.96,"1,379 Cr",3.78,4.37,3.64,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,GE VERNOVA T&D INDIA ,CAPITAL GOODS,2.79,"1,299 Cr",2.59,2.9,2.17,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,BAJAJ FINANCE ,FINANCIAL,2.77,"1,288 Cr",2.84,3.15,3.71,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,NTPC ,ENERGY,2.66,"1,238 Cr",2.16,2.45,2.73,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,ITC ,CONSUMER STAPLES,2.65,"1,232 Cr",2.8,3.05,0.27,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,TATA CONSULTANCY SERVICES ,TECHNOLOGY,2.38,"1,108 Cr",2.96,2.21,2.4,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,MAHINDRA & MAHINDRA ,AUTOMOBILE,2.34,"1,090 Cr",2.69,2.72,1.61,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,MARUTI SUZUKI INDIA ,AUTOMOBILE,2.25,"1,046 Cr",2.34,2.46,1.8,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,HINDUSTAN UNILEVER ,CONSUMER STAPLES,2.22,"1,034 Cr",2.29,2.73,2.07,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,AVENUE SUPERMARTS ,SERVICES,2.16,"1,005 Cr",1.85,2.06,1.48,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,KOTAK MAHINDRA BANK ,FINANCIAL,1.9,884.72 Cr,1.65,1.01,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,TATA POWER COMPANY ,ENERGY,1.83,852.18 Cr,1.68,1.88,2.25,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,DR. REDDY'S LABORATORIES ,HEALTHCARE,1.45,672.3 Cr,1.34,1.41,1.53,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,1.44,667.78 Cr,1.5,1.14,0.44,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,TATA STEEL ,METALS & MINING,1.28,594.82 Cr,1.1,1.13,1.13,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,ABB INDIA ,CAPITAL GOODS,1.27,588.66 Cr,0.83,0.91,1.21,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,ETERNAL ,SERVICES,1.23,572.96 Cr,1.42,1.82,1.4,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,SBI LIFE INSURANCE COMPANY ,INSURANCE,1.2,558.58 Cr,1.54,1.33,1.42,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,LUPIN ,HEALTHCARE,1.17,543.64 Cr,0.97,0.97,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,ULTRATECH CEMENT ,MATERIALS,1.16,537.82 Cr,1.45,1.65,1.53,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,DIVI'S LABORATORIES ,HEALTHCARE,1.1,512.14 Cr,1.08,1.05,1.23,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,CHALET HOTELS ,SERVICES,1.01,471.55 Cr,1.15,1.39,1.48,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,VEDANTA ,METALS & MINING,0.93,432.87 Cr,0.91,1.07,1.32,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,THE INDIAN HOTELS COMPANY ,SERVICES,0.92,425.96 Cr,1.08,1.08,1.46,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,TATA CONSUMER PRODUCTS ,CONSUMER STAPLES,0.9,419.06 Cr,0.97,1.0,0.96,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,SIEMENS ENERGY INDIA ,ENERGY,0.87,405.77 Cr,0.69,0.85,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,CIPLA ,HEALTHCARE,0.85,394.12 Cr,0.96,0.91,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,TRENT ,SERVICES,0.84,390.06 Cr,0.84,0.5,0.44,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,CHOLAMANDALAM INVESTMENT AND FINANCE COMPANY ,FINANCIAL,0.83,385.06 Cr,0.9,0.84,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,0.8,371.52 Cr,0.71,0.34,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,PB FINTECH ,SERVICES,0.77,357.38 Cr,0.26,0.26,0.34,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,SHREE CEMENT ,MATERIALS,0.75,350.32 Cr,0.79,0.66,0.24,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,NTPC GREEN ENERGY ,ENERGY,0.75,350.64 Cr,0.69,0.78,0.72,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,ICICI LOMBARD GENERAL INSURANCE COMPANY ,INSURANCE,0.74,344.4 Cr,0.78,0.7,0.82,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,TECH MAHINDRA ,TECHNOLOGY,0.74,345.67 Cr,0.47,0.45,0.47,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,SWIGGY ,SERVICES,0.71,328.53 Cr,0.43,0.52,0.46,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,HDFC LIFE INSURANCE CO ,INSURANCE,0.7,324.83 Cr,0.81,0.9,1.1,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,SIEMENS ,CAPITAL GOODS,0.68,318.12 Cr,0.65,0.71,1.48,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,VISHAL MEGA MART ,SERVICES,0.68,316.08 Cr,0.8,1.03,0.86,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,HYUNDAI MOTOR INDIA ,AUTOMOBILE,0.64,298.53 Cr,0.76,0.82,0.53,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,MANKIND PHARMA ,HEALTHCARE,0.64,298.06 Cr,0.64,,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,EIH ,SERVICES,0.63,293.56 Cr,0.78,0.83,1.01,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,SBI CARDS AND PAYMENT SERVICES ,FINANCIAL,0.58,272.06 Cr,0.79,0.88,1.04,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,HCL TECHNOLOGIES ,TECHNOLOGY,0.55,253.95 Cr,1.15,1.07,1.53,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,INTERGLOBE AVIATION ,SERVICES,0.51,236.61 Cr,1.13,1.37,0.64,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,DIXON TECHNOLOGIES (INDIA) ,CAPITAL GOODS,0.47,216.78 Cr,,,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,HAVELLS INDIA ,CAPITAL GOODS,0.46,212.3 Cr,0.56,0.65,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,DLF ,CONSTRUCTION,0.46,213.94 Cr,,,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,MAX FINANCIAL SERVICES ,FINANCIAL,0.45,209.58 Cr,0.71,0.79,0.71,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,VARUN BEVERAGES ,CONSUMER STAPLES,0.43,200.72 Cr,0.5,,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,GODREJ CONSUMER PRODUCTS ,CONSUMER STAPLES,0.43,201.88 Cr,0.49,0.44,0.4,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,GILLETTE INDIA ,CONSUMER STAPLES,0.4,188.24 Cr,0.38,0.45,0.48,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,HDB FINANCIAL SERVICES ,FINANCIAL,0.36,167.98 Cr,0.55,0.59,,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,UNITED BREWERIES ,CONSUMER STAPLES,0.35,164.41 Cr,0.23,0.28,0.22,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,LINDE INDIA ,CHEMICALS,0.32,148.12 Cr,0.25,0.29,0.36,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,DEVYANI INTERNATIONAL ,SERVICES,0.28,129.02 Cr,0.39,0.48,0.4,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,COLGATE-PALMOLIVE (INDIA) ,CONSUMER STAPLES,0.28,132.57 Cr,0.25,0.29,0.38,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,PVR INOX ,SERVICES,0.19,87.78 Cr,0.19,0.22,0.23,2026-05-11,ETMoney
+Nippon India Large Cap Fund,Large Cap,Nippon India Mutual Fund,5077,SHRIRAM FINANCE ,FINANCIAL,0.19,87.21 Cr,,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,ICICI BANK ,FINANCIAL,8.84,"2,533 Cr",7.96,8.4,8.82,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,HDFC BANK ,FINANCIAL,7.71,"2,210 Cr",9.58,9.36,9.69,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,RELIANCE INDUSTRIES ,ENERGY,5.08,"1,457 Cr",7.85,6.15,2.94,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,INFOSYS ,TECHNOLOGY,4.81,"1,379 Cr",5.41,5.06,4.35,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,BHARTI AIRTEL ,COMMUNICATION,4.73,"1,356 Cr",5.19,5.23,5.59,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,LARSEN & TOUBRO ,CONSTRUCTION,4.37,"1,253 Cr",5.11,4.07,3.43,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,STATE BANK OF INDIA,FINANCIAL,4.16,"1,191 Cr",3.8,3.38,2.56,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,MAHINDRA & MAHINDRA ,AUTOMOBILE,3.51,"1,006 Cr",3.58,3.38,2.73,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,KOTAK MAHINDRA BANK ,FINANCIAL,3.47,995.3 Cr,3.05,1.68,2.89,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,BAJAJ FINANCE ,FINANCIAL,3.43,983.5 Cr,3.84,5.39,5.08,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,ULTRATECH CEMENT ,MATERIALS,2.85,815.92 Cr,2.25,3.02,2.26,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,APOLLO HOSPITALS ENTERPRISE ,HEALTHCARE,2.69,772.05 Cr,2.06,2.22,1.05,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,ETERNAL ,SERVICES,2.65,758.87 Cr,2.87,3.94,1.51,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,TITAN COMPANY ,CONSUMER DISCRETIONARY,2.28,653.69 Cr,2.02,1.3,1.14,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,2.26,646.98 Cr,1.08,1.02,3.01,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,NIFTY 50,FINANCIAL,1.87,--,,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,NTPC ,ENERGY,1.48,423.74 Cr,0.55,1.06,1.26,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,INTERGLOBE AVIATION ,SERVICES,1.46,419.73 Cr,1.45,3.02,2.43,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,TORRENT PHARMACEUTICALS ,HEALTHCARE,1.42,407.14 Cr,1.05,1.04,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,TECH MAHINDRA ,TECHNOLOGY,1.41,403.39 Cr,1.31,0.98,0.22,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,AXIS BANK ,FINANCIAL,1.34,384.24 Cr,,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,PIDILITE INDUSTRIES ,CHEMICALS,1.27,364.24 Cr,1.35,1.78,1.93,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,1.15,329.43 Cr,0.81,0.42,0.48,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,DIVI'S LABORATORIES ,HEALTHCARE,1.15,330.4 Cr,1.82,1.5,0.67,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,BHARAT ELECTRONICS ,CAPITAL GOODS,1.08,310.74 Cr,1.78,1.99,0.68,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,CG POWER AND INDUSTRIAL SOLUTIONS ,CAPITAL GOODS,1.01,288.89 Cr,0.89,0.98,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,TATA CONSUMER PRODUCTS ,CONSUMER STAPLES,1.0,286.51 Cr,0.99,0.86,0.5,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,CHOLAMANDALAM INVESTMENT AND FINANCE COMPANY ,FINANCIAL,1.0,287.97 Cr,1.23,1.49,1.55,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,TVS MOTOR COMPANY ,AUTOMOBILE,0.96,275.03 Cr,0.92,1.58,1.08,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,SHRIRAM FINANCE ,FINANCIAL,0.93,265.65 Cr,1.75,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,BRITANNIA INDUSTRIES ,CONSUMER STAPLES,0.92,263.88 Cr,0.2,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,AXIS NIFTY 50 ETF-GROWTH,UNCLASSIFIED,0.83,--,,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,THE INDIAN HOTELS COMPANY ,SERVICES,0.83,238.37 Cr,1.12,1.9,1.89,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,TATA MOTORS ,AUTOMOBILE,0.77,221.57 Cr,1.06,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,ICICI PRUDENTIAL ASSET MANAGEMENT COMPANY ,UNCLASSIFIED,0.71,202.76 Cr,0.49,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,TATA CONSULTANCY SERVICES ,TECHNOLOGY,0.66,188.16 Cr,1.1,0.47,3.15,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,SOLAR INDUSTRIES INDIA ,CHEMICALS,0.57,162.32 Cr,0.42,0.4,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,AVENUE SUPERMARTS ,SERVICES,0.53,150.57 Cr,0.83,1.84,1.26,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,TRENT ,SERVICES,0.53,151.61 Cr,0.62,0.64,0.66,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,HDFC LIFE INSURANCE CO ,INSURANCE,0.52,149.06 Cr,0.56,1.09,0.99,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,HYUNDAI MOTOR INDIA ,AUTOMOBILE,0.52,147.71 Cr,0.52,1.29,0.1,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,LG ELECTRONICS INDIA ,CONSUMER DISCRETIONARY,0.52,148.44 Cr,0.47,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,CUMMINS INDIA ,CAPITAL GOODS,0.49,139.94 Cr,0.93,0.97,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,VARUN BEVERAGES ,CONSUMER STAPLES,0.38,109.59 Cr,0.32,0.24,0.92,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,DIXON TECHNOLOGIES (INDIA) ,CAPITAL GOODS,0.22,61.83 Cr,0.34,0.52,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,SBI LIFE INSURANCE COMPANY ,INSURANCE,0.14,41.4 Cr,0.31,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,TATA STEEL ,METALS & MINING,0.11,31.19 Cr,,,,2026-05-11,ETMoney
+Axis Large Cap Fund,Large Cap,Axis Mutual Fund,10434,DLF ,CONSTRUCTION,0.03,69.21 Cr,,,0.32,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,HDFC BANK ,FINANCIAL,9.23,"3,262 Cr",9.63,9.95,10.28,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,ICICI BANK ,FINANCIAL,8.55,"3,020 Cr",7.95,8.21,7.77,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,RELIANCE INDUSTRIES ,ENERGY,5.76,"2,034 Cr",5.08,4.66,4.81,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,BHARTI AIRTEL ,COMMUNICATION,5.1,"1,803 Cr",4.32,3.96,4.09,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,INFOSYS ,TECHNOLOGY,4.68,"1,655 Cr",5.33,5.51,5.24,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,AXIS BANK ,FINANCIAL,3.46,"1,221 Cr",3.24,3.05,4.16,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,STATE BANK OF INDIA,FINANCIAL,3.39,"1,198 Cr",2.88,2.71,2.53,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,LARSEN & TOUBRO ,CONSTRUCTION,3.27,"1,157 Cr",3.72,3.53,3.57,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,ITC ,CONSUMER STAPLES,2.9,"1,024 Cr",4.21,4.33,2.63,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,TATA CONSULTANCY SERVICES ,TECHNOLOGY,2.89,"1,021 Cr",3.54,3.36,3.88,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,ETERNAL ,SERVICES,2.67,942 Cr,2.38,2.05,1.78,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,MARUTI SUZUKI INDIA ,AUTOMOBILE,2.38,842.87 Cr,2.46,3.22,1.49,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,MAHINDRA & MAHINDRA ,AUTOMOBILE,2.13,751.85 Cr,2.31,2.15,1.43,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,KOTAK MAHINDRA BANK ,FINANCIAL,1.69,598.12 Cr,1.78,1.7,2.6,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,AMBUJA CEMENTS ,MATERIALS,1.55,547.91 Cr,1.52,1.64,1.62,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,ASIAN PAINTS ,MATERIALS,1.46,516.09 Cr,1.4,1.28,1.42,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,APOLLO HOSPITALS ENTERPRISE ,HEALTHCARE,1.46,517.61 Cr,1.35,1.28,1.27,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,NTPC ,ENERGY,1.44,508.19 Cr,1.21,0.91,1.04,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,1.43,504.23 Cr,0.95,0.93,1.18,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,VARUN BEVERAGES ,CONSUMER STAPLES,1.33,468.45 Cr,1.46,1.4,0.8,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,ONE97 COMMUNICATIONS ,SERVICES,1.31,464.3 Cr,1.2,1.11,1.2,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,GODREJ CONSUMER PRODUCTS ,CONSUMER STAPLES,1.29,454.62 Cr,1.53,1.31,1.04,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SHRIRAM FINANCE ,FINANCIAL,1.2,423.5 Cr,1.46,1.26,0.76,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,BRITANNIA INDUSTRIES ,CONSUMER STAPLES,1.19,421.96 Cr,0.89,0.87,0.86,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SIEMENS ,CAPITAL GOODS,1.13,400.94 Cr,0.95,0.63,0.61,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,EICHER MOTORS ,AUTOMOBILE,1.11,391.24 Cr,1.4,1.57,0.81,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,JSW ENERGY ,CAPITAL GOODS,1.06,372.97 Cr,0.91,1.06,1.13,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,TITAN COMPANY ,CONSUMER DISCRETIONARY,1.03,364.14 Cr,0.8,0.7,0.82,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SBI LIFE INSURANCE COMPANY ,INSURANCE,1.01,358.1 Cr,1.08,1.15,1.22,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,GLAND PHARMA ,HEALTHCARE,0.96,338.5 Cr,0.87,1.06,0.9,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SIEMENS ENERGY INDIA ,ENERGY,0.95,337.1 Cr,0.6,0.47,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,TRENT ,SERVICES,0.93,329.03 Cr,0.75,0.32,0.46,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,HINDUSTAN UNILEVER ,CONSUMER STAPLES,0.92,323.87 Cr,1.25,1.46,1.47,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,BAJAJ FINANCE ,FINANCIAL,0.86,303.4 Cr,0.8,0.85,0.82,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,DR. REDDY'S LABORATORIES ,HEALTHCARE,0.86,304.93 Cr,0.87,0.64,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,THE INDIAN HOTELS COMPANY ,SERVICES,0.83,292.65 Cr,0.77,0.57,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,ADANI PORTS AND SPECIAL ECONOMIC ZONE ,SERVICES,0.81,286.01 Cr,0.72,0.73,0.82,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SONA BLW PRECISION FORGINGS ,AUTOMOBILE,0.79,278.43 Cr,0.66,0.6,0.63,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,INDUSIND BANK ,FINANCIAL,0.72,256.2 Cr,0.85,0.67,0.63,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,VEDANTA ,METALS & MINING,0.68,241.9 Cr,0.59,1.26,1.32,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SOLAR INDUSTRIES INDIA ,CHEMICALS,0.66,233.01 Cr,,,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,FSN E-COMMERCE VENTURES ,SERVICES,0.66,233.09 Cr,0.67,0.74,1.17,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,POWER FINANCE CORPORATION ,FINANCIAL,0.64,227.69 Cr,0.51,0.62,0.66,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,LODHA DEVELOPERS ,CONSTRUCTION,0.63,223.03 Cr,0.59,0.37,0.73,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,PIDILITE INDUSTRIES ,CHEMICALS,0.59,208.83 Cr,0.58,0.6,0.61,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,INTERGLOBE AVIATION ,SERVICES,0.58,205.42 Cr,0.53,0.5,0.69,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,AVENUE SUPERMARTS ,SERVICES,0.58,204.6 Cr,0.47,0.82,0.96,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SWIGGY ,SERVICES,0.58,203.41 Cr,0.61,0.22,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,KALPATARU PROJECTS INTERNATIONAL ,CAPITAL GOODS,0.58,203.7 Cr,0.43,0.33,0.27,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,JINDAL STEEL ,METALS & MINING,0.57,200.43 Cr,0.52,0.68,1.15,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,TIMKEN INDIA ,CAPITAL GOODS,0.55,194.94 Cr,0.58,0.61,0.81,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,BIOCON ,HEALTHCARE,0.53,186.89 Cr,0.25,0.24,0.26,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,GUJARAT FLUOROCHEMICALS ,CHEMICALS,0.48,169.2 Cr,0.39,0.13,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,MPHASIS ,TECHNOLOGY,0.47,165.86 Cr,0.6,0.11,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,OIL AND NATURAL GAS CORPORATION ,ENERGY,0.44,153.99 Cr,0.47,0.49,0.53,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,DLF ,CONSTRUCTION,0.42,147.3 Cr,,,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,CROMPTON GREAVES CONSUMER ELECTRICALS ,CONSUMER DISCRETIONARY,0.39,139.16 Cr,0.37,0.45,0.57,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,EPL ,MATERIALS,0.33,117.13 Cr,0.29,0.3,0.41,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,INDIAN ENERGY EXCHANGE ,SERVICES,0.31,108.98 Cr,0.3,0.33,0.8,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,ABB INDIA ,CAPITAL GOODS,0.3,105.01 Cr,0.22,0.23,0.32,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,KPIT TECHNOLOGIES ,TECHNOLOGY,0.28,98.55 Cr,0.1,,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SKF INDIA (INDUSTRIAL) ,CAPITAL GOODS,0.26,90.13 Cr,0.13,,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,LG ELECTRONICS INDIA ,CONSUMER DISCRETIONARY,0.25,89.88 Cr,,,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,ULTRATECH CEMENT ,MATERIALS,0.25,88.64 Cr,,,,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,GAIL (INDIA) ,ENERGY,0.23,82.19 Cr,0.56,0.65,0.72,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,SOBHA ,CONSTRUCTION,0.22,79.26 Cr,0.21,0.23,0.19,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,TITAGARH RAIL SYSTEMS ,AUTOMOBILE,0.21,75.69 Cr,0.28,0.29,0.28,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,TATA STEEL ,METALS & MINING,0.19,68.73 Cr,0.32,0.82,0.65,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,BHARAT ELECTRONICS ,CAPITAL GOODS,0.18,63.75 Cr,0.37,0.4,0.66,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,RESTAURANT BRANDS ASIA ,SERVICES,0.17,61.53 Cr,0.16,0.21,0.17,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,BHARAT PETROLEUM CORPORATION ,ENERGY,0.16,57.64 Cr,0.3,0.43,0.2,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,GUJARAT STATE PETRONET ,ENERGY,0.16,57.07 Cr,0.18,0.19,0.19,2026-05-11,ETMoney
+Mirae Asset Large Cap Fund,Large Cap,Mirae Asset Mutual Fund,6550,CHEMPLAST SANMAR ,CHEMICALS,0.15,54 Cr,0.13,0.2,0.3,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,ICICI BANK ,FINANCIAL,7.18,703.41 Cr,6.93,6.97,7.47,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,HDFC BANK ,FINANCIAL,6.45,631.42 Cr,7.67,7.78,7.36,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,STATE BANK OF INDIA,FINANCIAL,4.4,431.26 Cr,3.58,3.41,2.84,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,BHARTI AIRTEL ,COMMUNICATION,4.0,391.75 Cr,3.77,3.57,3.44,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,LARSEN & TOUBRO ,CONSTRUCTION,3.94,386.21 Cr,4.01,3.78,3.94,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,AXIS BANK ,FINANCIAL,3.14,307.23 Cr,3.17,2.93,3.16,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,2.92,286.29 Cr,2.58,2.48,2.36,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,MAHINDRA & MAHINDRA ,AUTOMOBILE,2.85,279.63 Cr,2.93,3.18,2.85,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,BAJAJ FINANCE ,FINANCIAL,2.82,276.36 Cr,2.77,2.34,1.89,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,MARUTI SUZUKI INDIA ,AUTOMOBILE,2.23,218.34 Cr,2.71,2.83,2.14,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,ITC ,CONSUMER STAPLES,2.19,214.22 Cr,2.81,2.78,2.75,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,TATA STEEL ,METALS & MINING,2.15,210.8 Cr,1.76,1.64,1.58,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,ULTRATECH CEMENT ,MATERIALS,2.1,205.44 Cr,1.98,2.1,2.28,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,SHRIRAM FINANCE ,FINANCIAL,1.79,175.12 Cr,1.82,1.27,1.23,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,INTERGLOBE AVIATION ,SERVICES,1.72,168.9 Cr,1.88,2.11,2.17,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,TATA CONSULTANCY SERVICES ,TECHNOLOGY,1.71,167.96 Cr,2.06,1.59,2.33,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,SOLAR INDUSTRIES INDIA ,CHEMICALS,1.53,149.4 Cr,1.37,1.53,1.37,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,KOTAK MAHINDRA BANK ,FINANCIAL,1.47,144.01 Cr,1.62,1.56,1.88,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,ETERNAL ,SERVICES,1.44,140.62 Cr,1.48,1.74,1.17,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,BHARAT ELECTRONICS ,CAPITAL GOODS,1.38,135.63 Cr,1.12,1.21,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,BHARAT PETROLEUM CORPORATION ,ENERGY,1.22,119.03 Cr,1.57,1.42,1.23,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,TECH MAHINDRA ,TECHNOLOGY,1.22,119.8 Cr,1.21,1.08,1.32,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,COROMANDEL INTERNATIONAL ,CHEMICALS,1.17,114.64 Cr,1.23,1.29,1.66,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,UNITED SPIRITS ,CONSUMER STAPLES,1.13,110.55 Cr,1.18,1.05,1.51,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,HINDALCO INDUSTRIES ,METALS & MINING,1.13,110.76 Cr,0.9,0.78,0.73,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,GODREJ CONSUMER PRODUCTS ,CONSUMER STAPLES,1.1,107.34 Cr,1.2,1.22,1.22,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,CUMMINS INDIA ,CAPITAL GOODS,1.1,107.66 Cr,1.03,0.96,0.89,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,APOLLO HOSPITALS ENTERPRISE ,HEALTHCARE,0.98,96.41 Cr,0.83,0.92,0.55,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,APOLLO TYRES ,AUTOMOBILE,0.95,93.28 Cr,1.02,1.03,0.93,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,HINDUSTAN UNILEVER ,CONSUMER STAPLES,0.95,93.34 Cr,1.12,1.29,1.93,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,BHARAT FORGE ,AUTOMOBILE,0.87,85.45 Cr,0.64,0.59,0.76,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,POWER FINANCE CORPORATION ,FINANCIAL,0.86,84.33 Cr,0.75,0.92,0.92,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,TORRENT PHARMACEUTICALS ,HEALTHCARE,0.82,80.48 Cr,0.62,0.59,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,PERSISTENT SYSTEMS ,TECHNOLOGY,0.8,78.16 Cr,1.02,0.67,0.67,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,BRITANNIA INDUSTRIES ,CONSUMER STAPLES,0.77,75.84 Cr,0.76,0.8,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,HDFC LIFE INSURANCE CO ,INSURANCE,0.76,74.16 Cr,0.85,0.91,0.58,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,BOSCH ,AUTOMOBILE,0.66,64.29 Cr,0.68,0.76,0.66,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,V-GUARD INDUSTRIES ,CONSUMER DISCRETIONARY,0.66,64.58 Cr,0.61,0.74,0.77,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,LG ELECTRONICS INDIA ,CONSUMER DISCRETIONARY,0.65,63.24 Cr,0.6,,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,SCHAEFFLER INDIA ,CAPITAL GOODS,0.63,61.51 Cr,0.56,0.65,0.57,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,MPHASIS ,TECHNOLOGY,0.62,60.8 Cr,0.75,0.75,0.65,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,POONAWALLA FINCORP ,FINANCIAL,0.59,57.35 Cr,0.68,0.79,0.61,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,HERO MOTOCORP ,AUTOMOBILE,0.55,53.89 Cr,0.6,0.98,0.72,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,OBEROI REALTY ,CONSTRUCTION,0.53,51.79 Cr,0.55,0.55,0.69,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,GUJARAT STATE PETRONET ,ENERGY,0.48,47.07 Cr,0.57,0.61,0.63,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,VISHAL MEGA MART ,SERVICES,0.46,44.81 Cr,0.6,0.7,0.35,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,ANTHEM BIOSCIENCES ,HEALTHCARE,0.44,43.08 Cr,0.39,0.45,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,SWIGGY ,SERVICES,0.37,36.02 Cr,0.48,0.56,0.44,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,POLYCAB INDIA ,CAPITAL GOODS,0.35,34.47 Cr,,,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,THE INDIA CEMENTS ,MATERIALS,0.34,33.49 Cr,0.38,0.49,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,ASTRA MICROWAVE PRODUCTS ,COMMUNICATION,0.34,32.85 Cr,0.34,0.36,0.27,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,LENSKART SOLUTIONS ,CONSUMER DISCRETIONARY,0.3,29.49 Cr,0.24,,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,MAHINDRA LIFESPACE DEVELOPERS ,CONSTRUCTION,0.27,26.29 Cr,0.32,0.3,0.21,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,COAL INDIA ,MATERIALS,0.2,20.89 Cr,,,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,BRAINBEES SOLUTIONS ,CONSUMER DISCRETIONARY,0.2,19.15 Cr,0.3,0.45,0.5,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,BANK OF MAHARASHTRA,FINANCIAL,0.14,13.72 Cr,0.13,,,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,NTPC ,ENERGY,0.14,306.64 Cr,2.34,2.57,2.84,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,INFOSYS ,TECHNOLOGY,0.06,348.39 Cr,3.92,3.85,4.41,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,0.04,78.32 Cr,0.77,0.47,0.73,2026-05-11,ETMoney
+Kotak Large Cap Fund,Large Cap,Kotak Mutual Fund,32273,RELIANCE INDUSTRIES ,ENERGY,0.02,682.67 Cr,6.82,6.44,6.26,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,HDFC BANK ,FINANCIAL,8.48,"1,291 Cr",9.41,9.45,9.29,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,ICICI BANK ,FINANCIAL,7.99,"1,218 Cr",7.75,8.24,8.23,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,RELIANCE INDUSTRIES ,ENERGY,5.65,860.29 Cr,5.88,5.36,4.79,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,BHARTI AIRTEL ,COMMUNICATION,4.71,717.47 Cr,4.4,4.0,4.04,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,INFOSYS ,TECHNOLOGY,4.17,635.41 Cr,4.28,4.02,4.11,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,STATE BANK OF INDIA,FINANCIAL,4.14,630.52 Cr,4.13,3.83,2.99,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,LARSEN & TOUBRO ,CONSTRUCTION,4.07,619.52 Cr,4.05,3.84,3.47,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,MAHINDRA & MAHINDRA ,AUTOMOBILE,3.25,494.47 Cr,3.55,3.41,2.91,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,AXIS BANK ,FINANCIAL,3.19,486.49 Cr,2.55,2.35,2.58,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,BAJAJ FINANCE ,FINANCIAL,2.78,423.16 Cr,2.77,2.97,2.93,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,ULTRATECH CEMENT ,MATERIALS,2.43,369.79 Cr,2.16,2.64,2.92,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,KOTAK MAHINDRA BANK ,FINANCIAL,2.23,339.92 Cr,2.33,2.12,2.02,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,ETERNAL ,SERVICES,2.01,305.48 Cr,1.98,2.86,2.03,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,1.7,259.24 Cr,1.51,1.85,1.82,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TITAN COMPANY ,CONSUMER DISCRETIONARY,1.65,251.6 Cr,1.5,1.32,1.31,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,SBI LIFE INSURANCE COMPANY ,INSURANCE,1.62,246.09 Cr,1.61,1.31,1.35,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TECH MAHINDRA ,TECHNOLOGY,1.52,232.3 Cr,1.48,1.27,1.26,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,MARUTI SUZUKI INDIA ,AUTOMOBILE,1.49,227.23 Cr,1.62,1.65,1.25,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,BHARAT ELECTRONICS ,CAPITAL GOODS,1.44,218.71 Cr,1.58,1.81,2.19,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,ITC ,CONSUMER STAPLES,1.42,215.77 Cr,2.59,2.36,2.52,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,NTPC ,ENERGY,1.41,214.97 Cr,1.26,1.67,2.13,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TATA CONSUMER PRODUCTS ,CONSUMER STAPLES,1.4,213.1 Cr,1.47,1.48,1.52,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,DIVI'S LABORATORIES ,HEALTHCARE,1.35,205.8 Cr,1.26,0.99,0.81,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,MAX HEALTHCARE INSTITUTE ,HEALTHCARE,1.33,201.9 Cr,1.25,1.31,1.36,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TATA CONSULTANCY SERVICES ,TECHNOLOGY,1.3,198.61 Cr,1.54,1.58,2.5,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,VARUN BEVERAGES ,CONSUMER STAPLES,1.27,193.26 Cr,1.39,1.18,1.34,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,CG POWER AND INDUSTRIAL SOLUTIONS ,CAPITAL GOODS,1.27,193.98 Cr,0.87,1.06,0.82,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TATA STEEL ,METALS & MINING,1.25,190.9 Cr,0.75,0.31,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,UNITED SPIRITS ,CONSUMER STAPLES,1.16,176.11 Cr,1.19,1.0,1.17,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,THE INDIAN HOTELS COMPANY ,SERVICES,1.15,175.53 Cr,1.3,1.34,0.25,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,INTERGLOBE AVIATION ,SERVICES,1.13,171.84 Cr,1.28,1.49,1.5,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,PB FINTECH ,SERVICES,1.11,168.7 Cr,0.96,1.03,0.58,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TORRENT PHARMACEUTICALS ,HEALTHCARE,1.04,159.17 Cr,0.9,0.89,0.52,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,CHOLAMANDALAM INVESTMENT AND FINANCE COMPANY ,FINANCIAL,0.98,149.96 Cr,1.13,1.21,1.52,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TATA POWER COMPANY ,ENERGY,0.96,145.81 Cr,0.84,0.91,0.97,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,VISHAL MEGA MART ,SERVICES,0.96,146.7 Cr,0.51,,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,HINDUSTAN AERONAUTICS ,CAPITAL GOODS,0.91,138.96 Cr,0.89,0.86,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TVS MOTOR COMPANY ,AUTOMOBILE,0.86,131.18 Cr,0.58,0.57,0.19,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,HINDUSTAN UNILEVER ,CONSUMER STAPLES,0.84,127.99 Cr,0.82,0.95,0.94,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,ICICI PRUDENTIAL ASSET MANAGEMENT COMPANY ,UNCLASSIFIED,0.81,123.46 Cr,0.62,,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,BRITANNIA INDUSTRIES ,CONSUMER STAPLES,0.81,123.25 Cr,0.7,,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,MANKIND PHARMA ,HEALTHCARE,0.8,122.44 Cr,1.15,1.35,1.46,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,PI INDUSTRIES ,CHEMICALS,0.74,112.09 Cr,0.99,0.98,0.54,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TRENT ,SERVICES,0.73,110.96 Cr,0.82,0.88,1.11,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,0.71,108.49 Cr,0.72,0.7,0.63,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,BAJAJ AUTO ,AUTOMOBILE,0.65,99.56 Cr,0.66,0.81,1.27,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,INFO EDGE (INDIA) ,SERVICES,0.6,90.88 Cr,0.58,0.46,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,UNO MINDA ,AUTOMOBILE,0.56,84.84 Cr,0.6,0.86,0.8,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,SHRIRAM FINANCE ,FINANCIAL,0.47,72.16 Cr,,,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,ABBOTT INDIA ,HEALTHCARE,0.45,69.13 Cr,0.53,0.56,0.71,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,MULTI COMMODITY EXCHANGE OF INDIA ,SERVICES,0.43,65.7 Cr,,,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,HCL TECHNOLOGIES ,TECHNOLOGY,0.43,65.79 Cr,0.73,0.66,1.3,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,OBEROI REALTY ,CONSTRUCTION,0.4,61.01 Cr,0.41,0.41,0.47,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,SRF ,CHEMICALS,0.4,60.49 Cr,0.44,0.42,0.49,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,HDFC ASSET MANAGEMENT COMPANY ,FINANCIAL,0.33,49.86 Cr,0.34,,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,ASIAN PAINTS ,MATERIALS,0.23,34.95 Cr,0.16,,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TATA MOTORS ,AUTOMOBILE,0.17,25.66 Cr,,,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,HINDALCO INDUSTRIES ,METALS & MINING,0.02,2.29 Cr,0.85,0.63,0.63,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,TVS MOTOR COMPANY  - PREF. SHARES,AUTOMOBILE,0.01,--,,,,2026-05-11,ETMoney
+Canara Robeco Large Cap Fund,Large Cap,Canara Robeco Mutual Fund,10960,KWALITY WALL'S (INDIA) ,CONSUMER STAPLES,0.01,1.39 Cr,0.01,,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,ICICI BANK ,FINANCIAL,9.06,221.92 Cr,4.09,4.35,4.76,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,HDFC BANK ,FINANCIAL,6.49,158.88 Cr,8.98,9.11,9.59,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,RELIANCE INDUSTRIES ,ENERGY,5.76,141.1 Cr,5.81,5.34,4.68,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,AXIS BANK ,FINANCIAL,3.89,95.22 Cr,4.11,3.88,4.13,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,INFOSYS ,TECHNOLOGY,3.87,94.82 Cr,3.86,3.96,3.57,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,KOTAK MAHINDRA BANK ,FINANCIAL,3.6,88.17 Cr,4.64,4.45,6.19,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,LARSEN & TOUBRO ,CONSTRUCTION,3.33,81.56 Cr,3.89,3.69,3.86,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,STATE BANK OF INDIA,FINANCIAL,3.28,80.4 Cr,2.84,2.67,2.58,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,TATA CONSULTANCY SERVICES ,TECHNOLOGY,2.91,71.2 Cr,3.41,2.82,1.79,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,MAHINDRA & MAHINDRA ,AUTOMOBILE,2.86,70.02 Cr,3.55,3.73,3.17,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,BAJAJ FINANCE ,FINANCIAL,2.78,68.13 Cr,3.13,3.35,2.01,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,TATA STEEL ,METALS & MINING,2.63,64.27 Cr,2.12,2.11,1.23,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,JSW STEEL ,METALS & MINING,2.43,59.49 Cr,2.17,2.26,1.86,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,BHARTI AIRTEL ,COMMUNICATION,2.37,57.92 Cr,2.41,2.27,2.3,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,TECH MAHINDRA ,TECHNOLOGY,2.15,52.59 Cr,2.13,1.57,1.16,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,INTERGLOBE AVIATION ,SERVICES,2.09,51.26 Cr,,,0.83,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,2.08,50.96 Cr,2.22,2.07,1.07,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,HINDUSTAN UNILEVER ,CONSUMER STAPLES,2.06,50.31 Cr,2.57,2.95,2.03,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,NTPC ,ENERGY,1.98,48.36 Cr,1.51,1.66,2.19,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,ICICI PRUDENTIAL ASSET MANAGEMENT COMPANY ,UNCLASSIFIED,1.87,45.88 Cr,1.53,,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,HDFC LIFE INSURANCE CO ,INSURANCE,1.81,44.29 Cr,1.98,2.11,2.1,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,ADANI ENERGY SOLUTIONS ,ENERGY,1.75,42.83 Cr,1.66,1.49,1.63,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,MANKIND PHARMA ,HEALTHCARE,1.68,41.11 Cr,,,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,POWER GRID CORPORATION OF INDIA ,ENERGY,1.61,39.47 Cr,1.24,1.39,1.58,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,ADANI POWER ,ENERGY,1.55,37.93 Cr,,,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,JSW CEMENT ,MATERIALS,1.54,37.73 Cr,1.43,0.94,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,INDUSIND BANK ,FINANCIAL,1.54,37.62 Cr,,,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,BANK OF BARODA,FINANCIAL,1.52,37.14 Cr,,,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,NESTLE INDIA ,CONSUMER STAPLES,1.48,36.24 Cr,,,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,UPL ,CHEMICALS,1.39,34.07 Cr,,,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,ADANI PORTS AND SPECIAL ECONOMIC ZONE ,SERVICES,1.31,32.15 Cr,1.27,1.28,1.18,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,AMBUJA CEMENTS ,MATERIALS,1.31,32.01 Cr,1.56,1.69,1.31,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,INDUS TOWERS ,COMMUNICATION,1.28,31.36 Cr,1.11,,0.65,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,HYUNDAI MOTOR INDIA ,AUTOMOBILE,1.23,30.16 Cr,1.37,1.63,1.48,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,WESTLIFE FOODWORLD ,SERVICES,1.19,29.01 Cr,1.19,1.16,0.98,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,BRITANNIA INDUSTRIES ,CONSUMER STAPLES,1.1,26.96 Cr,1.06,0.44,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,WHIRLPOOL OF INDIA ,CONSUMER DISCRETIONARY,1.08,26.49 Cr,1.06,0.82,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,HINDALCO INDUSTRIES ,METALS & MINING,1.08,26.53 Cr,0.94,0.85,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,BHARAT HEAVY ELECTRICALS ,CAPITAL GOODS,1.0,24.55 Cr,1.01,0.89,0.88,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,LG ELECTRONICS INDIA ,CONSUMER DISCRETIONARY,0.88,21.61 Cr,0.8,,,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,SIEMENS ,CAPITAL GOODS,0.69,16.87 Cr,0.62,0.67,1.12,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,CYIENT ,TECHNOLOGY,0.62,15.05 Cr,0.79,0.85,0.83,2026-05-11,ETMoney
+Tata Large Cap Fund,Large Cap,Tata Mutual Fund,32210,HONEYWELL AUTOMATION INDIA ,CAPITAL GOODS,0.48,11.84 Cr,0.52,0.61,0.62,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,HDFC BANK ,FINANCIAL,8.81,987.37 Cr,9.12,9.0,9.84,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,ICICI BANK ,FINANCIAL,7.96,892.17 Cr,6.94,7.36,8.21,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,RELIANCE INDUSTRIES ,ENERGY,5.75,644.41 Cr,4.86,3.32,3.97,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,INFOSYS ,TECHNOLOGY,5.31,594.68 Cr,5.77,5.58,5.41,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,KOTAK MAHINDRA BANK ,FINANCIAL,4.43,495.89 Cr,4.1,3.82,3.91,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,LARSEN & TOUBRO ,CONSTRUCTION,3.97,444.75 Cr,3.75,3.54,3.06,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,BHARTI AIRTEL ,COMMUNICATION,3.82,428.05 Cr,4.12,3.87,4.51,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,BAJAJ FINANCE ,FINANCIAL,3.65,408.66 Cr,3.37,4.0,3.02,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,AXIS BANK ,FINANCIAL,2.84,318.4 Cr,2.9,3.18,3.26,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,ETERNAL ,SERVICES,2.44,273.78 Cr,2.1,1.97,0.56,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,ULTRATECH CEMENT ,MATERIALS,2.03,227.05 Cr,0.98,0.99,0.9,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,AVENUE SUPERMARTS ,SERVICES,1.95,218.24 Cr,2.3,3.73,3.64,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,MAHINDRA & MAHINDRA ,AUTOMOBILE,1.79,200.54 Cr,0.59,0.97,0.76,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,STATE BANK OF INDIA,FINANCIAL,1.7,190.23 Cr,2.9,2.46,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,TATA CONSULTANCY SERVICES ,TECHNOLOGY,1.57,175.64 Cr,1.79,1.66,1.31,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,TITAN COMPANY ,CONSUMER DISCRETIONARY,1.56,174.26 Cr,1.6,1.37,0.58,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,TATA CONSUMER PRODUCTS ,CONSUMER STAPLES,1.54,172.82 Cr,1.6,1.56,1.29,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,1.46,163.15 Cr,1.2,1.53,1.97,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,MARUTI SUZUKI INDIA ,AUTOMOBILE,1.44,161.44 Cr,1.64,1.82,2.56,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,HINDUSTAN AERONAUTICS ,CAPITAL GOODS,1.44,161.25 Cr,1.22,1.03,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,OIL AND NATURAL GAS CORPORATION ,ENERGY,1.33,148.97 Cr,0.63,1.03,1.13,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,LTM ,TECHNOLOGY,1.3,145.32 Cr,1.65,1.77,1.63,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,GODREJ CONSUMER PRODUCTS ,CONSUMER STAPLES,1.29,144.5 Cr,1.55,1.57,1.84,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,ITC ,CONSUMER STAPLES,1.24,139.03 Cr,2.74,2.8,2.76,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,LUPIN ,HEALTHCARE,1.24,138.91 Cr,0.95,,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,ASIAN PAINTS ,MATERIALS,1.23,138.1 Cr,1.33,0.8,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,HDFC LIFE INSURANCE CO ,INSURANCE,1.23,137.8 Cr,1.35,1.47,2.24,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,TECH MAHINDRA ,TECHNOLOGY,1.23,137.6 Cr,0.37,0.33,0.36,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,JINDAL STAINLESS ,METALS & MINING,1.17,131.17 Cr,1.16,1.05,0.88,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,COAL INDIA ,MATERIALS,1.11,124.39 Cr,,,0.81,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,TATA STEEL ,METALS & MINING,1.08,121.08 Cr,1.3,1.06,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,TATA MOTORS PASSENGER VEHICLES ,AUTOMOBILE,1.07,120.08 Cr,1.03,0.88,0.6,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,BAJAJ AUTO ,AUTOMOBILE,1.05,117.5 Cr,0.94,0.9,0.45,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,INFO EDGE (INDIA) ,SERVICES,0.96,107.35 Cr,0.79,0.48,0.65,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,ASTRAL ,MATERIALS,0.95,106.91 Cr,0.96,0.94,0.9,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,METROPOLIS HEALTHCARE ,HEALTHCARE,0.92,102.73 Cr,0.86,0.77,0.63,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,WIPRO ,TECHNOLOGY,0.9,100.62 Cr,1.06,0.99,1.15,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,VARUN BEVERAGES ,CONSUMER STAPLES,0.87,97.83 Cr,0.94,0.51,0.44,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,VEDANTA ,METALS & MINING,0.84,94.01 Cr,0.89,0.93,1.11,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,INDUSIND BANK ,FINANCIAL,0.82,91.8 Cr,0.79,0.69,1.67,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,LG ELECTRONICS INDIA ,CONSUMER DISCRETIONARY,0.82,91.5 Cr,0.55,,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,HAVELLS INDIA ,CAPITAL GOODS,0.81,90.39 Cr,0.86,0.93,0.43,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,JUBILANT FOODWORKS ,SERVICES,0.8,89.77 Cr,0.87,0.97,0.66,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,DIXON TECHNOLOGIES (INDIA) ,CAPITAL GOODS,0.77,85.78 Cr,0.81,,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,0.71,79.98 Cr,0.6,0.54,0.73,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,HCL TECHNOLOGIES ,TECHNOLOGY,0.61,68.13 Cr,0.62,0.8,0.98,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,PB FINTECH ,SERVICES,0.55,61.76 Cr,0.35,,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,TRENT ,SERVICES,0.53,59.55 Cr,0.39,0.44,0.64,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,METRO BRANDS ,CONSUMER DISCRETIONARY,0.52,58.29 Cr,0.59,0.65,0.54,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,HDFC ASSET MANAGEMENT COMPANY ,FINANCIAL,0.47,52.35 Cr,0.97,0.98,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,POLYCAB INDIA ,CAPITAL GOODS,0.47,52.67 Cr,1.44,1.72,1.18,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,HYUNDAI MOTOR INDIA ,AUTOMOBILE,0.45,50.88 Cr,0.49,0.57,0.93,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,SONA BLW PRECISION FORGINGS ,AUTOMOBILE,0.41,45.94 Cr,0.34,0.3,0.36,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,INTERGLOBE AVIATION ,SERVICES,0.36,39.77 Cr,0.83,0.99,1.17,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,BALKRISHNA INDUSTRIES ,AUTOMOBILE,0.27,30.61 Cr,0.26,0.21,0.41,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,BHARAT PETROLEUM CORPORATION ,ENERGY,0.26,28.73 Cr,1.19,1.29,1.13,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,SRF ,CHEMICALS,0.25,28.37 Cr,0.58,0.55,,2026-05-11,ETMoney
+UTI Large Cap Fund,Large Cap,UTI Mutual Fund,31802,POWER GRID CORPORATION OF INDIA ,ENERGY,0.23,25.86 Cr,,,0.62,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,ICICI BANK ,FINANCIAL,8.44,575.37 Cr,7.91,8.01,9.06,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,HDFC BANK ,FINANCIAL,6.81,464.52 Cr,7.9,6.83,8.96,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,RELIANCE INDUSTRIES ,ENERGY,6.18,421.75 Cr,5.03,3.94,6.0,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,ETERNAL ,SERVICES,5.02,342.33 Cr,5.28,4.14,2.55,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,KOTAK MAHINDRA BANK ,FINANCIAL,4.44,302.81 Cr,5.24,4.59,4.59,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,HCL TECHNOLOGIES ,TECHNOLOGY,4.21,286.92 Cr,4.35,4.08,3.67,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,AXIS BANK ,FINANCIAL,3.94,268.72 Cr,5.22,3.98,5.99,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,MAHINDRA & MAHINDRA ,AUTOMOBILE,3.87,263.69 Cr,5.71,5.15,2.56,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,LARSEN & TOUBRO ,CONSTRUCTION,3.05,208.26 Cr,2.27,3.11,3.1,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,INFOSYS ,TECHNOLOGY,2.59,176.77 Cr,3.95,5.01,2.73,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,2.52,171.88 Cr,3.08,2.97,2.0,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,STATE BANK OF INDIA,FINANCIAL,2.36,161.1 Cr,2.56,4.11,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,JB CHEMICALS & PHARMACEUTICALS ,HEALTHCARE,2.35,160.58 Cr,1.11,1.09,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,TATA POWER COMPANY ,ENERGY,2.18,148.58 Cr,1.59,1.69,1.39,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,ABB INDIA ,CAPITAL GOODS,2.12,144.29 Cr,1.0,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,APOLLO HOSPITALS ENTERPRISE ,HEALTHCARE,2.07,141.48 Cr,1.88,1.6,1.49,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,TORRENT PHARMACEUTICALS ,HEALTHCARE,2.02,137.95 Cr,4.09,3.98,2.07,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,HINDUSTAN UNILEVER ,CONSUMER STAPLES,2.01,136.9 Cr,2.85,3.21,1.98,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,POWER GRID CORPORATION OF INDIA ,ENERGY,1.99,135.99 Cr,1.22,,1.62,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,ASIAN PAINTS ,MATERIALS,1.9,129.75 Cr,1.25,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,HDFC LIFE INSURANCE CO ,INSURANCE,1.64,112.12 Cr,1.79,0.97,2.09,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,HINDALCO INDUSTRIES ,METALS & MINING,1.61,109.89 Cr,,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,PB FINTECH ,SERVICES,1.59,108.36 Cr,1.25,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,COGNIZANT TECHNOLOGY SOLUTIONS CORP.,TECHNOLOGY,1.51,--,,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,SBI LIFE INSURANCE COMPANY ,INSURANCE,1.5,102.36 Cr,,,1.75,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,ULTRATECH CEMENT ,MATERIALS,1.46,99.88 Cr,0.95,1.02,1.01,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,TATA MOTORS ,AUTOMOBILE,1.44,98.17 Cr,1.3,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,GODREJ CONSUMER PRODUCTS ,CONSUMER STAPLES,1.38,94.3 Cr,2.17,2.85,2.84,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,MAX HEALTHCARE INSTITUTE ,HEALTHCARE,1.36,92.73 Cr,0.68,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,INFO EDGE (INDIA) ,SERVICES,1.36,92.61 Cr,2.28,2.33,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,DIVI'S LABORATORIES ,HEALTHCARE,1.21,82.35 Cr,,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,VISHAL MEGA MART ,SERVICES,1.16,79.09 Cr,1.0,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,DIXON TECHNOLOGIES (INDIA) ,CAPITAL GOODS,1.05,71.38 Cr,,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,OBEROI REALTY ,CONSTRUCTION,1.01,68.83 Cr,0.61,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,TATA CONSUMER PRODUCTS ,CONSUMER STAPLES,1.0,68.02 Cr,,1.34,1.91,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,SWIGGY ,SERVICES,0.99,67.4 Cr,1.0,1.02,1.47,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,UNITED SPIRITS ,CONSUMER STAPLES,0.97,66.39 Cr,,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,CROMPTON GREAVES CONSUMER ELECTRICALS ,CONSUMER DISCRETIONARY,0.91,61.94 Cr,0.99,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,JSW INFRASTRUCTURE ,SERVICES,0.81,54.92 Cr,,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,TATA CONSULTANCY SERVICES ,TECHNOLOGY,0.59,40.42 Cr,2.98,4.55,4.61,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,BRIGADE ENTERPRISES ,CONSTRUCTION,0.57,38.67 Cr,0.85,0.9,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,PERSISTENT SYSTEMS ,TECHNOLOGY,0.57,39.15 Cr,,,0.81,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,OIL AND NATURAL GAS CORPORATION ,ENERGY,0.52,35.19 Cr,,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,TITAN COMPANY ,CONSUMER DISCRETIONARY,0.5,33.86 Cr,2.02,1.51,1.43,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,HEXAWARE TECHNOLOGIES ,TECHNOLOGY,0.37,25.49 Cr,,,,2026-05-11,ETMoney
+Franklin India Large Cap Fund,Large Cap,Franklin Templeton Mutual Fund,31893,HYUNDAI MOTOR INDIA ,AUTOMOBILE,0.23,15.39 Cr,0.25,1.9,1.79,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,ICICI BANK ,FINANCIAL,7.38,"1,971 Cr",6.99,7.35,7.93,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,HDFC BANK ,FINANCIAL,6.99,"1,865 Cr",7.76,7.79,8.25,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,RELIANCE INDUSTRIES ,ENERGY,5.54,"1,479 Cr",5.15,4.68,4.89,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,INFOSYS ,TECHNOLOGY,4.87,"1,299 Cr",5.14,5.12,5.61,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,AXIS BANK ,FINANCIAL,3.9,"1,041 Cr",3.73,3.48,3.25,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,BHARTI AIRTEL ,COMMUNICATION,3.84,"1,024 Cr",3.78,3.72,3.92,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,STATE BANK OF INDIA,FINANCIAL,3.73,996.59 Cr,3.18,3.03,2.39,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,LARSEN & TOUBRO ,CONSTRUCTION,3.67,981.14 Cr,4.09,4.31,4.69,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,KOTAK MAHINDRA BANK ,FINANCIAL,3.55,948.39 Cr,3.72,3.52,3.23,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,MAHINDRA & MAHINDRA ,AUTOMOBILE,3.35,895.61 Cr,3.58,3.36,2.75,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,NTPC ,ENERGY,2.41,643.92 Cr,2.02,2.29,2.66,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,ETERNAL ,SERVICES,2.1,561 Cr,1.98,2.29,1.34,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,2.05,548.08 Cr,1.67,1.67,2.27,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SBI LIFE INSURANCE COMPANY ,INSURANCE,1.84,491.55 Cr,1.79,1.65,1.52,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,HINDALCO INDUSTRIES ,METALS & MINING,1.67,445.3 Cr,1.42,1.28,1.09,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,HCL TECHNOLOGIES ,TECHNOLOGY,1.6,427.61 Cr,1.65,1.47,1.59,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,TITAN COMPANY ,CONSUMER DISCRETIONARY,1.48,395.14 Cr,1.43,1.19,1.12,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,GODREJ CONSUMER PRODUCTS ,CONSUMER STAPLES,1.38,369.15 Cr,1.41,1.3,1.16,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,ULTRATECH CEMENT ,MATERIALS,1.38,369.18 Cr,1.12,1.31,1.32,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,BAJAJ AUTO ,AUTOMOBILE,1.35,360.23 Cr,1.22,1.14,0.7,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,PERSISTENT SYSTEMS ,TECHNOLOGY,1.32,353.59 Cr,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,APOLLO HOSPITALS ENTERPRISE ,HEALTHCARE,1.29,345.24 Cr,1.04,1.09,0.82,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,BAJAJ FINANCE ,FINANCIAL,1.27,340.32 Cr,1.43,1.51,2.24,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,UNITED SPIRITS ,CONSUMER STAPLES,1.26,335.17 Cr,0.84,0.68,0.66,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,MARUTI SUZUKI INDIA ,AUTOMOBILE,1.23,328.04 Cr,2.14,2.14,1.44,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,AVENUE SUPERMARTS ,SERVICES,1.13,302.27 Cr,0.32,0.4,0.43,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,TECH MAHINDRA ,TECHNOLOGY,1.11,295.22 Cr,1.08,1.0,0.73,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,ITC ,CONSUMER STAPLES,1.08,287.7 Cr,2.03,2.33,2.4,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,CHOLAMANDALAM INVESTMENT AND FINANCE COMPANY ,FINANCIAL,0.92,246.57 Cr,0.99,0.98,1.04,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,VEDANTA ,METALS & MINING,0.9,239.28 Cr,0.75,0.53,0.57,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,BAJAJ FINSERV ,FINANCIAL,0.86,229.24 Cr,0.91,0.94,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,PNB HOUSING FINANCE ,FINANCIAL,0.85,227.81 Cr,0.91,0.74,0.53,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,HINDUSTAN UNILEVER ,CONSUMER STAPLES,0.85,226.07 Cr,0.8,0.66,0.55,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,TRENT ,SERVICES,0.83,222.43 Cr,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,CROMPTON GREAVES CONSUMER ELECTRICALS ,CONSUMER DISCRETIONARY,0.82,219.96 Cr,0.79,0.92,1.18,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,ICICI LOMBARD GENERAL INSURANCE COMPANY ,INSURANCE,0.82,217.68 Cr,0.06,0.06,0.06,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,JSW DULUX ,MATERIALS,0.79,210.93 Cr,0.75,0.78,0.92,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,MEESHO ,SERVICES,0.78,207.98 Cr,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SONA BLW PRECISION FORGINGS ,AUTOMOBILE,0.77,205.36 Cr,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,BRITANNIA INDUSTRIES ,CONSUMER STAPLES,0.75,199.6 Cr,0.59,0.61,0.44,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SWIGGY ,SERVICES,0.71,190.8 Cr,0.9,0.45,0.25,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,HDFC LIFE INSURANCE CO ,INSURANCE,0.68,181.75 Cr,0.68,0.82,0.66,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,0.67,178.95 Cr,0.53,0.48,0.43,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,TATA CONSULTANCY SERVICES ,TECHNOLOGY,0.66,174.96 Cr,0.76,0.71,0.6,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SHRIRAM FINANCE ,FINANCIAL,0.65,174.42 Cr,0.79,0.51,0.6,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,CUMMINS INDIA ,CAPITAL GOODS,0.64,171.57 Cr,0.54,0.5,0.41,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,DLF ,CONSTRUCTION,0.61,161.61 Cr,0.7,0.76,0.77,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,BAYER CROPSCIENCE ,CHEMICALS,0.61,162.24 Cr,0.51,0.52,0.56,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,EMAMI ,CONSUMER STAPLES,0.59,156.53 Cr,0.67,0.67,0.55,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,TVS MOTOR COMPANY ,AUTOMOBILE,0.59,157.64 Cr,0.41,0.4,0.43,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SANOFI CONSUMER HEALTHCARE INDIA ,HEALTHCARE,0.55,146.34 Cr,0.49,0.49,0.51,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,BHARAT PETROLEUM CORPORATION ,ENERGY,0.51,136.96 Cr,0.48,0.45,0.72,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,HINDUSTAN AERONAUTICS ,CAPITAL GOODS,0.5,132.26 Cr,0.47,0.4,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,BHARAT FORGE ,AUTOMOBILE,0.5,133.96 Cr,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,JINDAL STEEL ,METALS & MINING,0.47,125.98 Cr,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,WHIRLPOOL OF INDIA ,CONSUMER DISCRETIONARY,0.46,122.84 Cr,0.45,0.62,0.54,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,PI INDUSTRIES ,CHEMICALS,0.43,115.3 Cr,0.12,0.13,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,GLAND PHARMA ,HEALTHCARE,0.41,108.74 Cr,0.4,0.48,0.5,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,ADANI POWER ,ENERGY,0.38,101.2 Cr,0.27,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,ADITYA BIRLA CAPITAL ,FINANCIAL,0.36,97.38 Cr,0.38,0.32,0.22,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,DELHIVERY ,SERVICES,0.35,94.54 Cr,0.29,0.34,0.24,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,BANDHAN BANK ,FINANCIAL,0.34,91.87 Cr,0.18,0.29,0.45,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,PINE LABS ,FINANCIAL,0.34,90.51 Cr,0.44,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,THE FEDERAL BANK ,FINANCIAL,0.33,87.48 Cr,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SUZLON ENERGY ,CAPITAL GOODS,0.3,79.78 Cr,0.34,0.37,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SANOFI INDIA ,HEALTHCARE,0.3,80.35 Cr,0.33,0.39,0.51,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,VARUN BEVERAGES ,CONSUMER STAPLES,0.28,75.72 Cr,0.31,0.29,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,SOBHA ,CONSTRUCTION,0.26,70.49 Cr,0.28,0.31,0.26,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,AFCONS INFRASTRUCTURE ,CONSTRUCTION,0.25,65.8 Cr,0.3,0.33,0.29,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,LENSKART SOLUTIONS ,CONSUMER DISCRETIONARY,0.24,63.46 Cr,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,MANKIND PHARMA ,HEALTHCARE,0.23,60.61 Cr,,,0.03,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,HONEYWELL AUTOMATION INDIA ,CAPITAL GOODS,0.21,55.28 Cr,0.22,0.25,0.25,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,ICICI PRUDENTIAL LIFE INSURANCE COMPANY ,INSURANCE,0.21,54.81 Cr,0.49,0.45,0.03,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,CG POWER AND INDUSTRIAL SOLUTIONS ,CAPITAL GOODS,0.13,35.92 Cr,0.11,0.21,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,OTHERS,OTHERS,0.07,--,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,TVS MOTOR COMPANY  - PREF. SHARES,AUTOMOBILE,0.01,--,,,,2026-05-11,ETMoney
+Aditya Birla Sun Life Large Cap Fund,Large Cap,Aditya Birla Sun Life Mutual Fund,1247,KWALITY WALL'S (INDIA) ,CONSUMER STAPLES,0.01,2.42 Cr,0.01,,,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,HDFC BANK ,FINANCIAL,9.31,616.56 Cr,9.18,8.65,9.07,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,ICICI BANK ,FINANCIAL,8.02,530.76 Cr,8.11,7.18,9.1,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,ITC ,CONSUMER STAPLES,7.13,471.77 Cr,6.07,5.9,5.52,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,AXIS BANK ,FINANCIAL,5.61,371.53 Cr,5.68,5.07,4.91,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,INFOSYS ,TECHNOLOGY,5.43,359.29 Cr,6.18,5.48,1.81,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,MAHINDRA & MAHINDRA ,AUTOMOBILE,5.23,346.32 Cr,6.12,5.72,5.0,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,KOTAK MAHINDRA BANK ,FINANCIAL,5.04,333.59 Cr,4.59,5.06,4.08,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,CIPLA ,HEALTHCARE,4.59,303.99 Cr,3.93,4.61,4.14,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,NTPC ,ENERGY,4.11,272.05 Cr,4.53,4.93,3.91,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,HDFC LIFE INSURANCE CO ,INSURANCE,3.12,206.46 Cr,2.5,2.07,,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,3.04,201.37 Cr,3.7,3.58,2.83,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,SBI LIFE INSURANCE COMPANY ,INSURANCE,2.81,186.29 Cr,2.93,4.11,3.94,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,BAJAJ FINANCE ,FINANCIAL,2.33,154.23 Cr,2.61,3.4,4.84,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,BHARTI AIRTEL ,COMMUNICATION,2.15,142.04 Cr,,,,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,GAIL (INDIA) ,ENERGY,2.06,136.15 Cr,2.47,2.23,2.29,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,OIL AND NATURAL GAS CORPORATION ,ENERGY,2.02,133.74 Cr,2.78,3.05,2.09,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,STATE BANK OF INDIA,FINANCIAL,1.8,118.87 Cr,3.68,3.6,3.61,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,PETRONET LNG ,ENERGY,1.52,100.49 Cr,1.6,1.31,1.13,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,MARUTI SUZUKI INDIA ,AUTOMOBILE,1.48,98.1 Cr,,,,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,POWER FINANCE CORPORATION ,FINANCIAL,1.4,92.53 Cr,1.19,1.19,0.94,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,ICICI PRUDENTIAL ASSET MANAGEMENT COMPANY ,UNCLASSIFIED,1.32,87.65 Cr,1.56,,,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,INDUS TOWERS ,COMMUNICATION,1.24,82.23 Cr,1.49,1.52,1.54,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,SYNGENE INTERNATIONAL ,HEALTHCARE,1.12,73.9 Cr,1.59,1.41,,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,IPCA LABORATORIES ,HEALTHCARE,1.09,72.2 Cr,1.13,0.95,0.85,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,ICICI LOMBARD GENERAL INSURANCE COMPANY ,INSURANCE,1.04,69.05 Cr,0.72,0.76,0.94,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,COHANCE LIFESCIENCES ,HEALTHCARE,0.94,62.07 Cr,1.17,1.39,1.38,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,JUBILANT INGREVIA ,CHEMICALS,0.94,62.34 Cr,1.11,1.04,1.39,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,LIFE INSURANCE CORPORATION OF INDIA,INSURANCE,0.77,51.2 Cr,0.83,0.96,1.11,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,TATA MOTORS ,AUTOMOBILE,0.72,47.83 Cr,0.69,,,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,EMCURE PHARMACEUTICALS ,HEALTHCARE,0.71,47.23 Cr,0.55,0.57,,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,ALEMBIC PHARMACEUTICALS ,HEALTHCARE,0.61,40.36 Cr,0.71,0.83,1.12,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,CYIENT ,TECHNOLOGY,0.55,36.5 Cr,0.72,0.82,1.18,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,TATA CAPITAL ,FINANCIAL,0.44,28.95 Cr,,,,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,HCL TECHNOLOGIES ,TECHNOLOGY,0.43,28.58 Cr,1.26,1.96,2.37,2026-05-11,ETMoney
+DSP Large Cap Fund,Large Cap,DSP Mutual Fund,1386,NIFTY 50,FINANCIAL,0.16,--,,,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,ICICI BANK ,FINANCIAL,8.25,111.56 Cr,7.21,7.48,7.33,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,HDFC BANK ,FINANCIAL,7.94,107.29 Cr,9.37,9.29,9.61,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,RELIANCE INDUSTRIES ,ENERGY,6.96,94.04 Cr,6.91,6.2,6.38,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,LARSEN & TOUBRO ,CONSTRUCTION,5.56,75.2 Cr,5.12,4.74,3.87,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,BHARTI AIRTEL ,COMMUNICATION,4.49,60.7 Cr,4.33,3.99,3.63,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,STATE BANK OF INDIA,FINANCIAL,3.56,48.06 Cr,3.1,2.84,3.66,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,AXIS BANK ,FINANCIAL,3.2,43.32 Cr,2.44,2.24,0.43,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,INFOSYS ,TECHNOLOGY,2.87,38.84 Cr,3.74,3.79,4.4,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,ITC ,CONSUMER STAPLES,2.72,36.72 Cr,2.87,2.96,1.86,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,2.58,34.9 Cr,1.96,1.88,1.66,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,HINDUSTAN UNILEVER ,CONSUMER STAPLES,2.58,34.92 Cr,2.12,2.38,1.66,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,TATA MOTORS PASSENGER VEHICLES ,AUTOMOBILE,2.4,32.5 Cr,,1.29,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,SBI LIFE INSURANCE COMPANY ,INSURANCE,2.36,31.84 Cr,1.82,1.66,1.5,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,MAHINDRA & MAHINDRA ,AUTOMOBILE,2.17,29.34 Cr,2.25,1.85,0.91,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,TITAN COMPANY ,CONSUMER DISCRETIONARY,2.14,28.99 Cr,1.79,1.14,0.73,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,GRASIM INDUSTRIES ,MATERIALS,2.13,28.77 Cr,1.95,1.96,1.17,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,INTERGLOBE AVIATION ,SERVICES,1.98,26.71 Cr,,,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,ETERNAL ,SERVICES,1.92,25.95 Cr,1.12,0.79,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,ULTRATECH CEMENT ,MATERIALS,1.72,23.25 Cr,1.31,1.4,0.53,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,PIDILITE INDUSTRIES ,CHEMICALS,1.69,22.8 Cr,1.45,1.48,0.73,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,APOLLO HOSPITALS ENTERPRISE ,HEALTHCARE,1.67,22.53 Cr,1.39,1.51,1.05,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,BHARAT DYNAMICS ,CAPITAL GOODS,1.61,21.72 Cr,0.72,,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,KOTAK MAHINDRA BANK ,FINANCIAL,1.49,20.15 Cr,2.22,2.08,2.81,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,TRENT ,SERVICES,1.49,20.15 Cr,1.24,0.78,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,BHARAT ELECTRONICS ,CAPITAL GOODS,1.45,19.61 Cr,1.92,2.0,2.96,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,SHRIRAM FINANCE ,FINANCIAL,1.41,19.03 Cr,0.94,1.29,1.13,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,POWER FINANCE CORPORATION ,FINANCIAL,1.4,18.88 Cr,1.43,1.7,1.69,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,TATA CONSULTANCY SERVICES ,TECHNOLOGY,1.4,18.91 Cr,1.64,1.78,2.11,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,MARUTI SUZUKI INDIA ,AUTOMOBILE,1.27,17.15 Cr,1.12,1.81,1.58,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,TATA STEEL ,METALS & MINING,1.25,16.9 Cr,,,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,THE INDIAN HOTELS COMPANY ,SERVICES,1.13,15.34 Cr,0.82,0.68,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,MOIL ,METALS & MINING,1.01,13.62 Cr,0.93,0.85,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,NIPPON LIFE INDIA ASSET MANAGEMENT ,FINANCIAL,0.97,13.1 Cr,,,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,BLUE STAR ,CONSUMER DISCRETIONARY,0.97,13.15 Cr,0.86,0.96,1.15,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,HERO MOTOCORP ,AUTOMOBILE,0.97,13.09 Cr,0.99,1.71,1.02,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,TATA MOTORS ,AUTOMOBILE,0.85,11.54 Cr,0.77,,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,GODFREY PHILLIPS INDIA ,CONSUMER STAPLES,0.83,11.21 Cr,0.38,0.26,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,ALLIED BLENDERS AND DISTILLERS ,CONSUMER STAPLES,0.79,10.71 Cr,1.25,1.07,1.55,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,JUBILANT FOODWORKS ,SERVICES,0.73,9.85 Cr,0.77,0.67,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,CENTRAL MINE PLANNING & DESIGN INSTITUTE ,MATERIALS,0.57,7.71 Cr,,,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,FORTIS HEALTHCARE ,HEALTHCARE,0.56,7.61 Cr,0.45,,,2026-05-11,ETMoney
+LIC MF Large Cap Fund,Large Cap,Lic Mutual Fund,31937,NIFTY 50,FINANCIAL,0.15,--,,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ICICI BANK ,FINANCIAL,8.4,152.91 Cr,6.65,7.28,9.81,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,HDFC BANK ,FINANCIAL,7.96,144.86 Cr,9.41,9.19,9.49,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,RELIANCE INDUSTRIES ,ENERGY,6.6,120.09 Cr,7.7,7.19,7.3,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,INFOSYS ,TECHNOLOGY,4.96,90.23 Cr,4.99,3.73,2.58,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,NTPC ,ENERGY,4.23,77.08 Cr,3.53,3.58,3.13,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,STATE BANK OF INDIA,FINANCIAL,3.84,69.93 Cr,3.36,2.62,2.3,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,BHARTI AIRTEL ,COMMUNICATION,3.29,59.97 Cr,2.7,2.59,3.55,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,LARSEN & TOUBRO ,CONSTRUCTION,2.96,53.91 Cr,3.31,2.47,2.02,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,MAHINDRA & MAHINDRA ,AUTOMOBILE,2.91,52.95 Cr,3.07,3.02,3.27,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,AXIS BANK ,FINANCIAL,2.57,46.73 Cr,3.83,2.96,3.22,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,2.46,44.8 Cr,2.15,2.56,2.29,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,VEDANTA ,METALS & MINING,2.42,44.11 Cr,1.69,0.88,1.68,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,BAJAJ FINSERV ,FINANCIAL,2.42,44.11 Cr,2.59,2.54,2.67,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ETERNAL ,SERVICES,2.27,41.31 Cr,2.18,3.28,2.12,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,JSW STEEL ,METALS & MINING,2.02,36.84 Cr,1.32,1.31,1.54,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,TITAN COMPANY ,CONSUMER DISCRETIONARY,1.87,34.13 Cr,1.7,0.94,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,SBI LIFE INSURANCE COMPANY ,INSURANCE,1.72,31.31 Cr,1.89,1.69,1.21,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,EICHER MOTORS ,AUTOMOBILE,1.44,26.25 Cr,1.23,0.87,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,KOTAK MAHINDRA BANK ,FINANCIAL,1.32,24.12 Cr,0.56,1.28,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,HINDUSTAN UNILEVER ,CONSUMER STAPLES,1.29,23.5 Cr,1.0,0.56,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ULTRATECH CEMENT ,MATERIALS,1.28,23.39 Cr,,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,VARUN BEVERAGES ,CONSUMER STAPLES,1.23,22.32 Cr,2.44,2.29,3.48,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,GE VERNOVA T&D INDIA ,CAPITAL GOODS,1.22,22.28 Cr,1.43,1.8,0.2,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ITC ,CONSUMER STAPLES,1.21,22.1 Cr,1.6,1.69,3.33,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,GRASIM INDUSTRIES ,MATERIALS,1.18,21.55 Cr,1.36,1.42,1.57,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ONE97 COMMUNICATIONS ,SERVICES,1.17,21.26 Cr,2.0,2.38,2.12,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,BHARAT ELECTRONICS ,CAPITAL GOODS,1.11,20.15 Cr,0.72,0.41,0.49,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,SHRIRAM FINANCE ,FINANCIAL,1.03,18.69 Cr,0.9,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,DIVI'S LABORATORIES ,HEALTHCARE,1.01,18.32 Cr,1.0,1.07,1.35,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,FORTIS HEALTHCARE ,HEALTHCARE,0.99,18.08 Cr,1.05,0.51,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,TATA CONSULTANCY SERVICES ,TECHNOLOGY,0.91,16.55 Cr,1.33,2.19,5.42,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,PIDILITE INDUSTRIES ,CHEMICALS,0.9,16.43 Cr,,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,BAJAJ AUTO ,AUTOMOBILE,0.88,16.03 Cr,0.8,1.1,1.04,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,THE INDIAN HOTELS COMPANY ,SERVICES,0.86,15.57 Cr,0.62,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,COFORGE ,TECHNOLOGY,0.81,14.77 Cr,1.24,1.24,1.13,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,JUBILANT INGREVIA ,CHEMICALS,0.77,13.97 Cr,1.1,1.12,0.51,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,TRENT ,SERVICES,0.76,13.83 Cr,0.88,0.67,1.07,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,GODREJ PROPERTIES ,CONSTRUCTION,0.75,13.57 Cr,1.08,1.15,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ATHER ENERGY ,AUTOMOBILE,0.74,13.49 Cr,0.77,0.51,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,TECH MAHINDRA ,TECHNOLOGY,0.74,13.4 Cr,0.57,1.2,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ASTRAZENECA PHARMA INDIA ,HEALTHCARE,0.72,13.03 Cr,0.61,0.43,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,DR. AGARWAL'S HEALTH CARE ,HEALTHCARE,0.71,12.86 Cr,0.53,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,GLENMARK PHARMACEUTICALS ,HEALTHCARE,0.65,11.79 Cr,0.99,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,RBL BANK ,FINANCIAL,0.65,11.88 Cr,,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,KFIN TECHNOLOGIES ,FINANCIAL,0.65,11.92 Cr,1.03,1.08,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,POONAWALLA FINCORP ,FINANCIAL,0.63,11.52 Cr,0.61,0.6,0.2,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,AMBER ENTERPRISES INDIA ,CONSUMER DISCRETIONARY,0.63,11.55 Cr,0.25,0.86,1.19,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,CRAFTSMAN AUTOMATION ,AUTOMOBILE,0.63,11.4 Cr,0.89,0.77,0.36,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ADANI PORTS AND SPECIAL ECONOMIC ZONE ,SERVICES,0.6,10.94 Cr,,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,AVENUE SUPERMARTS ,SERVICES,0.57,10.35 Cr,,,1.96,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,TORRENT PHARMACEUTICALS ,HEALTHCARE,0.51,9.28 Cr,0.78,0.8,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,CHOLAMANDALAM INVESTMENT AND FINANCE COMPANY ,FINANCIAL,0.46,8.3 Cr,0.5,0.57,2.16,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,OIL AND NATURAL GAS CORPORATION ,ENERGY,0.43,7.74 Cr,,,0.49,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,CUMMINS INDIA ,CAPITAL GOODS,0.42,7.63 Cr,0.37,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,TUBE INVESTMENTS OF INDIA ,AUTOMOBILE,0.41,7.37 Cr,,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,CANARA HSBC LIFE INSURANCE COMPANY ,INSURANCE,0.39,7.08 Cr,0.4,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,TATA POWER COMPANY ,ENERGY,0.39,7.18 Cr,0.36,0.39,0.52,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,JSW DULUX ,MATERIALS,0.37,6.8 Cr,0.64,0.52,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,LODHA DEVELOPERS ,CONSTRUCTION,0.36,6.54 Cr,1.0,0.8,1.47,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ASIAN PAINTS ,MATERIALS,0.35,6.4 Cr,0.46,0.57,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,SONA BLW PRECISION FORGINGS ,AUTOMOBILE,0.32,5.77 Cr,0.29,0.28,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,ETHOS ,SERVICES,0.32,5.89 Cr,0.52,0.54,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,VISHAL MEGA MART ,SERVICES,0.31,5.62 Cr,,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,MPHASIS ,TECHNOLOGY,0.29,5.33 Cr,0.86,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,INDIAN OIL CORPORATION ,ENERGY,0.24,4.32 Cr,,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,PRESTIGE ESTATES PROJECTS ,CONSTRUCTION,0.23,4.15 Cr,0.51,1.0,0.38,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,PG ELECTROPLAST ,CAPITAL GOODS,0.17,3.06 Cr,,,,2026-05-11,ETMoney
+Bandhan Large Cap Fund,Large Cap,Bandhan Mutual Fund,3207,TATA MOTORS PASSENGER VEHICLES ,AUTOMOBILE,0.09,1.7 Cr,0.54,,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,ICICI BANK ,FINANCIAL,7.61,116.9 Cr,6.59,6.03,7.58,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,HDFC BANK ,FINANCIAL,6.59,101.3 Cr,7.99,7.69,9.1,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,ICICI PRUDENTIAL ASSET MANAGEMENT COMPANY ,UNCLASSIFIED,5.87,90.14 Cr,4.98,,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,INFOSYS ,TECHNOLOGY,5.87,90.23 Cr,5.47,5.52,3.9,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,LARSEN & TOUBRO ,CONSTRUCTION,3.95,60.77 Cr,4.12,,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,BHARTI AIRTEL ,COMMUNICATION,3.72,57.1 Cr,3.93,3.75,4.37,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,BAJAJ FINANCE ,FINANCIAL,3.5,53.79 Cr,3.85,4.17,3.03,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,TECH MAHINDRA ,TECHNOLOGY,3.34,51.28 Cr,3.19,2.75,1.77,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,ETERNAL ,SERVICES,3.16,48.55 Cr,2.87,2.78,1.85,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,INTERGLOBE AVIATION ,SERVICES,2.91,44.77 Cr,3.34,3.03,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,AXIS BANK ,FINANCIAL,2.84,43.62 Cr,,,3.81,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,TORRENT PHARMACEUTICALS ,HEALTHCARE,2.75,42.27 Cr,2.6,2.08,1.94,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,TITAN COMPANY ,CONSUMER DISCRETIONARY,2.58,39.68 Cr,2.37,2.11,2.63,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,EICHER MOTORS ,AUTOMOBILE,2.57,39.51 Cr,2.55,3.25,3.0,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,ULTRATECH CEMENT ,MATERIALS,2.41,36.97 Cr,1.5,,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,MAX HEALTHCARE INSTITUTE ,HEALTHCARE,2.37,36.35 Cr,1.96,,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,ABB INDIA ,CAPITAL GOODS,2.22,34.18 Cr,1.53,1.21,1.19,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,ASIAN PAINTS ,MATERIALS,2.21,33.95 Cr,2.66,2.63,0.52,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,ATHER ENERGY ,AUTOMOBILE,2.21,33.93 Cr,1.98,1.77,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,CHOLAMANDALAM INVESTMENT AND FINANCE COMPANY ,FINANCIAL,1.96,30.19 Cr,2.21,1.81,1.81,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,MULTI COMMODITY EXCHANGE OF INDIA ,SERVICES,1.87,28.67 Cr,1.56,1.3,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,CG POWER AND INDUSTRIAL SOLUTIONS ,CAPITAL GOODS,1.75,26.85 Cr,1.55,1.66,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,MAHINDRA & MAHINDRA ,AUTOMOBILE,1.5,23.08 Cr,1.69,1.67,1.98,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,BANK OF BARODA,FINANCIAL,1.39,21.4 Cr,,,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,POLY MEDICURE ,HEALTHCARE,1.35,20.67 Cr,1.79,1.82,1.06,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,POLYCAB INDIA ,CAPITAL GOODS,1.28,19.73 Cr,,,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,COFORGE ,TECHNOLOGY,1.22,18.68 Cr,1.3,1.02,1.4,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,SHRIRAM FINANCE ,FINANCIAL,1.18,18.17 Cr,1.0,,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,CENTRAL DEPOSITORY SERVICES (INDIA) ,FINANCIAL,1.17,17.91 Cr,1.51,0.98,0.45,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,DIVI'S LABORATORIES ,HEALTHCARE,1.16,17.84 Cr,1.12,1.17,1.9,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,HINDALCO INDUSTRIES ,METALS & MINING,1.04,15.92 Cr,0.93,1.14,0.41,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,SAMVARDHANA MOTHERSON INTERNATIONAL ,AUTOMOBILE,1.03,15.76 Cr,1.05,0.99,2.85,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,VISHAL MEGA MART ,SERVICES,1.03,15.79 Cr,1.19,1.52,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,PTC INDUSTRIES ,METALS & MINING,0.99,15.14 Cr,1.18,1.23,1.61,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,HINDUSTAN AERONAUTICS ,CAPITAL GOODS,0.96,14.81 Cr,0.61,0.7,0.87,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,SRF ,CHEMICALS,0.95,14.62 Cr,1.07,1.28,2.04,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,PB FINTECH ,SERVICES,0.95,14.57 Cr,0.82,0.92,0.54,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,TUBE INVESTMENTS OF INDIA ,AUTOMOBILE,0.94,14.42 Cr,0.87,0.87,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,BHARAT ELECTRONICS ,CAPITAL GOODS,0.92,14.19 Cr,1.23,1.34,1.35,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,DELHIVERY ,SERVICES,0.81,12.42 Cr,0.7,0.56,0.63,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,GLOBAL HEALTH ,HEALTHCARE,0.76,11.63 Cr,0.84,,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,HOME FIRST FINANCE COMPANY INDIA ,FINANCIAL,0.71,10.85 Cr,0.77,0.91,1.19,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,DLF ,CONSTRUCTION,0.66,10.07 Cr,0.8,1.86,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,JYOTI CNC AUTOMATION ,CAPITAL GOODS,0.61,9.34 Cr,0.44,0.41,1.11,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,NTPC GREEN ENERGY ,ENERGY,0.6,9.23 Cr,0.55,0.91,2.37,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,DIXON TECHNOLOGIES (INDIA) ,CAPITAL GOODS,0.55,8.5 Cr,0.62,1.1,1.6,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,TRENT ,SERVICES,0.46,7.07 Cr,0.53,0.62,1.03,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,LODHA DEVELOPERS ,CONSTRUCTION,0.39,5.92 Cr,0.54,1.11,,2026-05-11,ETMoney
+Invesco India Largecap Fund,Large Cap,Invesco Mutual Fund,10234,KWALITY WALL'S (INDIA) ,CONSUMER STAPLES,0.03,40.45L,0.04,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,RELIANCE INDUSTRIES ,ENERGY,6.5,152.39 Cr,6.59,6.18,5.66,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,HDFC BANK ,FINANCIAL,6.18,144.84 Cr,7.73,8.03,8.32,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,ICICI BANK ,FINANCIAL,5.88,137.83 Cr,6.26,7.06,7.48,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,HITACHI ENERGY INDIA ,CAPITAL GOODS,4.37,102.51 Cr,2.93,3.04,2.58,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,BHARTI AIRTEL ,COMMUNICATION,4.17,97.85 Cr,4.28,4.0,2.89,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,LARSEN & TOUBRO ,CONSTRUCTION,4.04,94.61 Cr,4.49,4.08,3.88,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,STATE BANK OF INDIA,FINANCIAL,3.23,75.8 Cr,2.65,2.06,1.28,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,INFOSYS ,TECHNOLOGY,2.88,67.53 Cr,3.12,2.83,2.95,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,KOTAK MAHINDRA BANK ,FINANCIAL,2.71,63.61 Cr,3.01,3.7,4.1,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,VEDANTA ,METALS & MINING,2.51,58.93 Cr,2.01,1.57,1.91,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,NTPC ,ENERGY,2.42,56.7 Cr,1.87,2.19,2.51,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,ETERNAL ,SERVICES,2.37,55.64 Cr,1.53,1.82,1.04,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,TECH MAHINDRA ,TECHNOLOGY,2.13,49.82 Cr,2.12,1.89,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,SUN PHARMACEUTICAL INDUSTRIES ,HEALTHCARE,2.09,49.02 Cr,1.37,1.29,1.6,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,TATA CONSULTANCY SERVICES ,TECHNOLOGY,1.99,46.7 Cr,2.35,2.34,3.78,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,DIVI'S LABORATORIES ,HEALTHCARE,1.87,43.88 Cr,1.7,1.54,1.71,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,ULTRATECH CEMENT ,MATERIALS,1.79,42.01 Cr,1.88,2.27,2.34,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,TATA CAPITAL ,FINANCIAL,1.76,41.17 Cr,1.08,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,DR. REDDY'S LABORATORIES ,HEALTHCARE,1.69,39.52 Cr,1.44,1.57,1.19,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,NESTLE INDIA ,CONSUMER STAPLES,1.62,38.06 Cr,1.54,1.4,1.0,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,ITC ,CONSUMER STAPLES,1.55,36.25 Cr,2.08,2.17,2.65,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,PUNJAB NATIONAL BANK,FINANCIAL,1.54,36.2 Cr,1.65,1.14,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,EICHER MOTORS ,AUTOMOBILE,1.52,35.56 Cr,1.46,1.24,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,HINDUSTAN UNILEVER ,CONSUMER STAPLES,1.42,33.29 Cr,1.39,1.53,1.0,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,BHARAT HEAVY ELECTRICALS ,CAPITAL GOODS,1.41,33.14 Cr,1.44,1.09,1.06,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,BAJAJ FINANCE ,FINANCIAL,1.38,32.46 Cr,1.51,1.55,1.32,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,HERO MOTOCORP ,AUTOMOBILE,1.36,31.89 Cr,1.35,1.48,1.03,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,TATA MOTORS ,AUTOMOBILE,1.36,31.97 Cr,1.25,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,TITAN COMPANY ,CONSUMER DISCRETIONARY,1.3,30.58 Cr,1.16,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,MARUTI SUZUKI INDIA ,AUTOMOBILE,1.28,29.9 Cr,1.5,1.46,1.15,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,HYUNDAI MOTOR INDIA ,AUTOMOBILE,1.23,28.8 Cr,1.45,2.1,1.52,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,MULTI COMMODITY EXCHANGE OF INDIA ,SERVICES,1.21,--,,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,BOSCH ,AUTOMOBILE,1.19,27.94 Cr,1.33,1.93,1.73,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,LG ELECTRONICS INDIA ,CONSUMER DISCRETIONARY,1.16,27.23 Cr,1.01,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,JSW STEEL ,METALS & MINING,1.16,27.27 Cr,1.05,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,BHARAT ELECTRONICS ,CAPITAL GOODS,1.15,27.04 Cr,1.0,1.02,0.64,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,OIL INDIA ,ENERGY,1.13,26.53 Cr,,0.84,1.0,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,BAJAJ FINSERV ,FINANCIAL,1.13,26.43 Cr,1.22,1.22,1.34,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,AXIS BANK ,FINANCIAL,1.11,26.12 Cr,1.06,0.96,0.82,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,NHPC ,ENERGY,1.05,24.54 Cr,0.9,0.76,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,UNITED SPIRITS ,CONSUMER STAPLES,1.03,24.13 Cr,1.06,0.45,1.3,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,PERSISTENT SYSTEMS ,TECHNOLOGY,1.03,24.14 Cr,1.04,0.73,0.86,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,VARUN BEVERAGES ,CONSUMER STAPLES,0.99,23.16 Cr,1.09,0.97,1.2,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,HDFC LIFE INSURANCE CO ,INSURANCE,0.95,22.32 Cr,1.05,1.02,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,ESCORTS KUBOTA ,AUTOMOBILE,0.88,20.71 Cr,1.05,0.99,1.02,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,INDUSIND BANK ,FINANCIAL,0.87,20.31 Cr,,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,HINDUSTAN ZINC ,METALS & MINING,0.71,16.72 Cr,,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,TORRENT PHARMACEUTICALS ,HEALTHCARE,0.65,15.19 Cr,,,,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,TATA POWER COMPANY ,ENERGY,0.58,13.63 Cr,,,0.9,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,GMR AIRPORTS ,CONSTRUCTION,0.46,10.67 Cr,0.49,0.41,0.41,2026-05-11,ETMoney
+Baroda BNP Paribas Large Cap Fund,Large Cap,Baroda BNP Paribas Mutual Fund,2156,POWER GRID CORPORATION OF INDIA ,ENERGY,0.43,31.97 Cr,1.06,1.14,0.97,2026-05-11,ETMoney
