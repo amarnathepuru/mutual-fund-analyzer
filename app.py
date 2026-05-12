@@ -42,11 +42,21 @@ h1, h2, h3 { color: #1A1A2E; }
 .metric-card {
     background: #fff; border: 1px solid #E5E7EB; border-radius: 12px;
     padding: 1.25rem 1.5rem; text-align: center;
+    transition: border-color 0.18s ease, background 0.18s ease,
+                box-shadow 0.18s ease, transform 0.18s ease;
 }
-.metric-value { font-size: 2.25rem; font-weight: 800; color: #6C3CE1; line-height: 1; }
-.metric-label { font-size: 0.75rem; color: #6B7280; font-weight: 600;
+a.metric-card-link { all: unset; display: block; cursor: pointer; }
+a.metric-card-link:hover .metric-card,
+.metric-card:hover {
+    border-color: #6C3CE1;
+    background: #F5F3FF;
+    box-shadow: 0 4px 20px rgba(108,60,225,0.12);
+    transform: translateY(-2px);
+}
+.metric-value { font-size: 2.25rem; font-weight: 800; color: #6C3CE1 !important; line-height: 1; }
+.metric-label { font-size: 0.75rem; color: #6B7280 !important; font-weight: 600;
                 text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
-.metric-sub { font-size: 0.7rem; color: #9CA3AF; margin-top: 4px; }
+.metric-sub { font-size: 0.7rem; color: #9CA3AF !important; margin-top: 4px; }
 
 /* Journey cards */
 .journey-card {
@@ -145,13 +155,6 @@ def load_similarity():
         return pd.DataFrame()
 
 
-@st.cache_data
-def load_common():
-    try:
-        return pd.read_csv("data/processed/common_holdings.csv")
-    except Exception:
-        return pd.DataFrame()
-
 
 @st.cache_data
 def compute_fund_enriched(holdings_df, master_df):
@@ -190,15 +193,6 @@ def get_sector_breakdown(holdings_df):
     )
 
 
-def build_sim_matrix(similarity_df, fund_names):
-    matrix = pd.DataFrame(100.0, index=fund_names, columns=fund_names)
-    for _, row in similarity_df.iterrows():
-        a, b, s = row["fund_a"], row["fund_b"], row["similarity_score"]
-        if a in fund_names and b in fund_names:
-            matrix.loc[a, b] = s
-            matrix.loc[b, a] = s
-    return matrix
-
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
 
@@ -232,58 +226,154 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df):
     sel_sim = similarity_df[
         similarity_df["fund_a"].isin(fund_list) & similarity_df["fund_b"].isin(fund_list)
     ]
+    sel_h = holdings_df[holdings_df["fund_name"].isin(fund_list)]
 
+    # 1. Highest-overlap pair — name the actual shared stocks
     if not sel_sim.empty:
-        worst = sel_sim.loc[sel_sim["similarity_score"].idxmax()]
-        if worst["similarity_score"] >= 60:
-            insights.append({
-                "type": "alert", "icon": "⚠️",
-                "text": (
-                    f"<strong>{short_name(worst['fund_a'])}</strong> and "
-                    f"<strong>{short_name(worst['fund_b'])}</strong> share "
-                    f"<strong>{worst['similarity_score']:.0f}%</strong> portfolio similarity. "
-                    "Holding both funds provides minimal additional diversification."
-                ),
-            })
-        best = sel_sim.loc[sel_sim["similarity_score"].idxmin()]
-        if best["similarity_score"] < 45:
+        worst    = sel_sim.loc[sel_sim["similarity_score"].idxmax()]
+        fa, fb   = worst["fund_a"], worst["fund_b"]
+        wscore   = worst["similarity_score"]
+        wcommon  = int(worst["common_stocks"])
+        h_a_set  = set(sel_h[sel_h["fund_name"] == fa]["stock_name"])
+        h_b_set  = set(sel_h[sel_h["fund_name"] == fb]["stock_name"])
+        shared   = h_a_set & h_b_set
+        top3     = (
+            sel_h[sel_h["stock_name"].isin(shared)]
+            .groupby("stock_name")["allocation_percent"].mean()
+            .nlargest(3).index.tolist()
+        )
+        top3_txt = ", ".join(f"<strong>{s}</strong>" for s in top3)
+        stype    = "alert" if wscore >= 60 else "warning"
+        icon     = "⚠️"   if wscore >= 60 else "📊"
+        tail     = ("Holding both adds minimal diversification benefit."
+                    if wscore >= 60 else
+                    "Moderate overlap — monitor combined concentration in shared positions.")
+        insights.append({
+            "type": stype, "icon": icon,
+            "text": (
+                f"<strong>{short_name(fa)}</strong> and <strong>{short_name(fb)}</strong> share "
+                f"<strong>{wscore:.0f}% portfolio similarity</strong> ({wcommon} stocks in common). "
+                f"Their largest shared positions are: {top3_txt}. {tail}"
+            ),
+        })
+
+    # 2. Best diversification pair
+    if not sel_sim.empty and len(sel_sim) > 1:
+        best   = sel_sim.loc[sel_sim["similarity_score"].idxmin()]
+        bscore = best["similarity_score"]
+        if bscore < 50:
             insights.append({
                 "type": "success", "icon": "✅",
                 "text": (
                     f"<strong>{short_name(best['fund_a'])}</strong> and "
-                    f"<strong>{short_name(best['fund_b'])}</strong> have "
-                    f"relatively low overlap ({best['similarity_score']:.0f}%), "
-                    "offering meaningful diversification when combined."
+                    f"<strong>{short_name(best['fund_b'])}</strong> are the most complementary pair "
+                    f"with only <strong>{bscore:.0f}% overlap</strong> — they bring the most distinct "
+                    "exposure when held together."
                 ),
             })
 
+    # 3. Stocks held by ALL funds — name the top ones
+    if not sel_h.empty:
+        counts        = sel_h.groupby("stock_name")["fund_name"].nunique()
+        unani_stocks  = counts[counts == len(fund_list)].index.tolist()
+        if unani_stocks:
+            top5u = (
+                sel_h[sel_h["stock_name"].isin(unani_stocks)]
+                .groupby("stock_name")["allocation_percent"].mean()
+                .nlargest(5).index.tolist()
+            )
+            top5_txt = ", ".join(f"<strong>{s}</strong>" for s in top5u)
+            insights.append({
+                "type": "info", "icon": "📌",
+                "text": (
+                    f"<strong>{len(unani_stocks)} stock{'s' if len(unani_stocks) > 1 else ''}</strong> "
+                    f"appear in all {len(fund_list)} selected funds — your indirect exposure to these "
+                    f"is multiplied across every fund you hold: {top5_txt}."
+                ),
+            })
+
+    # 4. Sector dominance — which fund is most/least exposed and by how much
     sel_sector = sector_df[sector_df["fund_name"].isin(fund_list)]
     if not sel_sector.empty:
-        avg_by_sector = sel_sector.groupby("sector")["allocation_percent"].mean()
-        top_s = avg_by_sector.idxmax()
-        top_pct = avg_by_sector.max()
-        if top_pct > 28:
+        avg_by_sec = sel_sector.groupby("sector")["allocation_percent"].mean()
+        top_s      = avg_by_sec.idxmax()
+        top_pct    = avg_by_sec.max()
+        if top_pct > 25:
+            by_fund  = (
+                sel_sector[sel_sector["sector"] == top_s]
+                .sort_values("allocation_percent", ascending=False)
+            )
+            hi_fund  = short_name(by_fund.iloc[0]["fund_name"])
+            hi_pct   = by_fund.iloc[0]["allocation_percent"]
+            lo_txt   = ""
+            if len(by_fund) > 1:
+                lo_fund = short_name(by_fund.iloc[-1]["fund_name"])
+                lo_pct  = by_fund.iloc[-1]["allocation_percent"]
+                lo_txt  = (f" <strong>{lo_fund}</strong> has the lowest at "
+                           f"<strong>{lo_pct:.1f}%</strong> — the widest spread in this selection.")
             insights.append({
                 "type": "warning", "icon": "🏦",
                 "text": (
-                    f"All selected funds carry heavy <strong>{top_s}</strong> sector exposure "
-                    f"(avg {top_pct:.1f}%). This creates correlated sector risk "
-                    "even across multiple funds."
+                    f"<strong>{top_s.title()}</strong> dominates all selected funds (avg "
+                    f"<strong>{top_pct:.1f}%</strong>). <strong>{hi_fund}</strong> carries the highest "
+                    f"concentration at <strong>{hi_pct:.1f}%</strong>.{lo_txt}"
                 ),
             })
 
-    sel_h = holdings_df[holdings_df["fund_name"].isin(fund_list)]
-    counts = sel_h.groupby("stock_name")["fund_name"].nunique()
-    unanimous = (counts == len(fund_list)).sum()
-    if unanimous > 0:
-        insights.append({
-            "type": "info", "icon": "📌",
-            "text": (
-                f"<strong>{unanimous} stock{'s' if unanimous > 1 else ''}</strong> "
-                f"appear in all {len(fund_list)} selected funds. "
-                "Your indirect exposure to these stocks is amplified across your entire portfolio."
-            ),
-        })
+    # 5. Per-fund unique holdings — what each fund contributes exclusively
+    if not sel_h.empty and len(fund_list) >= 2:
+        for fund in fund_list:
+            fund_stocks   = set(sel_h[sel_h["fund_name"] == fund]["stock_name"])
+            others_stocks = set(sel_h[sel_h["fund_name"] != fund]["stock_name"])
+            unique        = fund_stocks - others_stocks
+            if len(unique) >= 3:
+                top_unique = (
+                    sel_h[(sel_h["fund_name"] == fund) & (sel_h["stock_name"].isin(unique))]
+                    .nlargest(3, "allocation_percent")["stock_name"].tolist()
+                )
+                u_txt = ", ".join(f"<strong>{s}</strong>" for s in top_unique)
+                insights.append({
+                    "type": "info", "icon": "🔬",
+                    "text": (
+                        f"<strong>{short_name(fund)}</strong> holds <strong>{len(unique)} exclusive "
+                        f"positions</strong> not found in any other selected fund, including: {u_txt}. "
+                        "These represent the unique exposure this fund adds to the mix."
+                    ),
+                })
+
+    # 6. Allocation momentum — stocks with consistent buying/selling across funds
+    if not sel_h.empty:
+        trend_df  = sel_h.groupby("stock_name").agg(
+            funds=("fund_name", "nunique"),
+            avg_3m=("change_3m_percent", "mean"),
+        ).reset_index()
+        multi    = trend_df[trend_df["funds"] >= min(2, len(fund_list))]
+        growing  = multi[multi["avg_3m"] > 0.8].nlargest(2, "avg_3m")
+        declining = multi[multi["avg_3m"] < -0.8].nsmallest(2, "avg_3m")
+        if not growing.empty:
+            g_txt = ", ".join(
+                f"<strong>{r['stock_name']}</strong> (+{r['avg_3m']:.1f}%)"
+                for _, r in growing.iterrows()
+            )
+            insights.append({
+                "type": "success", "icon": "📈",
+                "text": (
+                    f"Fund managers across the selection have been consistently "
+                    f"<strong>increasing allocation</strong> to: {g_txt} over the last 3 months."
+                ),
+            })
+        if not declining.empty:
+            d_txt = ", ".join(
+                f"<strong>{r['stock_name']}</strong> ({r['avg_3m']:.1f}%)"
+                for _, r in declining.iterrows()
+            )
+            insights.append({
+                "type": "warning", "icon": "📉",
+                "text": (
+                    f"Fund managers across the selection have been consistently "
+                    f"<strong>reducing allocation</strong> to: {d_txt} over the last 3 months."
+                ),
+            })
 
     return insights
 
@@ -304,100 +394,154 @@ def nav_header(back_page=None, back_label="Back"):
 # ── PAGE: HOME ────────────────────────────────────────────────────────────────
 
 def page_home():
-    holdings = load_holdings()
+    # Handle card-click navigation via query params
+    nav_target = st.query_params.get("nav", "")
+    if nav_target:
+        if "stock" in st.query_params:
+            st.session_state.preselected_stock = st.query_params.get("stock", "")
+        st.session_state.page = nav_target
+        st.query_params.clear()
+        st.rerun()
+
+    holdings   = load_holdings()
     similarity = load_similarity()
-    common = load_common()
 
-    st.markdown('<div class="app-logo" style="margin-bottom:2rem;">📊 FundInsight</div>', unsafe_allow_html=True)
+    n_funds  = holdings["fund_name"].nunique()  if not holdings.empty else 0
+    n_unique = holdings["stock_name"].nunique() if not holdings.empty else 0
+    max_sim  = similarity["similarity_score"].max() if not similarity.empty else 0
 
-    st.markdown("## Understand Your Investments Better")
+    top5 = (
+        holdings.groupby("stock_name").agg(
+            funds=("fund_name", "nunique"),
+            avg_alloc=("allocation_percent", "mean"),
+        ).nlargest(5, "funds").reset_index()
+        if not holdings.empty else pd.DataFrame()
+    )
+
+    st.markdown('<div class="app-logo" style="margin-bottom:0.5rem;">📊 FundInsight</div>',
+                unsafe_allow_html=True)
     st.markdown(
-        "<p style='color:#6B7280;font-size:1rem;margin-top:-0.5rem;margin-bottom:1.5rem;'>"
-        "Analyze mutual fund overlap, exposure, diversification and portfolio concentration — all in one place."
-        "</p>",
+        "<p style='color:#6B7280;font-size:0.88rem;margin-bottom:1.75rem;'>"
+        "Portfolio analytics and transparency — not investment advice</p>",
         unsafe_allow_html=True,
     )
 
-    # Live stats banner
-    n_funds   = holdings["fund_name"].nunique() if not holdings.empty else 0
-    n_unique  = holdings["stock_name"].nunique() if not holdings.empty else 0
-    n_rows    = len(holdings) if not holdings.empty else 0
-    max_sim   = similarity["similarity_score"].max() if not similarity.empty else 0
-    top_stock = common.iloc[0]["stock_name"].strip() if not common.empty else "—"
+    # ── Stat cards ──
+    m1, m2, m3, m4 = st.columns(4)
 
+    for col, val, label, sub, nav in [
+        (m1, str(n_funds),      "Funds Analyzed",     "Large Cap · Live data",       "category"),
+        (m2, str(n_unique),     "Unique Stocks",       "Across all funds",            "stock_explorer"),
+        (m3, f"{max_sim:.0f}%", "Max Fund Overlap",    "Highest pairwise similarity", "overlap_drilldown"),
+    ]:
+        with col:
+            st.markdown(f"""
+            <a href="?nav={nav}" target="_self" class="metric-card-link">
+                <div class="metric-card">
+                    <div class="metric-value"
+                         style="font-size:{'1.4rem' if len(str(val)) > 8 else '2.25rem'};">
+                        {val}
+                    </div>
+                    <div class="metric-label">{label}</div>
+                    <div class="metric-sub">{sub}</div>
+                </div>
+            </a>""", unsafe_allow_html=True)
+
+    # Card 4 — Top 5 held stocks (individual row links)
+    with m4:
+        if not top5.empty:
+            rows_html = "".join(
+                f'<a href="?nav=stock_explorer&stock={row["stock_name"].replace(" ", "+")}" '
+                f'target="_self" style="all:unset;display:block;cursor:pointer;">'
+                f'<div style="display:flex;justify-content:space-between;align-items:center;'
+                f'padding:4px 2px;{"border-bottom:1px solid #F3F4F6;" if idx < 4 else ""}">'
+                f'<span style="font-size:0.75rem;font-weight:600;color:#1A1A2E;">{row["stock_name"]}</span>'
+                f'<span style="font-size:0.68rem;color:#6C3CE1;white-space:nowrap;margin-left:6px;">'
+                f'{row["funds"]}f&nbsp;·&nbsp;{row["avg_alloc"]:.1f}%</span>'
+                f'</div></a>'
+                for idx, (_, row) in enumerate(top5.iterrows())
+            )
+        else:
+            rows_html = '<div style="color:#9CA3AF;font-size:0.8rem;">No data</div>'
+
+        st.markdown(f"""
+        <div class="metric-card" style="cursor:default;">
+            <div style="font-size:0.72rem;font-weight:700;color:#6B7280;text-transform:uppercase;
+                        letter-spacing:0.5px;margin-bottom:0.6rem;text-align:center;">
+                Top Held Stocks</div>
+            {rows_html}
+        </div>""", unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── Journey cards (clickable anchor tags, hover-highlighted) ──
     st.markdown(f"""
-    <div class="stats-banner">
-        <div class="stat-item">
-            <div class="stat-value">{n_funds}</div>
-            <div class="stat-label">Funds Analyzed</div>
+    <style>
+    a.action-card-link {{
+        all: unset;
+        display: block;
+        cursor: pointer;
+        margin-bottom: 0.75rem;
+    }}
+    .action-card {{
+        background: #fff;
+        border: 1.5px solid #E5E7EB;
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        gap: 1.25rem;
+        align-items: flex-start;
+        cursor: pointer;
+        transition: border-color 0.18s ease, background 0.18s ease,
+                    box-shadow 0.18s ease, transform 0.18s ease;
+    }}
+    .action-card:hover {{
+        border-color: #6C3CE1;
+        background: #F5F3FF;
+        box-shadow: 0 4px 20px rgba(108,60,225,0.12);
+        transform: translateY(-2px);
+    }}
+    .action-card-icon {{
+        font-size: 2rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }}
+    .action-card-title {{
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1A1A2E !important;
+        margin-bottom: 5px;
+        text-decoration: none !important;
+    }}
+    .action-card-desc {{
+        font-size: 0.82rem;
+        color: #6B7280 !important;
+        line-height: 1.65;
+        text-decoration: none !important;
+    }}
+    </style>
+    <a href="?nav=category" target="_self" class="action-card-link">
+        <div class="action-card">
+            <div class="action-card-icon">🔍</div>
+            <div>
+                <div class="action-card-title">Compare Mutual Funds</div>
+                <div class="action-card-desc">Pick up to 5 funds and instantly see portfolio overlap,
+                sector exposure, common holdings and redundancy — across {n_funds} large-cap funds.</div>
+            </div>
         </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-            <div class="stat-value">{n_unique}</div>
-            <div class="stat-label">Unique Stocks</div>
+    </a>
+    <a href="?nav=portfolio_upload" target="_self" class="action-card-link">
+        <div class="action-card">
+            <div class="action-card-icon">📋</div>
+            <div>
+                <div class="action-card-title">Portfolio X-Ray</div>
+                <div class="action-card-desc">Upload your existing mutual fund portfolio and discover
+                hidden stock exposure, duplicate funds, sector concentration and true diversification
+                across all your holdings.</div>
+            </div>
         </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-            <div class="stat-value">{n_rows:,}</div>
-            <div class="stat-label">Holdings Records</div>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-            <div class="stat-value">{max_sim:.0f}%</div>
-            <div class="stat-label">Max Fund Overlap</div>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-            <div class="stat-value" style="font-size:1.1rem;">{top_stock}</div>
-            <div class="stat-label">Most Widely Held Stock</div>
-        </div>
-    </div>
+    </a>
     """, unsafe_allow_html=True)
-
-    st.markdown("### Choose your journey")
-    col1, col2 = st.columns(2, gap="large")
-
-    with col1:
-        st.markdown("""
-        <div class="journey-card">
-            <div style="font-size:2.5rem;margin-bottom:1rem;">🔍</div>
-            <div style="font-size:1.1rem;font-weight:700;color:#1A1A2E;margin-bottom:0.5rem;">
-                Explore Mutual Funds
-            </div>
-            <div style="font-size:0.85rem;color:#6B7280;line-height:1.7;margin-bottom:1.25rem;">
-                Select a fund category, pick up to 5 funds, and get a deep-dive
-                comparison — portfolio overlap, common holdings, sector concentration,
-                and hidden redundancies.
-            </div>
-            <div style="font-size:0.75rem;color:#6C3CE1;font-weight:600;">
-                Category → Select Funds → Compare →
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("Explore Funds →", key="btn_explore", use_container_width=True, type="primary"):
-            st.session_state.page = "category"
-            st.rerun()
-
-    with col2:
-        st.markdown("""
-        <div class="journey-card">
-            <div style="font-size:2.5rem;margin-bottom:1rem;">📋</div>
-            <div style="font-size:1.1rem;font-weight:700;color:#1A1A2E;margin-bottom:0.5rem;">
-                Portfolio X-Ray
-            </div>
-            <div style="font-size:0.85rem;color:#6B7280;line-height:1.7;margin-bottom:1.25rem;">
-                Upload your existing mutual fund portfolio and instantly discover
-                hidden stock exposure, duplicate funds, sector concentration risks,
-                and true diversification across your holdings.
-            </div>
-            <div style="font-size:0.75rem;color:#6C3CE1;font-weight:600;">
-                Upload CSV → Instant X-Ray →
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("X-Ray My Portfolio →", key="btn_xray", use_container_width=True):
-            st.session_state.page = "portfolio_upload"
-            st.rerun()
 
     st.markdown("""
     <div class="disclaimer">
@@ -413,9 +557,10 @@ def page_home():
 def page_category_select():
     nav_header(back_page="home", back_label="Home")
 
-    st.markdown("## Choose a Fund Category")
+    st.markdown("## Choose Fund Categories")
     st.markdown(
-        "<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.5rem;'>Select a category to explore and compare funds</p>",
+        "<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.5rem;'>"
+        "Select one or more categories — mix Large Cap with Mid Cap, ELSS, or any combination to compare across the market.</p>",
         unsafe_allow_html=True,
     )
 
@@ -424,41 +569,80 @@ def page_category_select():
     if not holdings.empty:
         fund_counts = holdings.groupby("category")["fund_name"].nunique().to_dict()
 
+    if "selected_categories" not in st.session_state:
+        st.session_state.selected_categories = []
+
     categories = [
-        ("Large Cap",        "🏛️", "Top 100 companies by market cap. Lower risk, stable long-term returns.", True),
-        ("Mid Cap",          "📈", "Ranked 101–250. Higher growth potential with moderate risk.",            False),
-        ("Small Cap",        "🚀", "Ranked 251+. High growth potential, higher volatility.",                 False),
-        ("Flexi Cap",        "🔄", "Invests flexibly across large, mid and small caps.",                     False),
-        ("ELSS (Tax Saver)", "💰", "Tax saving under Sec 80C with 3-year lock-in.",                         False),
-        ("Index Funds",      "📊", "Passively track market indices with low cost.",                          False),
+        ("Large Cap",        "🏛️", "Top 100 companies by market cap. Lower risk, stable returns.",   True),
+        ("Mid Cap",          "📈", "Ranked 101–250. Higher growth potential with moderate risk.",       False),
+        ("Small Cap",        "🚀", "Ranked 251+. High growth potential, higher volatility.",            False),
+        ("Flexi Cap",        "🔄", "Invests flexibly across large, mid and small caps.",                False),
+        ("ELSS (Tax Saver)", "💰", "Tax saving under Sec 80C with 3-year lock-in.",                    False),
+        ("Index Funds",      "📊", "Passively track market indices with low cost.",                     False),
     ]
 
     cols = st.columns(3, gap="medium")
     for i, (name, icon, desc, live) in enumerate(categories):
         with cols[i % 3]:
-            count = fund_counts.get(name, 0)
-            badge = (
-                f'<span class="badge badge-live">{count} funds • Live Data</span>'
-                if live else
-                '<span class="badge badge-soon">Coming Soon</span>'
-            )
+            count       = fund_counts.get(name, 0)
+            is_selected = name in st.session_state.selected_categories
+
+            # Card border/background changes when selected
+            border  = "2px solid #6C3CE1" if is_selected else "1.5px solid #E5E7EB"
+            bg      = "#F5F3FF"            if is_selected else "#fff"
+            chk     = "✓ "                 if is_selected else ""
+
+            if live:
+                badge = f'<span class="badge badge-live">{count} funds • Live Data</span>'
+            else:
+                badge = '<span class="badge badge-soon">Coming Soon</span>'
+
             st.markdown(f"""
-            <div class="cat-card">
+            <div style="background:{bg};border:{border};border-radius:12px;
+                        padding:1.25rem;height:100%;">
                 <div style="font-size:2rem;">{icon}</div>
-                <div class="cat-name">{name}</div>
-                <div class="cat-desc">{desc}</div>
+                <div style="font-size:0.9rem;font-weight:700;color:#1A1A2E;
+                            margin:8px 0 4px;">{chk}{name}</div>
+                <div style="font-size:0.75rem;color:#6B7280;line-height:1.5;">{desc}</div>
                 <div style="margin-top:0.75rem;">{badge}</div>
             </div>
             """, unsafe_allow_html=True)
 
             if live:
-                if st.button(f"Explore {name} →", key=f"cat_{name}", use_container_width=True, type="primary"):
-                    st.session_state.selected_category = name
-                    st.session_state.selected_funds = []
-                    st.session_state.page = "explorer"
+                btn_label = "✓ Selected" if is_selected else "Select"
+                btn_type  = "primary"    if is_selected else "secondary"
+                if st.button(btn_label, key=f"cat_{name}",
+                             use_container_width=True, type=btn_type):
+                    cats = list(st.session_state.selected_categories)
+                    if is_selected:
+                        cats = [c for c in cats if c != name]
+                    else:
+                        cats.append(name)
+                    st.session_state.selected_categories = cats
                     st.rerun()
             else:
-                st.button("Coming Soon", key=f"cat_{name}", use_container_width=True, disabled=True)
+                st.button("Coming Soon", key=f"cat_{name}",
+                          use_container_width=True, disabled=True)
+
+    # ── Bottom CTA ──
+    st.markdown("<br>", unsafe_allow_html=True)
+    n_sel = len(st.session_state.selected_categories)
+
+    if n_sel == 0:
+        st.info("Select one or more categories above to continue.")
+    else:
+        sel_labels = " + ".join(st.session_state.selected_categories)
+        c1, c2, c3 = st.columns([1, 2, 1])
+        with c2:
+            if st.button(
+                f"Explore {sel_labels} →",
+                use_container_width=True,
+                type="primary",
+                key="cat_explore_cta",
+            ):
+                st.session_state.selected_funds = []
+                st.session_state.page = "explorer"
+                st.rerun()
 
 
 # ── PAGE: FUND EXPLORER ───────────────────────────────────────────────────────
@@ -466,133 +650,445 @@ def page_category_select():
 def page_fund_explorer():
     nav_header(back_page="category", back_label="Categories")
 
-    category = st.session_state.get("selected_category", "Large Cap")
-    holdings  = load_holdings()
-    master    = load_master()
-    similarity = load_similarity()
-    enriched  = compute_fund_enriched(holdings, master)
-    cat_funds = enriched[enriched["category"] == category].copy()
+    selected_cats = st.session_state.get("selected_categories", ["Large Cap"])
+    holdings      = load_holdings()
+    master_df     = load_master()
+    similarity    = load_similarity()
+    enriched      = compute_fund_enriched(holdings, master_df)
+    cat_funds     = enriched[enriched["category"].isin(selected_cats)].copy()
 
-    if "selected_funds" not in st.session_state:
-        st.session_state.selected_funds = []
+    if "selected_funds"  not in st.session_state: st.session_state.selected_funds  = []
+    if "explorer_layout" not in st.session_state: st.session_state.explorer_layout = "D"
 
-    st.markdown(f"## {category} Funds")
-    st.markdown(
-        "<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.25rem;'>Select up to 5 funds to compare their portfolios</p>",
-        unsafe_allow_html=True,
-    )
+    show_cat_filter = len(selected_cats) > 1
+    title  = " + ".join(selected_cats) if selected_cats else "All Funds"
+    layout = st.session_state.explorer_layout
 
-    # ── Filters ──
-    c_search, c_sort, c_amc = st.columns([3, 2, 2])
-    with c_search:
-        search = st.text_input("Search funds…", placeholder="Fund name or AMC", label_visibility="collapsed")
-    with c_sort:
-        sort_by = st.selectbox(
+    # ── Header + layout switcher ──────────────────────────────────────────────
+    ht, hs = st.columns([3, 2])
+    with ht:
+        st.markdown(f"## {title}")
+        st.markdown(
+            "<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:0.5rem;'>"
+            "Browse funds and add up to 5 to compare portfolios side by side.</p>",
+            unsafe_allow_html=True,
+        )
+    with hs:
+        st.markdown(
+            '<div style="text-align:right;font-size:0.72rem;color:#9CA3AF;'
+            'font-weight:600;margin-bottom:4px;">Choose layout</div>',
+            unsafe_allow_html=True,
+        )
+        la, lb, lc, ld = st.columns(4)
+        for code, label, col in [("A","Cards",la),("B","Split",lb),("C","Table",lc),("D","Search",ld)]:
+            with col:
+                if st.button(label, key=f"lsw_{code}",
+                             type="primary" if layout == code else "secondary",
+                             use_container_width=True):
+                    if layout != code:
+                        st.session_state.explorer_layout = code
+                        st.rerun()
+
+    selected = list(st.session_state.selected_funds)
+    n_sel    = len(selected)
+    amcs_list = ["All AMCs"] + sorted(cat_funds["fund_house"].dropna().unique().tolist())
+
+    # ── Shared helpers ────────────────────────────────────────────────────────
+    def apply_filters(df, search, amc, cat, sort):
+        f = df.copy()
+        if search:
+            mask = (f["fund_name"].str.contains(search, case=False, na=False) |
+                    f["fund_house"].str.contains(search, case=False, na=False))
+            f = f[mask]
+        if amc != "All AMCs":
+            f = f[f["fund_house"] == amc]
+        if cat != "All Categories":
+            f = f[f["category"] == cat]
+        sm = {
+            "AUM (High→Low)":           ("aum_cr",        False),
+            "AUM (Low→High)":           ("aum_cr",        True),
+            "Expense Ratio (Low→High)": ("expense_ratio",  True),
+            "Holdings Count":           ("holding_count",  False),
+        }
+        if sort in sm:
+            sc, sa = sm[sort]
+            if sc in f.columns:
+                f = f.sort_values(sc, ascending=sa, na_position="last")
+        return f
+
+    def overlap_warns(sel):
+        if len(sel) < 2 or similarity.empty:
+            return ""
+        sim = similarity[similarity["fund_a"].isin(sel) & similarity["fund_b"].isin(sel)]
+        parts = [
+            f'<span style="background:#FEF3C7;color:#92400E;border-radius:9999px;'
+            f'padding:3px 10px;font-size:0.72rem;font-weight:600;">'
+            f'⚠ {short_name(r["fund_a"])} ↔ {short_name(r["fund_b"])}: '
+            f'{r["similarity_score"]:.0f}% overlap</span>'
+            for _, r in sim[sim["similarity_score"] >= 60]
+                          .sort_values("similarity_score", ascending=False).head(2).iterrows()
+        ]
+        return ('<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">'
+                + " ".join(parts) + "</div>") if parts else ""
+
+    def fund_info(fund):
+        aum_str = format_aum(fund.get("aum_cr", ""))
+        er_val  = fund.get("expense_ratio")
+        er_str  = f"{float(er_val):.2f}%" if pd.notna(er_val) else "—"
+        hc_val  = fund.get("holding_count")
+        hc_str  = str(int(hc_val)) if pd.notna(hc_val) else "—"
+        top_sec = str(fund.get("top_sector") or "—").title()
+        amc_str = str(fund.get("fund_house") or "—")
+        cat_str = str(fund.get("category") or "")
+        return aum_str, er_str, hc_str, top_sec, amc_str, cat_str
+
+    def chips_html(sel):
+        return "".join(
+            f'<span style="background:#EDE9FE;color:#6C3CE1;border-radius:9999px;'
+            f'padding:4px 12px;font-size:0.78rem;font-weight:600;white-space:nowrap;">'
+            f'{short_name(fn)}</span>'
+            for fn in sel
+        )
+
+    def selection_tray(sel, n, cmp_key, clr_key):
+        if n == 0:
+            st.markdown(
+                '<div style="background:#F9FAFB;border:1.5px dashed #D1D5DB;border-radius:10px;'
+                'padding:0.75rem 1rem;font-size:0.82rem;color:#9CA3AF;text-align:center;">'
+                'Add 2–5 funds below to compare.</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            tc, cc = st.columns([5, 1])
+            with tc:
+                st.markdown(
+                    f'<div style="background:#F5F3FF;border:1.5px solid #DDD6FE;'
+                    f'border-radius:10px;padding:0.75rem 1rem;">'
+                    f'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">'
+                    f'<span style="font-size:0.72rem;color:#7C3AED;font-weight:700;'
+                    f'white-space:nowrap;">{n} of 5 selected:</span>'
+                    f'{chips_html(sel)}</div>{overlap_warns(sel)}</div>',
+                    unsafe_allow_html=True,
+                )
+            with cc:
+                if st.button("Compare →", type="primary", disabled=(n < 2),
+                             use_container_width=True, key=cmp_key):
+                    st.session_state.page = "compare"
+                    st.rerun()
+            if st.button("Clear selection", key=clr_key):
+                st.session_state.selected_funds = []
+                st.rerun()
+
+    # ─── LAYOUT A: Card Grid ─────────────────────────────────────────────────
+    if layout == "A":
+        fc = st.columns([3, 2, 2, 2] if show_cat_filter else [3, 2, 2])
+        search     = fc[0].text_input("Search", placeholder="Fund name or AMC…",
+                                       label_visibility="collapsed", key="a_srch")
+        amc_filter = fc[1].selectbox("AMC", amcs_list,
+                                      label_visibility="collapsed", key="a_amc")
+        sort_by    = fc[2].selectbox(
             "Sort", ["AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
-            label_visibility="collapsed",
+            label_visibility="collapsed", key="a_sort",
         )
-    with c_amc:
-        amcs = ["All AMCs"] + sorted(cat_funds["fund_house"].dropna().unique().tolist())
-        amc_filter = st.selectbox("AMC", amcs, label_visibility="collapsed")
+        cat_filter = "All Categories"
+        if show_cat_filter:
+            cat_filter = fc[3].selectbox("Category",
+                                          ["All Categories"] + sorted(selected_cats),
+                                          label_visibility="collapsed", key="a_cat")
+        filtered = apply_filters(cat_funds, search, amc_filter, cat_filter, sort_by)
 
-    filtered = cat_funds.copy()
-    if search:
-        mask = (
-            filtered["fund_name"].str.contains(search, case=False, na=False) |
-            filtered["fund_house"].str.contains(search, case=False, na=False)
+        st.markdown("<br>", unsafe_allow_html=True)
+        selection_tray(selected, n_sel, "a_cmp", "a_clr")
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="section-sub">{len(filtered)} fund{"s" if len(filtered)!=1 else ""}'
+            f' — click a card to add it to your comparison</div>',
+            unsafe_allow_html=True,
         )
-        filtered = filtered[mask]
-    if amc_filter != "All AMCs":
-        filtered = filtered[filtered["fund_house"] == amc_filter]
+        fund_list = list(filtered.iterrows())
+        for row_start in range(0, len(fund_list), 3):
+            chunk = fund_list[row_start:row_start + 3]
+            cols  = st.columns(3, gap="medium")
+            for ci, (_, fund) in enumerate(chunk):
+                fn     = fund["fund_name"]
+                is_sel = fn in selected
+                at_max = n_sel >= 5 and not is_sel
+                aum_str, er_str, hc_str, top_sec, amc_str, cat_str = fund_info(fund)
+                border = "2px solid #6C3CE1"               if is_sel else "1.5px solid #E5E7EB"
+                bg     = "#F5F3FF"                         if is_sel else "#FFFFFF"
+                shadow = "0 0 0 3px rgba(108,60,225,0.10)" if is_sel else "0 1px 3px rgba(0,0,0,0.06)"
+                name_c = "#6C3CE1"                         if is_sel else "#1A1A2E"
+                badge  = (
+                    '<div style="margin-top:8px;"><span style="background:#EDE9FE;color:#6C3CE1;'
+                    'border-radius:9999px;padding:2px 8px;font-size:0.65rem;font-weight:700;">'
+                    '✓ In comparison</span></div>'
+                ) if is_sel else ""
+                with cols[ci]:
+                    st.markdown(f"""
+                    <div style="background:{bg};border:{border};border-radius:14px 14px 6px 6px;
+                                padding:1.25rem 1.25rem 0.75rem;box-shadow:{shadow};">
+                        <div style="font-size:0.85rem;font-weight:700;color:{name_c};
+                                    line-height:1.4;margin-bottom:4px;">{fn}</div>
+                        <div style="font-size:0.72rem;color:#6B7280;margin-bottom:10px;">
+                            {amc_str}{(' &nbsp;·&nbsp; '+cat_str) if show_cat_filter else ''}
+                        </div>
+                        <div style="display:flex;gap:14px;margin-bottom:8px;">
+                            <div>
+                                <div style="font-size:0.62rem;color:#9CA3AF;text-transform:uppercase;
+                                            letter-spacing:0.4px;">AUM</div>
+                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{aum_str}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:0.62rem;color:#9CA3AF;text-transform:uppercase;
+                                            letter-spacing:0.4px;">Exp. Ratio</div>
+                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{er_str}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:0.62rem;color:#9CA3AF;text-transform:uppercase;
+                                            letter-spacing:0.4px;">Holdings</div>
+                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{hc_str}</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.7rem;color:#6B7280;">
+                            Top sector: <strong style="color:#374151;">{top_sec}</strong>
+                        </div>
+                        {badge}
+                    </div>""", unsafe_allow_html=True)
+                    if is_sel:
+                        bl, bt = "✓ Added — click to remove", "primary"
+                    elif at_max:
+                        bl, bt = "Max 5 reached", "secondary"
+                    else:
+                        bl, bt = "+ Add to Compare", "secondary"
+                    if st.button(bl, key=f"a_{row_start}_{ci}",
+                                 use_container_width=True, type=bt, disabled=at_max):
+                        if is_sel:
+                            st.session_state.selected_funds = [f for f in selected if f != fn]
+                        else:
+                            st.session_state.selected_funds = selected + [fn]
+                        st.rerun()
 
-    sort_map = {
-        "AUM (High→Low)":              ("aum_cr",         False),
-        "AUM (Low→High)":              ("aum_cr",         True),
-        "Expense Ratio (Low→High)":    ("expense_ratio",  True),
-        "Holdings Count":              ("holding_count",  False),
-    }
-    scol, sasc = sort_map[sort_by]
-    if scol in filtered.columns:
-        filtered = filtered.sort_values(scol, ascending=sasc, na_position="last")
+    # ─── LAYOUT B: Two-Panel Split ───────────────────────────────────────────
+    elif layout == "B":
+        b_search = st.text_input("Search", placeholder="Fund name or AMC…",
+                                  label_visibility="collapsed", key="b_srch")
+        bc1, bc2 = st.columns(2)
+        b_amc  = bc1.selectbox("AMC", amcs_list, label_visibility="collapsed", key="b_amc")
+        b_sort = bc2.selectbox(
+            "Sort", ["AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
+            label_visibility="collapsed", key="b_sort",
+        )
+        filtered = apply_filters(cat_funds, b_search, b_amc, "All Categories", b_sort)
 
-    # ── Selection widget ──
-    st.markdown("---")
-    selected = st.multiselect(
-        "**Select funds to compare** (choose 2–5):",
-        options=filtered["fund_name"].tolist(),
-        default=[f for f in st.session_state.selected_funds if f in filtered["fund_name"].tolist()],
-        max_selections=5,
-        placeholder="Choose funds…",
-    )
-    st.session_state.selected_funds = selected
+        left_col, right_col = st.columns([3, 2], gap="large")
+        with left_col:
+            st.markdown(
+                f'<div class="section-sub">{len(filtered)} funds — click Add to build your comparison</div>',
+                unsafe_allow_html=True,
+            )
+            for i, (_, fund) in enumerate(filtered.iterrows()):
+                fn     = fund["fund_name"]
+                is_b   = fn in selected
+                at_b   = n_sel >= 5 and not is_b
+                aum_str, er_str, _, _, amc_str, _ = fund_info(fund)
+                row_bg  = "#F5F3FF"             if is_b else "#FFFFFF"
+                row_bdr = "1.5px solid #6C3CE1" if is_b else "1px solid #E5E7EB"
+                r1, r2  = st.columns([4, 1])
+                with r1:
+                    st.markdown(f"""
+                    <div style="background:{row_bg};border:{row_bdr};border-radius:10px;
+                                padding:0.75rem 1rem;">
+                        <div style="font-size:0.85rem;font-weight:700;color:#1A1A2E;
+                                    margin-bottom:2px;">{fn}</div>
+                        <div style="font-size:0.72rem;color:#6B7280;">
+                            {amc_str} &nbsp;·&nbsp; AUM {aum_str} &nbsp;·&nbsp; ER {er_str}
+                        </div>
+                    </div>""", unsafe_allow_html=True)
+                with r2:
+                    bl, bt = ("✓ Remove", "primary") if is_b else ("+ Add", "secondary")
+                    if st.button(bl, key=f"b_{i}", use_container_width=True, type=bt, disabled=at_b):
+                        if is_b:
+                            st.session_state.selected_funds = [f for f in selected if f != fn]
+                        else:
+                            st.session_state.selected_funds = selected + [fn]
+                        st.rerun()
 
-    # ── Progress ──
-    n_sel = len(selected)
-    prog_text = f"{n_sel} / 5 selected"
-    c_prog, c_cta = st.columns([4, 1])
-    with c_prog:
-        st.progress(n_sel / 5, text=prog_text)
-    with c_cta:
-        if st.button("Compare →", disabled=(n_sel < 2), type="primary", use_container_width=True):
-            st.session_state.page = "compare"
+        with right_col:
+            tray_bg  = "#F5F3FF" if n_sel > 0 else "#F9FAFB"
+            tray_bdr = "#DDD6FE" if n_sel > 0 else "#E5E7EB"
+            st.markdown(f"""
+            <div style="background:{tray_bg};border:1.5px solid {tray_bdr};
+                        border-radius:12px;padding:1.25rem;">
+                <div style="font-size:0.85rem;font-weight:700;color:#1A1A2E;margin-bottom:0.75rem;">
+                    Your Comparison &nbsp;
+                    <span style="font-size:0.72rem;color:#6C3CE1;font-weight:600;">{n_sel} / 5</span>
+                </div>""", unsafe_allow_html=True)
+            if n_sel == 0:
+                st.markdown(
+                    '<div style="font-size:0.8rem;color:#9CA3AF;text-align:center;padding:1rem 0;">'
+                    'Add funds from the left to build your comparison</div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown("</div>", unsafe_allow_html=True)
+            else:
+                for idx, fn in enumerate(selected):
+                    rc1, rc2 = st.columns([4, 1])
+                    with rc1:
+                        st.markdown(
+                            f'<div style="font-size:0.82rem;font-weight:600;color:#1A1A2E;'
+                            f'padding:4px 0;">{short_name(fn)}</div>',
+                            unsafe_allow_html=True,
+                        )
+                    with rc2:
+                        if st.button("✕", key=f"b_rm_{idx}", use_container_width=True):
+                            st.session_state.selected_funds = [f for f in selected if f != fn]
+                            st.rerun()
+                warns = overlap_warns(selected)
+                if warns:
+                    st.markdown(warns, unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button("Compare Now →", type="primary", use_container_width=True,
+                             key="b_cmp", disabled=(n_sel < 2)):
+                    st.session_state.page = "compare"
+                    st.rerun()
+
+    # ─── LAYOUT C: Selectable Table ──────────────────────────────────────────
+    elif layout == "C":
+        cc = st.columns([3, 2, 2])
+        c_search = cc[0].text_input("Search", placeholder="Fund name or AMC…",
+                                     label_visibility="collapsed", key="c_srch")
+        c_amc    = cc[1].selectbox("AMC", amcs_list, label_visibility="collapsed", key="c_amc")
+        c_sort   = cc[2].selectbox(
+            "Sort", ["AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
+            label_visibility="collapsed", key="c_sort",
+        )
+        filtered = apply_filters(cat_funds, c_search, c_amc, "All Categories", c_sort)
+
+        c_tbl = filtered[["fund_name", "fund_house", "aum_cr",
+                           "expense_ratio", "holding_count", "top_sector"]].copy()
+        c_tbl = c_tbl.rename(columns={
+            "fund_name": "Fund", "fund_house": "AMC", "aum_cr": "AUM (₹ Cr)",
+            "expense_ratio": "Exp Ratio %", "holding_count": "Holdings", "top_sector": "Top Sector",
+        })
+        c_tbl["AUM (₹ Cr)"]  = pd.to_numeric(c_tbl["AUM (₹ Cr)"],  errors="coerce")
+        c_tbl["Exp Ratio %"] = pd.to_numeric(c_tbl["Exp Ratio %"], errors="coerce")
+        c_tbl["Holdings"]    = pd.to_numeric(c_tbl["Holdings"],    errors="coerce").astype("Int64")
+        c_tbl["Select"]      = c_tbl["Fund"].isin(selected)
+
+        edited = st.data_editor(
+            c_tbl[["Select", "Fund", "AMC", "AUM (₹ Cr)",
+                   "Exp Ratio %", "Holdings", "Top Sector"]].reset_index(drop=True),
+            use_container_width=True, height=440,
+            column_config={
+                "Select":      st.column_config.CheckboxColumn("Select", width="small"),
+                "Fund":        st.column_config.TextColumn("Fund Name", width="large"),
+                "AMC":         st.column_config.TextColumn("AMC"),
+                "AUM (₹ Cr)": st.column_config.NumberColumn("AUM (₹ Cr)", format="₹%,.0f Cr"),
+                "Exp Ratio %": st.column_config.NumberColumn("Exp Ratio",  format="%.2f%%"),
+                "Holdings":    st.column_config.NumberColumn("Holdings",   format="%d"),
+                "Top Sector":  st.column_config.TextColumn("Top Sector"),
+            },
+            hide_index=True, key="c_editor",
+        )
+        new_sel_c = edited[edited["Select"] == True]["Fund"].tolist()[:5]
+        if set(new_sel_c) != set(selected):
+            st.session_state.selected_funds = new_sel_c
             st.rerun()
 
-    # ── Overlap warning for current selection ──
-    if n_sel >= 2:
-        sel_sim = similarity[
-            similarity["fund_a"].isin(selected) & similarity["fund_b"].isin(selected)
-        ]
-        high_pairs = sel_sim[sel_sim["similarity_score"] >= 60].sort_values("similarity_score", ascending=False)
-        if not high_pairs.empty:
-            st.markdown("**⚠️ High-overlap pairs in your selection:**")
-            for _, row in high_pairs.head(3).iterrows():
-                label, cls = sim_badge(row["similarity_score"])
+        n_c = len(new_sel_c)
+        if n_c == 0:
+            st.info("Tick checkboxes in the Select column to build your comparison.")
+        else:
+            cbot1, _, cbot3 = st.columns([4, 1, 1])
+            with cbot1:
+                st.markdown(
+                    f'<div style="padding:0.5rem 0;display:flex;gap:6px;align-items:center;flex-wrap:wrap;">'
+                    f'<span style="font-size:0.75rem;color:#6B7280;font-weight:600;">{n_c} selected:</span>'
+                    f'{chips_html(new_sel_c)}{overlap_warns(new_sel_c)}</div>',
+                    unsafe_allow_html=True,
+                )
+            with cbot3:
+                if st.button("Compare →", type="primary", use_container_width=True,
+                             key="c_cmp", disabled=(n_c < 2)):
+                    st.session_state.selected_funds = new_sel_c
+                    st.session_state.page = "compare"
+                    st.rerun()
+
+    # ─── LAYOUT D: Search-First Chips (default) ──────────────────────────────
+    else:
+        if n_sel > 0:
+            d_chips = "".join(
+                '<span style="background:#EDE9FE;color:#6C3CE1;border-radius:9999px;'
+                'padding:5px 14px;font-size:0.82rem;font-weight:600;white-space:nowrap;">'
+                f'{short_name(fn)}</span> '
+                for fn in selected
+            )
+            dc, db = st.columns([5, 1])
+            with dc:
+                st.markdown(
+                    f'<div style="background:#F5F3FF;border:1.5px solid #DDD6FE;'
+                    f'border-radius:10px;padding:0.75rem 1rem;">'
+                    f'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">'
+                    f'<span style="font-size:0.72rem;color:#7C3AED;font-weight:700;'
+                    f'white-space:nowrap;">{n_sel} of 5:</span>'
+                    f'{d_chips}</div>{overlap_warns(selected)}</div>',
+                    unsafe_allow_html=True,
+                )
+            with db:
+                if st.button("Compare →", type="primary", use_container_width=True,
+                             key="d_cmp", disabled=(n_sel < 2)):
+                    st.session_state.page = "compare"
+                    st.rerun()
+            if st.button("Clear selection", key="d_clr"):
+                st.session_state.selected_funds = []
+                st.rerun()
+
+        d_search = st.text_input("", placeholder="Search by fund name or AMC…", key="d_srch")
+        da1, da2 = st.columns(2)
+        d_amc  = da1.selectbox("AMC", amcs_list, label_visibility="collapsed", key="d_amc")
+        d_sort = da2.selectbox(
+            "Sort", ["AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
+            label_visibility="collapsed", key="d_sort",
+        )
+        filtered = apply_filters(cat_funds, d_search, d_amc, "All Categories", d_sort)
+
+        st.markdown(
+            f'<div class="section-sub" style="margin-bottom:0.5rem;">'
+            f'{len(filtered)} result{"s" if len(filtered)!=1 else ""}</div>',
+            unsafe_allow_html=True,
+        )
+        for i, (_, fund) in enumerate(filtered.iterrows()):
+            fn     = fund["fund_name"]
+            is_d   = fn in selected
+            at_d   = n_sel >= 5 and not is_d
+            aum_str, er_str, hc_str, _, amc_str, _ = fund_info(fund)
+            row_bg  = "#F5F3FF"             if is_d else "#FFFFFF"
+            row_bdr = "1.5px solid #6C3CE1" if is_d else "1px solid #E5E7EB"
+            dot_c   = "#6C3CE1"             if is_d else "#D1D5DB"
+            dr1, dr2 = st.columns([5, 1])
+            with dr1:
                 st.markdown(f"""
-                <div style="background:#FFFBEB;border:1px solid #FEF3C7;border-radius:8px;
-                            padding:0.6rem 1rem;margin-bottom:6px;font-size:0.8rem;">
-                    <span class="badge {cls}">{label} overlap</span>
-                    &nbsp; <strong>{short_name(row['fund_a'])}</strong>
-                    &nbsp;↔&nbsp; <strong>{short_name(row['fund_b'])}</strong>
-                    &nbsp;—&nbsp; {row['similarity_score']:.0f}% similar,
-                    {int(row['common_stocks'])} common stocks
-                </div>
-                """, unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # ── Fund table ──
-    st.markdown('<div class="section-title">All Funds in Category</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-sub">Full universe — use the selector above to add funds for comparison</div>', unsafe_allow_html=True)
-
-    table_df = filtered[["fund_name", "fund_house", "aum_cr", "expense_ratio", "holding_count", "top_sector"]].copy()
-    table_df = table_df.rename(columns={
-        "fund_name":     "Fund",
-        "fund_house":    "AMC",
-        "aum_cr":        "AUM (₹ Cr)",
-        "expense_ratio": "Exp Ratio %",
-        "holding_count": "Holdings",
-        "top_sector":    "Top Sector",
-    })
-    table_df["AUM (₹ Cr)"]    = pd.to_numeric(table_df["AUM (₹ Cr)"],    errors="coerce")
-    table_df["Exp Ratio %"]   = pd.to_numeric(table_df["Exp Ratio %"],   errors="coerce")
-    table_df["Holdings"]      = pd.to_numeric(table_df["Holdings"],      errors="coerce").astype("Int64")
-    table_df["In Selection"]  = table_df["Fund"].isin(selected)
-
-    st.dataframe(
-        table_df.reset_index(drop=True),
-        use_container_width=True,
-        height=420,
-        column_config={
-            "Fund":         st.column_config.TextColumn("Fund Name", width="large"),
-            "AMC":          st.column_config.TextColumn("AMC"),
-            "AUM (₹ Cr)":  st.column_config.NumberColumn("AUM (₹ Cr)", format="₹%,.0f Cr"),
-            "Exp Ratio %":  st.column_config.NumberColumn("Expense Ratio", format="%.2f%%"),
-            "Holdings":     st.column_config.NumberColumn("Holdings", format="%d"),
-            "Top Sector":   st.column_config.TextColumn("Top Sector"),
-            "In Selection": st.column_config.CheckboxColumn("Selected?", disabled=True),
-        },
-        hide_index=True,
-    )
+                <div style="background:{row_bg};border:{row_bdr};border-radius:8px;
+                            padding:0.6rem 1rem;display:flex;align-items:center;gap:10px;">
+                    <div style="width:8px;height:8px;border-radius:50%;background:{dot_c};
+                                flex-shrink:0;margin-top:2px;"></div>
+                    <div>
+                        <div style="font-size:0.85rem;font-weight:700;color:#1A1A2E;">{fn}</div>
+                        <div style="font-size:0.7rem;color:#6B7280;">
+                            {amc_str} &nbsp;·&nbsp; {aum_str} &nbsp;·&nbsp;
+                            ER {er_str} &nbsp;·&nbsp; {hc_str} holdings
+                        </div>
+                    </div>
+                </div>""", unsafe_allow_html=True)
+            with dr2:
+                dl, dt = ("✓ Remove", "primary") if is_d else ("+ Add", "secondary")
+                if st.button(dl, key=f"d_{i}", use_container_width=True, type=dt, disabled=at_d):
+                    if is_d:
+                        st.session_state.selected_funds = [f for f in selected if f != fn]
+                    else:
+                        st.session_state.selected_funds = selected + [fn]
+                    st.rerun()
 
 
 # ── PAGE: COMPARE ─────────────────────────────────────────────────────────────
@@ -659,47 +1155,146 @@ def page_compare():
 
     # ── Tab 1: Overview ──────────────────────────────────────────────────────
     with tab_ov:
-        col_heat, col_top = st.columns([3, 2], gap="large")
+        display_mode = st.radio(
+            "Show numbers as:",
+            ["% overlap", "plain words", "both"],
+            index=2,
+            horizontal=True,
+        )
 
-        with col_heat:
-            st.markdown('<div class="section-title">Pairwise Similarity Heatmap</div>', unsafe_allow_html=True)
-            st.markdown('<div class="section-sub">Overlap score between every pair of selected funds</div>', unsafe_allow_html=True)
+        col_matrix, col_top = st.columns([3, 2], gap="large")
 
-            mat = build_sim_matrix(similarity, selected)
-            short_labels = [short_name(f) for f in mat.columns]
+        with col_matrix:
+            # Build score / common-stock lookups from pairwise similarity data
+            score_lk  = {}
+            common_lk = {}
+            for _, row in sel_sim.iterrows():
+                for key in [(row["fund_a"], row["fund_b"]), (row["fund_b"], row["fund_a"])]:
+                    score_lk[key]  = row["similarity_score"]
+                    common_lk[key] = int(row["common_stocks"])
 
-            # Mask diagonal for better visual (show as 100 but style differently)
-            z_vals = mat.values.tolist()
-            text_vals = [[f"{v:.0f}%" for v in row] for row in mat.values]
+            master  = load_master()
+            cat_lk  = dict(zip(master["fund_name"], master["category"])) if not master.empty else {}
+            s_names = [short_name(f) for f in selected]
+            cats    = [cat_lk.get(f, "Large Cap") for f in selected]
 
-            fig_h = go.Figure(go.Heatmap(
-                z=z_vals,
-                x=short_labels,
-                y=short_labels,
-                colorscale=[[0, "#D1FAE5"], [0.45, "#FEF3C7"], [0.65, "#FEE2E2"], [1, "#DC2626"]],
-                zmin=0, zmax=100,
-                text=text_vals,
-                texttemplate="%{text}",
-                textfont={"size": 12, "color": "#1A1A2E"},
-                showscale=True,
-                colorbar=dict(title="Similarity %", ticksuffix="%", len=0.85),
-            ))
-            fig_h.update_layout(
-                height=max(320, len(selected) * 68),
-                margin=dict(l=0, r=0, t=10, b=0),
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter, sans-serif", size=11),
+            def _cell_cfg(score, common):
+                if common == 0 and score == 0:
+                    return {"bg": "#F9FAFB", "txt": "#9CA3AF",
+                            "label": "No data",
+                            "bdg_bg": "#F3F4F6", "bdg_txt": "#9CA3AF"}
+                if score >= 65:
+                    return {"bg": "#1B4332", "txt": "#FFFFFF",
+                            "label": "Avoid pairing",
+                            "bdg_bg": "#FCA5A5", "bdg_txt": "#7F1D1D"}
+                if score >= 50:
+                    return {"bg": "#2D6A4F", "txt": "#FFFFFF",
+                            "label": "Mostly redundant",
+                            "bdg_bg": "#FDE68A", "bdg_txt": "#78350F"}
+                if score >= 35:
+                    return {"bg": "#52B788", "txt": "#FFFFFF",
+                            "label": "Some overlap",
+                            "bdg_bg": "#A7F3D0", "bdg_txt": "#064E3B"}
+                if score >= 20:
+                    return {"bg": "#B7E4C7", "txt": "#1B4332",
+                            "label": "Good pairing",
+                            "bdg_bg": "#D1FAE5", "bdg_txt": "#065F46"}
+                return {"bg": "#D8F3DC", "txt": "#1B4332",
+                        "label": "Best pairing",
+                        "bdg_bg": "#ECFDF5", "bdg_txt": "#065F46"}
+
+            # Column headers
+            hdr = '<td style="min-width:90px;"></td>'
+            for sn, cat in zip(s_names, cats):
+                hdr += (
+                    f'<td style="text-align:center;padding:0 4px 10px;min-width:110px;vertical-align:bottom;">'
+                    f'<div style="font-weight:700;font-size:12px;color:#1A1A2E;line-height:1.4;">{sn}</div>'
+                    f'<div style="font-size:10px;color:#6B7280;">{cat}</div>'
+                    f'</td>'
+                )
+
+            # Matrix rows
+            rows = ""
+            for fa, fa_sn, fa_cat in zip(selected, s_names, cats):
+                cells = ""
+                for fb in selected:
+                    if fa == fb:
+                        cells += (
+                            '<td style="padding:3px;">'
+                            '<div style="background:#F3F4F6;border-radius:10px;'
+                            'width:104px;height:80px;display:flex;align-items:center;justify-content:center;">'
+                            '<span style="font-size:11px;color:#9CA3AF;font-style:italic;">same fund</span>'
+                            '</div></td>'
+                        )
+                    else:
+                        sc  = score_lk.get((fa, fb), 0)
+                        co  = common_lk.get((fa, fb), 0)
+                        cfg = _cell_cfg(sc, co)
+                        pct = (
+                            f'<div style="font-size:22px;font-weight:800;color:{cfg["txt"]};line-height:1;">'
+                            f'{sc:.0f}%</div>'
+                            if display_mode in ("% overlap", "both") else ""
+                        )
+                        lbl = (
+                            f'<div style="background:{cfg["bdg_bg"]};color:{cfg["bdg_txt"]};'
+                            f'font-size:9px;font-weight:700;border-radius:9999px;'
+                            f'padding:2px 7px;margin-top:5px;white-space:nowrap;">'
+                            f'{cfg["label"]}</div>'
+                            if display_mode in ("plain words", "both") else ""
+                        )
+                        cells += (
+                            f'<td style="padding:3px;">'
+                            f'<div style="background:{cfg["bg"]};border-radius:10px;'
+                            f'width:104px;height:80px;display:flex;flex-direction:column;'
+                            f'align-items:center;justify-content:center;">'
+                            f'{pct}{lbl}</div></td>'
+                        )
+
+                rows += (
+                    f'<tr>'
+                    f'<td style="padding:3px 12px 3px 0;text-align:right;vertical-align:middle;white-space:nowrap;">'
+                    f'<div style="font-weight:700;font-size:12px;color:#1A1A2E;">{fa_sn}</div>'
+                    f'<div style="font-size:10px;color:#6B7280;">{fa_cat}</div>'
+                    f'</td>{cells}</tr>'
+                )
+
+            st.markdown(
+                f'<div style="overflow-x:auto;padding-bottom:4px;">'
+                f'<table style="border-collapse:separate;border-spacing:0;">'
+                f'<thead><tr>{hdr}</tr></thead>'
+                f'<tbody>{rows}</tbody>'
+                f'</table></div>',
+                unsafe_allow_html=True,
             )
-            st.plotly_chart(fig_h, use_container_width=True)
+
+            # Colour legend
+            st.markdown("""
+            <div style="display:flex;align-items:center;gap:8px;margin-top:14px;
+                        font-size:11px;color:#6B7280;flex-wrap:wrap;">
+                <span>Low overlap</span>
+                <div style="display:flex;gap:3px;align-items:center;">
+                    <div style="width:14px;height:14px;background:#D8F3DC;border-radius:3px;"></div>
+                    <div style="width:14px;height:14px;background:#B7E4C7;border-radius:3px;"></div>
+                    <div style="width:14px;height:14px;background:#52B788;border-radius:3px;"></div>
+                    <div style="width:14px;height:14px;background:#2D6A4F;border-radius:3px;"></div>
+                    <div style="width:14px;height:14px;background:#1B4332;border-radius:3px;"></div>
+                </div>
+                <span>High overlap &nbsp;·&nbsp;
+                    Higher = more redundant = less diversification</span>
+            </div>
+            """, unsafe_allow_html=True)
 
         with col_top:
             st.markdown('<div class="section-title">Top Common Holdings</div>', unsafe_allow_html=True)
-            st.markdown('<div class="section-sub">Stocks held by the most selected funds</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-sub">Stocks held across the most selected funds, ranked by avg allocation</div>', unsafe_allow_html=True)
 
             top_com = (
                 sel_h.groupby("stock_name")
-                .agg(funds_holding=("fund_name", "nunique"), avg_alloc=("allocation_percent", "mean"))
+                .agg(
+                    funds_holding=("fund_name",         "nunique"),
+                    avg_alloc    =("allocation_percent", "mean"),
+                    sector       =("sector",             "first"),
+                )
                 .reset_index()
                 .sort_values(["funds_holding", "avg_alloc"], ascending=[False, False])
                 .head(12)
@@ -707,16 +1302,70 @@ def page_compare():
             top_com["stock_name"] = top_com["stock_name"].str.strip()
             top_com["avg_alloc"]  = top_com["avg_alloc"].round(2)
 
-            st.dataframe(
-                top_com.reset_index(drop=True),
-                use_container_width=True,
-                height=380,
-                column_config={
-                    "stock_name":    st.column_config.TextColumn("Stock"),
-                    "funds_holding": st.column_config.NumberColumn("Funds Holding", format="%d"),
-                    "avg_alloc":     st.column_config.NumberColumn("Avg Alloc %",   format="%.2f%%"),
-                },
-                hide_index=True,
+            max_alloc_top = float(top_com["avg_alloc"].max()) if not top_com.empty else 1.0
+            n_sel         = len(selected)
+
+            def _ch_row(stock, n_funds, alloc, sector_val):
+                bar_w = min(100.0, alloc / max_alloc_top * 100) if max_alloc_top else 0
+                sec_str = str(sector_val).strip() if pd.notna(sector_val) and str(sector_val).strip() not in ("", "nan") else ""
+                sec_tag = (
+                    '<span style="font-size:0.58rem;background:#F3F4F6;color:#6B7280;'
+                    'border-radius:4px;padding:1px 5px;margin-left:4px;">'
+                    + sec_str.title() + '</span>'
+                ) if sec_str else ""
+                dots = ""
+                for idx in range(n_sel):
+                    bg = "#6C3CE1" if idx < n_funds else "#E5E7EB"
+                    dots += (
+                        '<span style="display:inline-block;width:9px;height:9px;'
+                        'border-radius:50%;background:' + bg + ';margin-right:2px;"></span>'
+                    )
+                return (
+                    '<div style="display:flex;align-items:center;padding:8px 0;'
+                    'border-bottom:1px solid #F9FAFB;gap:10px;">'
+                    '<div style="flex:1;min-width:0;">'
+                    '<div style="font-size:0.78rem;font-weight:700;color:#1A1A2E;'
+                    'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
+                    + stock + sec_tag +
+                    '</div>'
+                    '<div style="background:#EDE9FE;border-radius:3px;height:5px;'
+                    'margin-top:5px;overflow:hidden;">'
+                    '<div style="background:#6C3CE1;width:' + f"{bar_w:.1f}" + '%;'
+                    'height:100%;border-radius:3px;"></div>'
+                    '</div></div>'
+                    '<div style="flex-shrink:0;">' + dots + '</div>'
+                    '<div style="font-size:0.78rem;font-weight:800;color:#6C3CE1;'
+                    'width:38px;text-align:right;flex-shrink:0;">'
+                    + f"{alloc:.1f}%" +
+                    '</div></div>'
+                )
+
+            rows_html = "".join(
+                _ch_row(r["stock_name"], int(r["funds_holding"]), r["avg_alloc"], r["sector"])
+                for _, r in top_com.iterrows()
+            )
+
+            legend_parts = []
+            for fund_name in selected:
+                legend_parts.append(
+                    '<div style="display:flex;align-items:center;gap:4px;margin-right:10px;">'
+                    '<div style="width:9px;height:9px;border-radius:50%;background:#6C3CE1;"></div>'
+                    '<span style="font-size:0.65rem;color:#6B7280;">' + short_name(fund_name) + '</span>'
+                    '</div>'
+                )
+            legend_html = "".join(legend_parts)
+
+            st.markdown(
+                '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:0.75rem 1rem;">'
+                '<div style="display:flex;flex-wrap:wrap;gap:2px;margin-bottom:8px;'
+                'padding-bottom:8px;border-bottom:1px solid #F3F4F6;">'
+                + legend_html +
+                '</div>'
+                + rows_html +
+                '<div style="font-size:0.62rem;color:#9CA3AF;margin-top:8px;text-align:right;">'
+                'Filled dots = fund holds stock &nbsp;·&nbsp; bar = avg allocation weight'
+                '</div></div>',
+                unsafe_allow_html=True,
             )
 
     # ── Tab 2: Holdings Overlap ──────────────────────────────────────────────
@@ -751,7 +1400,7 @@ def page_compare():
 
         st.markdown("---")
         st.markdown('<div class="section-title">Stock-Level Allocation Comparison</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-sub">Allocation % of each stock per fund — cells shaded by weight</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-sub">Stocks held by 2+ funds — bar width shows allocation weight per fund</div>', unsafe_allow_html=True)
 
         pivot = (
             sel_h.pivot_table(index="stock_name", columns="fund_name", values="allocation_percent", aggfunc="sum")
@@ -759,18 +1408,50 @@ def page_compare():
         )
         pivot.index = pivot.index.str.strip()
         pivot.columns = [short_name(c) for c in pivot.columns]
-        pivot["_funds_holding"] = (pivot > 0).sum(axis=1)
-        pivot = pivot[pivot["_funds_holding"] > 1].drop(columns=["_funds_holding"])
+        pivot["_n"] = (pivot > 0).sum(axis=1)
+        pivot = pivot[pivot["_n"] > 1].drop(columns=["_n"])
 
         if pivot.empty:
             st.info("No stocks are held by more than one selected fund.")
         else:
-            if pivot.columns.tolist():
-                pivot = pivot.sort_values(pivot.columns.tolist()[0], ascending=False)
+            fund_cols = pivot.columns.tolist()
+            pivot = pivot.sort_values(fund_cols[0], ascending=False)
+
+            # Enrich: add Sector and # Funds columns
+            sector_map = (
+                sel_h.assign(stock_name=sel_h["stock_name"].str.strip())
+                .dropna(subset=["sector"])
+                .groupby("stock_name")["sector"]
+                .first()
+                .to_dict()
+            )
+            pivot_tbl  = pivot.reset_index()
+            pivot_tbl.rename(columns={"stock_name": "Stock"}, inplace=True)
+            pivot_tbl.insert(1, "Sector",  pivot_tbl["Stock"].map(sector_map).fillna("—"))
+            pivot_tbl.insert(2, "# Funds", (pivot_tbl[fund_cols] > 0).sum(axis=1))
+
+            max_alloc_pv = float(pivot_tbl[fund_cols].values.max()) * 1.25 if pivot_tbl[fund_cols].values.max() > 0 else 1.0
+
+            col_cfg = {
+                "Stock":   st.column_config.TextColumn("Stock",   width="medium"),
+                "Sector":  st.column_config.TextColumn("Sector",  width="small"),
+                "# Funds": st.column_config.ProgressColumn(
+                    "# Funds", format="%d",
+                    min_value=0, max_value=len(selected), width="small",
+                ),
+            }
+            for fc in fund_cols:
+                col_cfg[fc] = st.column_config.ProgressColumn(
+                    fc, format="%.2f%%",
+                    min_value=0, max_value=max_alloc_pv,
+                )
+
             st.dataframe(
-                pivot.style.format("{:.2f}%"),
+                pivot_tbl,
                 use_container_width=True,
-                height=520,
+                height=min(560, 36 * len(pivot_tbl) + 38),
+                hide_index=True,
+                column_config=col_cfg,
             )
 
     # ── Tab 3: Sector Analysis ───────────────────────────────────────────────
@@ -813,17 +1494,29 @@ def page_compare():
         st.plotly_chart(fig_bar, use_container_width=True)
 
         st.markdown('<div class="section-title" style="margin-top:1rem;">Sector Concentration Table</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-sub">Each bar shows allocation % to that sector — compare widths across funds at a glance</div>', unsafe_allow_html=True)
+
         sec_pivot = (
             sel_sector.pivot_table(index="sector", columns="fund_short", values="allocation_percent", aggfunc="sum")
             .fillna(0)
         )
-        sec_pivot["Avg"] = sec_pivot.mean(axis=1)
-        sec_pivot = sec_pivot.sort_values("Avg", ascending=False).drop(columns=["Avg"])
+        sec_pivot["_avg"] = sec_pivot.mean(axis=1)
+        sec_pivot = sec_pivot.sort_values("_avg", ascending=False).drop(columns=["_avg"])
+        sec_tbl   = sec_pivot.reset_index()
+        fund_cols = [c for c in sec_tbl.columns if c != "sector"]
+        max_sec   = float(sec_pivot.values.max()) * 1.25
 
+        col_cfg = {"sector": st.column_config.TextColumn("Sector", width="medium")}
+        for fc in fund_cols:
+            col_cfg[fc] = st.column_config.ProgressColumn(
+                fc, format="%.1f%%", min_value=0, max_value=max_sec,
+            )
         st.dataframe(
-            sec_pivot.style.format("{:.1f}%"),
+            sec_tbl,
             use_container_width=True,
-            height=400,
+            height=min(420, 36 * len(sec_tbl) + 38),
+            hide_index=True,
+            column_config=col_cfg,
         )
 
     # ── Tab 4: Common Holdings ───────────────────────────────────────────────
@@ -850,20 +1543,35 @@ def page_compare():
             .reset_index(drop=True)
         )
 
+        def _t(v):
+            try:
+                return "↑" if float(v) > 0.3 else ("↓" if float(v) < -0.3 else "→")
+            except Exception:
+                return "→"
+
+        stock_detail.insert(2, "Trend", stock_detail["avg_3m"].apply(_t))
+        max_alloc_ch = float(stock_detail["avg_alloc"].max()) * 1.25
+
         st.dataframe(
             stock_detail,
             use_container_width=True,
-            height=520,
-            column_config={
-                "stock_name":    st.column_config.TextColumn("Stock"),
-                "funds_holding": st.column_config.NumberColumn("Funds Holding", format="%d"),
-                "avg_alloc":     st.column_config.NumberColumn("Avg Alloc %",   format="%.2f%%"),
-                "avg_3m":        st.column_config.NumberColumn("3M Δ Alloc",    format="%.2f%%"),
-                "avg_6m":        st.column_config.NumberColumn("6M Δ Alloc",    format="%.2f%%"),
-                "avg_1y":        st.column_config.NumberColumn("1Y Δ Alloc",    format="%.2f%%"),
-                "sector":        st.column_config.TextColumn("Sector"),
-            },
+            height=min(560, 36 * len(stock_detail) + 38),
             hide_index=True,
+            column_config={
+                "stock_name":    st.column_config.TextColumn("Stock",        width="medium"),
+                "funds_holding": st.column_config.ProgressColumn(
+                                     "Funds Holding", format="%d",
+                                     min_value=0, max_value=len(selected),   width="small"),
+                "Trend":         st.column_config.TextColumn("Trend",        width=60,
+                                     help="3M direction: ↑ growing · ↓ declining · → stable"),
+                "avg_alloc":     st.column_config.ProgressColumn(
+                                     "Avg Alloc %", format="%.2f%%",
+                                     min_value=0, max_value=max_alloc_ch,    width="medium"),
+                "avg_3m":        st.column_config.NumberColumn("3M Δ%",      format="%+.2f%%", width="small"),
+                "avg_6m":        st.column_config.NumberColumn("6M Δ%",      format="%+.2f%%", width="small"),
+                "avg_1y":        st.column_config.NumberColumn("1Y Δ%",      format="%+.2f%%", width="small"),
+                "sector":        st.column_config.TextColumn("Sector",       width="small"),
+            },
         )
 
     # ── Tab 5: Insights ──────────────────────────────────────────────────────
@@ -1205,22 +1913,403 @@ def page_portfolio_xray():
 
 # ── ROUTER ────────────────────────────────────────────────────────────────────
 
+# ── PAGE: STOCK EXPLORER ─────────────────────────────────────────────────────
+
+def page_stock_explorer():
+    nav_header(back_page="home", back_label="Home")
+
+    holdings = load_holdings()
+    if holdings.empty:
+        st.warning("Holdings data not available.")
+        return
+
+    st.markdown("## Stock Explorer")
+    st.markdown(
+        "<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.5rem;'>"
+        "Select any stock to see which funds hold it, their exposure levels, and historical allocation trends. "
+        "For informational and analytical purposes only — not investment advice.</p>",
+        unsafe_allow_html=True,
+    )
+
+    all_stocks = sorted(holdings["stock_name"].unique().tolist())
+    preselected = st.session_state.pop("preselected_stock", "")
+    default_idx = all_stocks.index(preselected) if preselected in all_stocks else 0
+
+    selected_stock = st.selectbox("Search for a stock", all_stocks, index=default_idx)
+    if not selected_stock:
+        return
+
+    stock_df = holdings[holdings["stock_name"] == selected_stock].sort_values(
+        "allocation_percent", ascending=False
+    )
+    n_holding   = len(stock_df)
+    avg_alloc   = stock_df["allocation_percent"].mean()
+    max_alloc   = stock_df["allocation_percent"].max()
+    max_fund    = stock_df.loc[stock_df["allocation_percent"].idxmax(), "fund_name"]
+    sector      = stock_df["sector"].mode().iloc[0] if not stock_df.empty else "—"
+    total_funds = holdings["fund_name"].nunique()
+
+    # Metric row
+    c1, c2, c3, c4 = st.columns(4)
+    for col, val, label, sub in [
+        (c1, str(n_holding),        "Funds Holding",      f"Out of {total_funds} large-cap funds"),
+        (c2, f"{avg_alloc:.2f}%",   "Avg Allocation",     "Average across holding funds"),
+        (c3, f"{max_alloc:.2f}%",   "Highest Allocation", max_fund[:28]),
+        (c4, sector.title(),        "Sector",             "Primary classification"),
+    ]:
+        with col:
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-value" style="font-size:1.65rem;">{val}</div>
+                <div class="metric-label">{label}</div>
+                <div class="metric-sub">{sub}</div>
+            </div>""", unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Allocation bar chart
+    fig = px.bar(
+        stock_df,
+        x="allocation_percent", y="fund_name", orientation="h",
+        color="allocation_percent",
+        color_continuous_scale=[[0, "#EDE9FE"], [1, "#6C3CE1"]],
+        labels={"allocation_percent": "Allocation %", "fund_name": ""},
+        title=f"{selected_stock} — Allocation Across Funds",
+        text="allocation_percent",
+    )
+    fig.update_traces(texttemplate="%{text:.2f}%", textposition="outside")
+    fig.update_layout(
+        height=max(300, n_holding * 44),
+        yaxis={"categoryorder": "total ascending"},
+        showlegend=False, coloraxis_showscale=False,
+        plot_bgcolor="#F8F9FA", paper_bgcolor="#F8F9FA",
+        title_font_color="#1A1A2E",
+        margin={"l": 10, "r": 60, "t": 45, "b": 20},
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Fund breakdown table
+    st.markdown('<div class="section-title">Fund-level Breakdown</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-sub">Allocation % and 3M / 6M / 1Y allocation changes per fund</div>',
+        unsafe_allow_html=True,
+    )
+
+    display_df = stock_df[[
+        "fund_name", "allocation_percent",
+        "sector", "change_3m_percent", "change_6m_percent", "change_1y_percent",
+    ]].copy()
+
+    def _trend_arrow(v):
+        try:
+            return "↑" if float(v) > 0.3 else ("↓" if float(v) < -0.3 else "→")
+        except Exception:
+            return "→"
+
+    display_df.insert(1, "Trend", display_df["change_3m_percent"].apply(_trend_arrow))
+    display_df.columns = ["Fund", "Trend", "Alloc %", "Sector", "3M Δ%", "6M Δ%", "1Y Δ%"]
+
+    max_alloc_val = float(display_df["Alloc %"].max()) * 1.25
+    tbl_height    = min(580, 36 * len(display_df) + 38)
+
+    st.dataframe(
+        display_df,
+        use_container_width=True,
+        hide_index=True,
+        height=tbl_height,
+        column_config={
+            "Fund":   st.column_config.TextColumn("Fund", width="large"),
+            "Trend":  st.column_config.TextColumn("Trend", width=60,
+                          help="↑ allocation growing · ↓ declining · → stable (3M)"),
+            "Alloc %": st.column_config.ProgressColumn(
+                "Allocation %", format="%.2f%%",
+                min_value=0, max_value=max_alloc_val, width="medium",
+            ),
+            "Sector": st.column_config.TextColumn("Sector", width="medium"),
+            "3M Δ%":  st.column_config.NumberColumn("3M Δ%",  format="%+.2f%%", width="small"),
+            "6M Δ%":  st.column_config.NumberColumn("6M Δ%",  format="%+.2f%%", width="small"),
+            "1Y Δ%":  st.column_config.NumberColumn("1Y Δ%",  format="%+.2f%%", width="small"),
+        },
+    )
+
+    # Insights
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Insights</div>', unsafe_allow_html=True)
+
+    coverage = n_holding / total_funds * 100
+    if coverage >= 80:
+        st.markdown(f"""<div class="insight-card insight-alert">
+            <div class="insight-icon">⚠️</div>
+            <div class="insight-text"><strong>High Concentration Risk</strong> — {selected_stock} appears in
+            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage). Investors holding multiple large-cap
+            funds likely have significant overlapping exposure to this stock.</div></div>""",
+            unsafe_allow_html=True)
+    elif coverage >= 50:
+        st.markdown(f"""<div class="insight-card insight-warning">
+            <div class="insight-icon">📊</div>
+            <div class="insight-text"><strong>Moderate Coverage</strong> — {selected_stock} is held by
+            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage), a common but not universal
+            holding in the large-cap space.</div></div>""", unsafe_allow_html=True)
+    else:
+        st.markdown(f"""<div class="insight-card insight-info">
+            <div class="insight-icon">🔍</div>
+            <div class="insight-text"><strong>Selective Holding</strong> — {selected_stock} appears in only
+            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage), indicating a selective conviction
+            pick rather than a consensus position.</div></div>""", unsafe_allow_html=True)
+
+    alloc_spread = stock_df["allocation_percent"].max() - stock_df["allocation_percent"].min()
+    if alloc_spread > 3:
+        st.markdown(f"""<div class="insight-card insight-info">
+            <div class="insight-icon">📐</div>
+            <div class="insight-text"><strong>Wide Allocation Spread</strong> — Allocation ranges from
+            {stock_df["allocation_percent"].min():.2f}% to {stock_df["allocation_percent"].max():.2f}%
+            (spread: {alloc_spread:.2f}%), reflecting significantly different conviction levels among
+            fund managers.</div></div>""", unsafe_allow_html=True)
+
+    avg_3m = stock_df["change_3m_percent"].mean()
+    if not pd.isna(avg_3m):
+        direction = "increasing" if avg_3m > 0.1 else "decreasing" if avg_3m < -0.1 else "stable"
+        icon      = "📈" if avg_3m > 0.1 else "📉" if avg_3m < -0.1 else "➡️"
+        ctype     = "insight-success" if avg_3m > 0.1 else "insight-warning" if avg_3m < -0.1 else "insight-info"
+        st.markdown(f"""<div class="insight-card {ctype}">
+            <div class="insight-icon">{icon}</div>
+            <div class="insight-text"><strong>3-Month Trend</strong> — Average allocation to
+            {selected_stock} has been {direction} over the last 3 months
+            (avg change: {avg_3m:+.2f}%) across holding funds.</div></div>""",
+            unsafe_allow_html=True)
+
+    st.markdown("""<div class="disclaimer">
+        Stock exposure data is for informational and analytical purposes only — not investment advice.
+        Data sourced from ETMoney.</div>""", unsafe_allow_html=True)
+
+
+# ── PAGE: OVERLAP DRILLDOWN ───────────────────────────────────────────────────
+
+def page_overlap_drilldown():
+    nav_header(back_page="home", back_label="Home")
+
+    holdings   = load_holdings()
+    similarity = load_similarity()
+
+    if similarity.empty:
+        st.warning("Similarity data not available.")
+        return
+
+    def _short(name):
+        return name.replace(" Large Cap Fund", "").replace(" Large Cap", "").strip()
+
+    st.markdown("## Fund Overlap Analysis")
+    st.markdown(
+        "<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.5rem;'>"
+        "Explore which fund pairs share the most holdings — a key indicator of portfolio redundancy. "
+        "For informational and analytical purposes only — not investment advice.</p>",
+        unsafe_allow_html=True,
+    )
+
+    top_row    = similarity.nlargest(1, "similarity_score").iloc[0]
+    max_pair_a = top_row["fund_a"]
+    max_pair_b = top_row["fund_b"]
+    max_score  = top_row["similarity_score"]
+    max_common = int(top_row["common_stocks"])
+    high_count = int((similarity["similarity_score"] >= 60).sum())
+
+    # ── Summary metrics ──
+    c1, c2, c3, c4 = st.columns(4)
+    for col, val, label, sub in [
+        (c1, f"{max_score:.0f}%",   "Highest Overlap",    "Max pairwise similarity score"),
+        (c2, str(max_common),       "Common Stocks",      "In the top-overlap pair"),
+        (c3, str(high_count),       "High-Overlap Pairs", "Pairs with ≥60% overlap"),
+        (c4, str(len(similarity)),  "Pairs Analyzed",     "All fund-pair combinations"),
+    ]:
+        with col:
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-value" style="font-size:2rem;">{val}</div>
+                <div class="metric-label">{label}</div>
+                <div class="metric-sub">{sub}</div>
+            </div>""", unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── Top 15 bar chart (full width) ──
+    st.markdown('<div class="section-title">Top 15 Fund Pair Overlaps</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-sub">Higher score = more shared holdings = higher redundancy risk</div>',
+        unsafe_allow_html=True,
+    )
+    top15 = similarity.nlargest(15, "similarity_score").copy()
+    top15["pair"] = top15.apply(
+        lambda r: f"{_short(r['fund_a'])} ↔ {_short(r['fund_b'])}", axis=1
+    )
+    fig = px.bar(
+        top15.iloc[::-1],
+        x="similarity_score", y="pair", orientation="h",
+        color="similarity_score",
+        color_continuous_scale=[[0, "#EDE9FE"], [0.6, "#9B7FE8"], [1, "#6C3CE1"]],
+        labels={"similarity_score": "Overlap %", "pair": ""},
+        text="similarity_score",
+    )
+    fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+    fig.update_layout(
+        height=460, showlegend=False, coloraxis_showscale=False,
+        plot_bgcolor="#F8F9FA", paper_bgcolor="#F8F9FA",
+        margin={"l": 10, "r": 60, "t": 10, "b": 20},
+        xaxis={"range": [0, max_score + 12]},
+        yaxis={"tickfont": {"size": 11}},
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # ── All Pairs table (full width, selectable) ──
+    st.markdown('<div class="section-title">All Fund Pairs</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-sub">Select a row to update the Common Holdings section below</div>',
+        unsafe_allow_html=True,
+    )
+
+    sorted_sim = similarity.sort_values("similarity_score", ascending=False).reset_index(drop=True)
+
+    def _risk(score):
+        if score >= 65: return "High"
+        if score >= 45: return "Medium"
+        return "Low"
+
+    disp = pd.DataFrame({
+        "Fund A":        sorted_sim["fund_a"].apply(_short),
+        "Fund B":        sorted_sim["fund_b"].apply(_short),
+        "Overlap %":     sorted_sim["similarity_score"],
+        "Common Stocks": sorted_sim["common_stocks"],
+        "Risk Level":    sorted_sim["similarity_score"].apply(_risk),
+    })
+
+    sel_result = st.dataframe(
+        disp,
+        use_container_width=True,
+        hide_index=True,
+        height=min(400, 36 * len(disp) + 38),
+        on_select="rerun",
+        selection_mode="single-row",
+        column_config={
+            "Fund A":        st.column_config.TextColumn("Fund A",        width="large"),
+            "Fund B":        st.column_config.TextColumn("Fund B",        width="large"),
+            "Overlap %":     st.column_config.ProgressColumn(
+                                 "Overlap %", format="%.1f%%",
+                                 min_value=0, max_value=100, width="medium"),
+            "Common Stocks": st.column_config.NumberColumn(
+                                 "Common Stocks", format="%d stocks",    width="small"),
+            "Risk Level":    st.column_config.TextColumn("Risk",          width="small"),
+        },
+    )
+
+    # Resolve selected pair (default = top pair)
+    sel_rows = sel_result.selection.rows
+    if sel_rows:
+        row       = sorted_sim.iloc[sel_rows[0]]
+        sel_a     = row["fund_a"]
+        sel_b     = row["fund_b"]
+        sel_score = float(row["similarity_score"])
+        sel_n     = int(row["common_stocks"])
+    else:
+        sel_a, sel_b, sel_score, sel_n = max_pair_a, max_pair_b, max_score, max_common
+
+    short_a = _short(sel_a)
+    short_b = _short(sel_b)
+
+    # ── Common Holdings (dynamic) ──
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="section-title">Common Holdings: {short_a} ↔ {short_b}</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<div class="section-sub">{sel_n} shared positions · {sel_score:.1f}% overlap score</div>',
+        unsafe_allow_html=True,
+    )
+
+    if not holdings.empty:
+        h_a = holdings[holdings["fund_name"] == sel_a][
+            ["stock_name", "allocation_percent", "sector"]
+        ].rename(columns={"allocation_percent": "alloc_a"})
+        h_b = holdings[holdings["fund_name"] == sel_b][
+            ["stock_name", "allocation_percent"]
+        ].rename(columns={"allocation_percent": "alloc_b"})
+        common_df = pd.merge(h_a, h_b, on="stock_name").sort_values("alloc_a", ascending=False)
+        common_df.columns = ["Stock", f"{short_a} %", "Sector", f"{short_b} %"]
+        max_alloc_scale = max(
+            common_df[f"{short_a} %"].max(), common_df[f"{short_b} %"].max()
+        ) * 1.25
+        st.dataframe(
+            common_df,
+            use_container_width=True,
+            hide_index=True,
+            height=min(520, 36 * len(common_df) + 38),
+            column_config={
+                "Stock": st.column_config.TextColumn("Stock", width="medium"),
+                f"{short_a} %": st.column_config.ProgressColumn(
+                    short_a, format="%.2f%%",
+                    min_value=0, max_value=max_alloc_scale, width="medium",
+                ),
+                "Sector": st.column_config.TextColumn("Sector", width="small"),
+                f"{short_b} %": st.column_config.ProgressColumn(
+                    short_b, format="%.2f%%",
+                    min_value=0, max_value=max_alloc_scale, width="medium",
+                ),
+            },
+        )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button(
+        f"Open Full Comparison: {short_a} vs {short_b} →",
+        type="primary", use_container_width=True,
+    ):
+        st.session_state.selected_funds = [sel_a, sel_b]
+        st.session_state.page = "compare"
+        st.rerun()
+
+    # ── Insights ──
+    st.markdown("<br>", unsafe_allow_html=True)
+    if high_count > 0:
+        st.markdown(f"""<div class="insight-card insight-warning">
+            <div class="insight-icon">⚠️</div>
+            <div class="insight-text"><strong>{high_count} High-Overlap Pair(s)</strong> —
+            {high_count} fund combination(s) share ≥60% of their portfolios. Holding these funds
+            together may provide less diversification than expected.</div></div>""",
+            unsafe_allow_html=True)
+
+    median_overlap = similarity["similarity_score"].median()
+    st.markdown(f"""<div class="insight-card insight-info">
+        <div class="insight-icon">📊</div>
+        <div class="insight-text"><strong>Median Overlap: {median_overlap:.1f}%</strong> —
+        The typical large-cap fund pair shares {median_overlap:.1f}% of their portfolio, reflecting
+        the structural concentration of the large-cap universe around a core set of index-dominant
+        stocks.</div></div>""", unsafe_allow_html=True)
+
+    st.markdown("""<div class="disclaimer">
+        Overlap analysis is for informational and analytical purposes only — not investment advice.
+        Data sourced from ETMoney.</div>""", unsafe_allow_html=True)
+
+
 def main():
     for key, default in [
-        ("page",           "home"),
-        ("selected_funds", []),
-        ("selected_category", "Large Cap"),
+        ("page",              "home"),
+        ("selected_funds",    []),
+        ("selected_categories", []),
+        ("preselected_stock", ""),
     ]:
         if key not in st.session_state:
             st.session_state[key] = default
 
+    if "explorer_layout" not in st.session_state:
+        st.session_state.explorer_layout = "D"
+
     routes = {
-        "home":             page_home,
-        "category":         page_category_select,
-        "explorer":         page_fund_explorer,
-        "compare":          page_compare,
-        "portfolio_upload": page_portfolio_upload,
-        "portfolio_xray":   page_portfolio_xray,
+        "home":               page_home,
+        "category":           page_category_select,
+        "explorer":           page_fund_explorer,
+        "compare":            page_compare,
+        "portfolio_upload":   page_portfolio_upload,
+        "portfolio_xray":     page_portfolio_xray,
+        "stock_explorer":     page_stock_explorer,
+        "overlap_drilldown":  page_overlap_drilldown,
     }
     routes.get(st.session_state.page, page_home)()
 
