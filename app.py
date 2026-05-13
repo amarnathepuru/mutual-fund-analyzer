@@ -3,12 +3,13 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
+import urllib.parse
 
 st.set_page_config(
     page_title="FundInsight — Investment Intelligence",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 # ── GLOBAL CSS ────────────────────────────────────────────────────────────────
@@ -17,9 +18,19 @@ st.markdown("""
 <style>
 [data-testid="stAppViewContainer"] { background: #F8F9FA; }
 [data-testid="stHeader"] { display: none; }
-[data-testid="stSidebar"] { display: none; }
 footer { display: none; }
-.block-container { padding: 2rem 3rem !important; max-width: 1280px !important; margin: 0 auto; }
+.block-container { padding: 2rem 2.5rem !important; max-width: 1100px !important; margin: 0 auto; }
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background: #fff !important;
+    border-right: 1px solid #E5E7EB !important;
+    min-width: 220px !important;
+    max-width: 240px !important;
+    overflow: visible !important;
+}
+[data-testid="stSidebar"] > div:first-child { padding: 1.5rem 0.75rem 1rem; overflow: visible !important; }
+[data-testid="stSidebarCollapseButton"] { display: none; }
 
 /* Typography */
 h1, h2, h3 { color: #1A1A2E; }
@@ -84,6 +95,82 @@ a.metric-card-link:hover .metric-card,
 .cat-name { font-size: 0.9rem; font-weight: 700; color: #1A1A2E; margin-bottom: 4px; margin-top: 8px; }
 .cat-desc { font-size: 0.75rem; color: #6B7280; line-height: 1.5; }
 
+/* Primary Streamlit button — override red to purple */
+.stButton > button[kind="primaryFormSubmit"],
+.stButton > button[kind="primary"],
+button[data-testid="baseButton-primary"] {
+    background: #6C3CE1 !important;
+    border-color: #6C3CE1 !important;
+    color: #fff !important;
+}
+
+/* Category cards */
+.cat-card-inner {
+    background: #fff; border: 1.5px solid #E5E7EB; border-radius: 12px;
+    padding: .9rem .9rem .85rem; min-height: 120px; position: relative;
+    transition: border-color .15s, box-shadow .15s;
+}
+.cat-card-inner.selected {
+    background: #F5F3FF; border: 2px solid #6C3CE1;
+    box-shadow: 0 0 0 3px rgba(108,60,225,.10);
+}
+/* Style the checkbox in each cat-card column */
+.cat-card-col [data-testid="stCheckbox"] {
+    margin-top: .3rem;
+}
+.cat-card-col [data-testid="stCheckbox"] label {
+    font-size: .78rem !important; color: #6B7280 !important; font-weight: 500;
+}
+.cat-card-col [data-testid="stCheckbox"] label span { color: #6B7280 !important; }
+
+/* ── Nav header pill buttons ─────────────────────────────────────────────── */
+a.nav-pill {
+    display: inline-flex; align-items: center; gap: .3rem;
+    padding: .3rem .9rem; border-radius: 9999px;
+    border: 1.5px solid #E5E7EB; background: #fff;
+    color: #6B7280; font-size: .78rem; font-weight: 600;
+    text-decoration: none; cursor: pointer;
+    transition: border-color .15s, color .15s, background .15s;
+    white-space: nowrap;
+}
+a.nav-pill:hover {
+    border-color: #6C3CE1; color: #6C3CE1; background: #F5F3FF;
+}
+.nav-pill-row {
+    display: flex; gap: .5rem; align-items: center;
+    margin-bottom: .85rem;
+}
+
+/* ── Sidebar nav card tooltip ────────────────────────────────────────────── */
+.nav-tooltip-wrap { position: relative; display: block; }
+.nav-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-4px);
+    transition: opacity .18s ease, transform .18s ease, visibility .18s;
+    background: #1A1A2E;
+    color: #fff;
+    border-radius: 10px;
+    padding: .7rem .95rem;
+    font-size: .75rem;
+    line-height: 1.55;
+    width: 210px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.22);
+    z-index: 9999;
+    pointer-events: none;
+    white-space: normal;
+}
+.nav-tooltip-wrap:hover .nav-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+.nav-tooltip-title { font-weight: 700; margin-bottom: .4rem; color: #C4B5FD; font-size: .78rem; }
+.nav-tooltip-item { display: flex; gap: .35rem; margin-bottom: .22rem; opacity: .88; align-items: flex-start; }
+
 /* Badges */
 .badge {
     display: inline-block; padding: 2px 8px; border-radius: 9999px;
@@ -125,6 +212,63 @@ a.metric-card-link:hover .metric-card,
 }
 .overlap-bar-bg { background: #F3F4F6; border-radius: 4px; height: 8px; overflow: hidden; margin-top: 8px; }
 .overlap-bar-fill { background: #6C3CE1; height: 100%; border-radius: 4px; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+
+/* Tablet (≤1024px) — tighten padding */
+@media (max-width: 1024px) {
+    .block-container { padding: 1.5rem 1.25rem !important; }
+}
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+    /* Layout */
+    .block-container { padding: 0.75rem !important; max-width: 100% !important; }
+
+    /* Show sidebar hamburger that we hid globally */
+    [data-testid="stSidebarCollapseButton"] { display: flex !important; }
+
+    /* Stack ALL st.columns() vertically */
+    [data-testid="stHorizontalBlock"] { flex-wrap: wrap !important; gap: 0.5rem !important; }
+    [data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        min-width: 100% !important;
+    }
+
+    /* Typography scale-down */
+    h1 { font-size: 1.5rem !important; }
+    h2 { font-size: 1.25rem !important; }
+    h3 { font-size: 1.1rem !important; }
+
+    /* Cards — reduce padding */
+    .feat-card  { padding: 1rem !important; }
+    .card       { padding: 1rem !important; }
+    .metric-card { padding: 1rem !important; }
+    .journey-card { padding: 1.25rem !important; }
+
+    /* Fund explorer cards — single column */
+    .action-card { margin-bottom: 0.5rem !important; }
+
+    /* Disclaimer */
+    .disclaimer { font-size: 0.65rem !important; padding: 0.5rem 0.75rem !important; }
+
+    /* Insight cards */
+    .insight-card { padding: 0.65rem 0.75rem !important; }
+
+    /* Overlap rows */
+    .overlap-row { padding: 0.75rem !important; }
+
+    /* Hide decorative elements on very small screens */
+    .hide-mobile { display: none !important; }
+}
+
+/* Extra small (≤480px) — further scale */
+@media (max-width: 480px) {
+    .block-container { padding: 0.5rem !important; }
+    .feat-card  { padding: 0.75rem !important; }
+    .card       { padding: 0.75rem !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -385,20 +529,156 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df):
 # ── NAV HEADER ────────────────────────────────────────────────────────────────
 
 def nav_header(back_page=None, back_label="Back"):
-    c1, c2 = st.columns([1, 6])
-    with c1:
-        st.markdown('<div class="app-logo">📊 FundInsight</div>', unsafe_allow_html=True)
-    if back_page:
-        with c2:
-            if st.button(f"← {back_label}", key="nav_back_btn"):
-                st.session_state.page = back_page
-                st.rerun()
+    back_pill = ""
+    if back_page and back_page != "home":
+        href = f"?nav={back_page}"
+        # Preserve selected_categories in URL so the explorer isn't empty after a reload
+        if back_page == "explorer":
+            cats = st.session_state.get("selected_categories", [])
+            if cats:
+                cats_enc = "|".join(urllib.parse.quote_plus(c) for c in cats)
+                href = f"?nav={back_page}&cats={cats_enc}"
+        back_pill = f'<a href="{href}" target="_self" class="nav-pill">← {back_label}</a>'
+
+    st.markdown(
+        f'<div class="nav-pill-row">'
+        f'<a href="?nav=home" target="_self" class="nav-pill">🏠 Home</a>'
+        f'{back_pill}'
+        f'</div>'
+        f'<div style="height:1px;background:#E5E7EB;margin:0 0 1.25rem;"></div>',
+        unsafe_allow_html=True,
+    )
+
+
+# ── SIDEBAR ───────────────────────────────────────────────────────────────────
+
+def render_sidebar():
+    page = st.session_state.get("page", "home")
+
+    with st.sidebar:
+        st.markdown(
+            '<div style="font-size:1.1rem;font-weight:800;color:#6C3CE1;'
+            'display:flex;align-items:center;gap:.4rem;padding:.25rem 0 1.5rem;">'
+            '<span style="font-size:1.25rem;">📊</span> FundInsight</div>',
+            unsafe_allow_html=True,
+        )
+
+        nav_items = [
+            ("category",          ["category", "explorer", "compare"],
+             "🔍", "Compare funds",   "Overlap · sector · holdings", "#EDE9FE", "#6C3CE1",
+             "Compare up to 5 funds",
+             ["Pairwise portfolio overlap (0–100%)", "Sector & holdings breakdown", "Common stocks with allocation trends"]),
+            ("stock_explorer",    ["stock_explorer"],
+             "📈", "Analyse a stock", "Which funds hold it",          "#DBEAFE", "#2563EB",
+             "Stock-level intelligence",
+             ["Search any stock by name", "See all funds holding it", "Allocation % + 3M/6M/1Y change"]),
+            ("overlap_drilldown", ["overlap_drilldown"],
+             "⊞",  "Overlap matrix",  "Full category view",           "#D1FAE5", "#059669",
+             "Full category overlap matrix",
+             ["Every fund-pair scored 0–100%", "Spot near-identical funds instantly", "Works across all 7 categories"]),
+            ("portfolio_upload",  ["portfolio_upload", "portfolio_xray"],
+             "📋", "Portfolio X-Ray", "Upload your holdings",         "#FEF3C7", "#D97706",
+             "X-Ray your portfolio",
+             ["CSV / XLSX upload or manual entry", "Hidden stock & sector exposure", "Detect duplicate fund holdings"]),
+        ]
+
+        for target, active_pages, icon, title, sub, ic_bg, ic_color, tip_title, tip_bullets in nav_items:
+            is_active   = page in active_pages
+            card_bg     = "#F5F3FF"      if is_active else "#FAFAFA"
+            card_border = "#6C3CE1"      if is_active else "#E5E7EB"
+            title_color = "#6C3CE1"      if is_active else "#1A1A2E"
+            arrow_color = "#6C3CE1"      if is_active else "#D1D5DB"
+            shadow      = "0 2px 8px rgba(108,60,225,.10)" if is_active else "none"
+            bullets_html = "".join(
+                f'<div class="nav-tooltip-item"><span>▸</span>{b}</div>' for b in tip_bullets
+            )
+            st.markdown(
+                f'<div class="nav-tooltip-wrap">'
+                f'<a href="?nav={target}" target="_self" style="all:unset;display:block;cursor:pointer;">'
+                f'<div style="background:{card_bg};border:1.5px solid {card_border};border-radius:12px;'
+                f'padding:.75rem .85rem;margin-bottom:.5rem;box-shadow:{shadow};transition:all .15s;">'
+                f'<div style="display:flex;align-items:center;gap:.7rem;">'
+                f'<div style="width:2.25rem;height:2.25rem;border-radius:9px;background:{ic_bg};'
+                f'display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">'
+                f'{icon}</div>'
+                f'<div style="flex:1;min-width:0;">'
+                f'<div style="font-size:.85rem;font-weight:700;color:{title_color};">{title}</div>'
+                f'<div style="font-size:.7rem;color:#9CA3AF;margin-top:2px;">{sub}</div>'
+                f'</div>'
+                f'<div style="font-size:.8rem;color:{arrow_color};font-weight:600;">→</div>'
+                f'</div></div></a>'
+                f'<div class="nav-tooltip">'
+                f'<div class="nav-tooltip-title">{tip_title}</div>'
+                f'{bullets_html}'
+                f'</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
+        # Stats at bottom
+        st.markdown('<div style="height:2rem;"></div>', unsafe_allow_html=True)
+        holdings = load_holdings()
+        master   = load_master()
+        n_funds  = master["fund_name"].nunique()    if not master.empty   else 0
+        n_stocks = holdings["stock_name"].nunique() if not holdings.empty else 0
+        n_cats   = master["category"].nunique()     if not master.empty   else 0
+        st.markdown(
+            f'<div style="font-size:.72rem;color:#9CA3AF;line-height:2;padding:.25rem 0;">'
+            f'{n_funds} funds · <strong style="color:#6C3CE1;">{n_stocks} stocks</strong><br>'
+            f'{n_cats} categories</div>',
+            unsafe_allow_html=True,
+        )
+
+
+# ── WELCOME SCREEN ────────────────────────────────────────────────────────────
+
+def render_welcome():
+    st.markdown(
+        '<div style="font-size:2rem;font-weight:900;color:#1A1A2E;line-height:1.2;margin-bottom:.75rem;">'
+        'Invest with <span style="color:#6C3CE1;">clarity.</span><br>'
+        'Backed by <span style="color:#6C3CE1;">data.</span></div>'
+        '<p style="font-size:.95rem;color:#6B7280;line-height:1.75;max-width:560px;margin:0 0 1.5rem;">'
+        'Most mutual fund apps show NAV charts and SIP calculators. '
+        'FundInsight goes deeper — it reveals what\'s actually <em>inside</em> your funds.'
+        '</p>',
+        unsafe_allow_html=True,
+    )
+
+    features = [
+        ("🔍", "Compare funds side-by-side",
+         "Pick up to 5 funds and instantly see portfolio overlap, sector exposure, common holdings and redundancy across 231 funds in 7 categories."),
+        ("📌", "Hidden stock exposure",
+         "You might think you own 5 funds. But you actually own 12% HDFC Bank — sitting inside every single one of them. We surface that."),
+        ("⊞", "Overlap matrix",
+         "See the full overlap heatmap across every fund pair in a category. Instantly spot which funds are practically identical."),
+        ("📋", "Portfolio X-Ray",
+         "Upload your existing holdings (CSV/XLSX) and get a full breakdown of true diversification, hidden concentration and duplicate funds."),
+        ("📈", "Stock-level intelligence",
+         "Pick any stock and see every fund that holds it, with allocation % and 3-month change — useful for tracking institutional conviction."),
+    ]
+
+    for icon, title, desc in features:
+        st.markdown(
+            f'<div style="display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.25rem;'
+            f'background:#fff;border:1px solid #E5E7EB;border-radius:12px;margin-bottom:.65rem;">'
+            f'<div style="width:2.25rem;height:2.25rem;border-radius:9px;background:#EDE9FE;'
+            f'display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">{icon}</div>'
+            f'<div><div style="font-size:.9rem;font-weight:700;color:#1A1A2E;margin-bottom:.25rem;">{title}</div>'
+            f'<div style="font-size:.82rem;color:#6B7280;line-height:1.6;">{desc}</div>'
+            f'</div></div>',
+            unsafe_allow_html=True,
+        )
+
+    st.markdown(
+        '<p style="font-size:.78rem;color:#9CA3AF;margin-top:1.5rem;text-align:center;">'
+        'Select a feature from the sidebar to get started.</p>',
+        unsafe_allow_html=True,
+    )
 
 
 # ── PAGE: HOME ────────────────────────────────────────────────────────────────
 
 def page_home():
-    # Handle card-click navigation via query params
     nav_target = st.query_params.get("nav", "")
     if nav_target:
         if "stock" in st.query_params:
@@ -409,151 +689,186 @@ def page_home():
 
     holdings   = load_holdings()
     similarity = load_similarity()
+    master     = load_master()
 
-    n_funds  = holdings["fund_name"].nunique()  if not holdings.empty else 0
+    n_funds  = master["fund_name"].nunique()    if not master.empty   else 0
+    n_cats   = master["category"].nunique()     if not master.empty   else 0
     n_unique = holdings["stock_name"].nunique() if not holdings.empty else 0
     max_sim  = similarity["normalized_score"].max() if not similarity.empty else 0
 
-    top5 = (
+    top_stocks = (
         holdings.groupby("stock_name").agg(
             funds=("fund_name", "nunique"),
             avg_alloc=("allocation_percent", "mean"),
-        ).nlargest(5, "funds").reset_index()
+        ).nlargest(6, "funds").reset_index()
         if not holdings.empty else pd.DataFrame()
     )
 
-    st.markdown('<div class="app-logo" style="margin-bottom:0.5rem;">📊 FundInsight</div>',
-                unsafe_allow_html=True)
-    st.markdown(
-        "<p style='color:#6B7280;font-size:0.88rem;margin-bottom:1.75rem;'>"
-        "Portfolio analytics and transparency — not investment advice</p>",
-        unsafe_allow_html=True,
-    )
-
-    # ── Action cards with embedded stats ──
+    # ── Page-level CSS ────────────────────────────────────────────────────────
     st.markdown("""
     <style>
-    .action-card {
-        background: #fff;
-        border: 1.5px solid #E5E7EB;
-        border-radius: 14px;
-        overflow: hidden;
-        margin-bottom: 0.85rem;
-        transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    .feat-card {
+        background:#fff; border:1.5px solid #E5E7EB; border-radius:16px;
+        padding:1.5rem; height:100%;
+        transition:border-color .2s, box-shadow .2s, transform .2s;
     }
-    .action-card:hover {
-        border-color: #6C3CE1;
-        box-shadow: 0 4px 20px rgba(108,60,225,0.12);
-        transform: translateY(-2px);
+    a:hover .feat-card {
+        border-color:#6C3CE1; box-shadow:0 4px 20px rgba(108,60,225,.12);
+        transform:translateY(-2px);
     }
-    a.ac-body {
-        all: unset;
-        display: flex;
-        gap: 1.25rem;
-        align-items: flex-start;
-        padding: 1.25rem 1.5rem;
-        cursor: pointer;
-        text-decoration: none !important;
-    }
-    a.ac-body:hover { background: #F5F3FF; }
-    .ac-icon  { font-size: 2rem; flex-shrink: 0; margin-top: 2px; }
-    .ac-title { font-size: 1rem; font-weight: 700; color: #1A1A2E !important;
-                margin-bottom: 5px; text-decoration: none !important; }
-    .ac-desc  { font-size: 0.82rem; color: #6B7280 !important;
-                line-height: 1.65; text-decoration: none !important; }
-    .ac-stats { display: flex; border-top: 1px solid #F3F4F6;
-                background: #FAFAFA; }
-    a.ac-stat-chip {
-        all: unset;
-        flex: 1;
-        cursor: pointer;
-        padding: 0.65rem 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        border-right: 1px solid #F3F4F6;
-        transition: background 0.15s;
-        text-decoration: none !important;
-    }
-    a.ac-stat-chip:last-child { border-right: none; }
-    a.ac-stat-chip:hover { background: #EDE9FE; }
-    .ac-stat-val   { font-size: 1.3rem; font-weight: 800; color: #6C3CE1 !important;
-                     line-height: 1; text-decoration: none !important; }
-    .ac-stat-label { font-size: 0.68rem; color: #6B7280 !important; font-weight: 500;
-                     text-decoration: none !important; }
+    .feat-icon  { font-size:1.75rem; margin-bottom:.75rem; }
+    .feat-title { font-size:1rem; font-weight:700; color:#1A1A2E; margin-bottom:.4rem; }
+    .feat-desc  { font-size:.82rem; color:#6B7280; line-height:1.65; margin-bottom:1rem; }
+    .feat-foot  { font-size:.78rem; color:#6C3CE1; font-weight:600; }
+    .stock-row  { padding:.7rem 0; border-bottom:1px solid #F3F4F6; }
+    .stock-row:last-child { border-bottom:none; }
     </style>
     """, unsafe_allow_html=True)
 
-    # Compare Mutual Funds card
+    # ── Top nav bar ───────────────────────────────────────────────────────────
     st.markdown(
-        '<div class="action-card">'
-        '<a href="?nav=category" target="_self" class="ac-body">'
-        '<div class="ac-icon">🔍</div>'
-        '<div>'
-        '<div class="ac-title">Compare Mutual Funds</div>'
-        f'<div class="ac-desc">Pick up to 5 funds and instantly see portfolio overlap, sector exposure, '
-        f'common holdings and redundancy — across {n_funds} funds across 7 categories.</div>'
-        '</div></a>'
-        '<div class="ac-stats">'
-        f'<a href="?nav=stock_explorer" target="_self" class="ac-stat-chip">'
-        f'<div class="ac-stat-val">{n_unique}</div>'
-        '<div class="ac-stat-label">Unique Stocks &nbsp;↗</div>'
-        '</a>'
-        f'<a href="?nav=overlap_drilldown" target="_self" class="ac-stat-chip">'
-        f'<div class="ac-stat-val">{max_sim:.0f}%</div>'
-        '<div class="ac-stat-label">Max Fund Overlap &nbsp;↗</div>'
-        '</a>'
-        f'<div class="ac-stat-chip" style="cursor:default;">'
-        f'<div class="ac-stat-val">{n_funds}</div>'
-        '<div class="ac-stat-label">Funds in Registry</div>'
-        '</div>'
+        '<div style="display:flex;align-items:center;justify-content:space-between;'
+        'padding-bottom:1.25rem;border-bottom:1px solid #E5E7EB;margin-bottom:2.5rem;">'
+        '<div class="app-logo">📊 FundInsight</div>'
+        '<div style="display:flex;gap:1.5rem;align-items:center;">'
+        '<a href="?nav=home" target="_self" style="font-size:.85rem;font-weight:600;color:#6C3CE1;text-decoration:none;">Home</a>'
+        '<a href="?nav=category" target="_self" style="font-size:.85rem;font-weight:500;color:#6B7280;text-decoration:none;">Compare</a>'
+        '<a href="?nav=portfolio_upload" target="_self" style="font-size:.85rem;font-weight:500;color:#6B7280;text-decoration:none;">X-Ray</a>'
         '</div>'
         '</div>',
         unsafe_allow_html=True,
     )
 
-    # Portfolio X-Ray card
-    st.markdown(
-        '<div class="action-card">'
-        '<a href="?nav=portfolio_upload" target="_self" class="ac-body">'
-        '<div class="ac-icon">📋</div>'
-        '<div>'
-        '<div class="ac-title">Portfolio X-Ray</div>'
-        '<div class="ac-desc">Upload your existing mutual fund portfolio and discover hidden stock '
-        'exposure, duplicate funds, sector concentration and true diversification across all your '
-        'holdings.</div>'
-        '</div></a>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
-    # ── Top 5 widely-held stocks as clickable chips ──
-    if not top5.empty:
+    # ── Hero ──────────────────────────────────────────────────────────────────
+    hero_col, deco_col = st.columns([3, 2], gap="large")
+    with deco_col:
         st.markdown(
-            "<p style='font-size:0.75rem;font-weight:700;color:#6B7280;text-transform:uppercase;"
-            "letter-spacing:0.5px;margin:1.25rem 0 0.5rem;'>Most Widely Held Stocks</p>",
+            '<div class="hide-mobile" style="display:flex;align-items:center;justify-content:center;height:100%;padding:1rem 0;">'
+            '<div style="background:linear-gradient(135deg,#F5F3FF 0%,#EDE9FE 100%);'
+            'border:1.5px solid #DDD6FE;border-radius:20px;padding:2rem 2.5rem;text-align:center;">'
+            '<div style="font-size:3.5rem;margin-bottom:.5rem;">📊</div>'
+            '<div style="font-size:.8rem;color:#6C3CE1;font-weight:700;letter-spacing:.5px;">'
+            'ANALYZE · COMPARE · DECIDE</div>'
+            '</div></div>',
             unsafe_allow_html=True,
         )
-        chips = ""
-        for _, row in top5.iterrows():
-            slug = row["stock_name"].replace(" ", "+")
-            chips += (
-                '<a href="?nav=stock_explorer&stock=' + slug + '" target="_self" '
-                'style="all:unset;cursor:pointer;display:inline-block;margin:0 6px 6px 0;">'
-                '<div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:9999px;'
-                'padding:5px 14px;display:flex;align-items:center;gap:8px;'
-                'transition:background 0.15s,border-color 0.15s;">'
-                '<span style="font-size:0.78rem;font-weight:700;color:#1A1A2E;">'
-                + str(row["stock_name"]) + '</span>'
-                '<span style="font-size:0.68rem;color:#6C3CE1;font-weight:600;">'
-                + str(int(row["funds"])) + 'f&nbsp;·&nbsp;' + f'{row["avg_alloc"]:.1f}%' + '</span>'
-                '</div></a>'
+    with hero_col:
+        st.markdown(
+            '<div style="padding:1rem 0 2rem;">'
+            '<div style="font-size:2.75rem;font-weight:900;color:#1A1A2E;'
+            'line-height:1.15;letter-spacing:-0.5px;margin-bottom:.85rem;">'
+            'Invest with <span style="color:#6C3CE1;">clarity.</span><br>'
+            'Backed by <span style="color:#6C3CE1;">data.</span>'
+            '</div>'
+            '<p style="font-size:1rem;color:#6B7280;line-height:1.75;margin:0;">'
+            'Compare funds, analyze portfolios and make informed investment decisions.'
+            '</p>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── Feature cards ─────────────────────────────────────────────────────────
+    fc1, fc2, fc3 = st.columns(3, gap="medium")
+    for col, href, icon, title, desc, foot in [
+        (fc1, "?nav=category",
+         "🔍", "Compare Funds",
+         "Pick up to 5 funds and instantly see portfolio overlap, sector exposure, common holdings and hidden redundancy.",
+         f"{n_funds} funds · {n_cats} categories →"),
+        (fc2, "?nav=portfolio_upload",
+         "📋", "Portfolio X-Ray",
+         "Upload your existing mutual fund portfolio and uncover hidden stock exposure, duplicate funds and sector concentration.",
+         "CSV / XLSX upload →"),
+        (fc3, "?nav=category",
+         "📂", "Explore Categories",
+         f"Browse {n_funds} funds across {n_cats} categories with live star ratings, returns and risk metrics side by side.",
+         f"{n_cats} categories →"),
+    ]:
+        with col:
+            st.markdown(
+                f'<a href="{href}" target="_self" style="all:unset;display:block;cursor:pointer;">'
+                f'<div class="feat-card">'
+                f'<div class="feat-icon">{icon}</div>'
+                f'<div class="feat-title">{title}</div>'
+                f'<div class="feat-desc">{desc}</div>'
+                f'<div class="feat-foot">{foot}</div>'
+                f'</div></a>',
+                unsafe_allow_html=True,
             )
+
+    st.markdown('<div style="height:2rem;"></div>', unsafe_allow_html=True)
+
+    # ── Stats strip ───────────────────────────────────────────────────────────
+    s1, s2, s3, s4 = st.columns(4, gap="medium")
+    for col, val, label in [
+        (s1, str(n_funds),       "Funds Tracked"),
+        (s2, str(n_unique),      "Unique Stocks"),
+        (s3, f"{max_sim:.0f}%",  "Max Fund Overlap"),
+        (s4, str(n_cats),        "Fund Categories"),
+    ]:
+        with col:
+            st.markdown(
+                f'<div style="background:#fff;border:1px solid #E5E7EB;border-radius:12px;'
+                f'padding:1rem 1.25rem;text-align:center;">'
+                f'<div style="font-size:1.6rem;font-weight:800;color:#6C3CE1;">{val}</div>'
+                f'<div style="font-size:.7rem;color:#6B7280;font-weight:600;text-transform:uppercase;'
+                f'letter-spacing:.4px;margin-top:4px;">{label}</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
+    st.markdown('<div style="height:2rem;"></div>', unsafe_allow_html=True)
+
+    # ── Most Widely Held Stocks ───────────────────────────────────────────────
+    if not top_stocks.empty:
+        max_alloc = top_stocks["avg_alloc"].max()
+
+        def stock_rows_html(subset):
+            html = ""
+            for _, row in subset.iterrows():
+                bar_pct = int(row["avg_alloc"] / max_alloc * 100)
+                slug = str(row["stock_name"]).replace(" ", "+")
+                html += (
+                    f'<a href="?nav=stock_explorer&stock={slug}" target="_self"'
+                    f' style="all:unset;cursor:pointer;display:block;">'
+                    f'<div class="stock-row">'
+                    f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">'
+                    f'<span style="font-size:.85rem;font-weight:700;color:#1A1A2E;">{row["stock_name"]}</span>'
+                    f'<span style="font-size:.78rem;font-weight:600;color:#6C3CE1;">{row["avg_alloc"]:.1f}%'
+                    f'<span style="color:#9CA3AF;font-weight:400;margin-left:5px;">{int(row["funds"])} funds</span></span>'
+                    f'</div>'
+                    f'<div style="background:#F3F4F6;border-radius:4px;height:5px;overflow:hidden;">'
+                    f'<div style="background:#6C3CE1;width:{bar_pct}%;height:100%;border-radius:4px;"></div>'
+                    f'</div></div></a>'
+                )
+            return html
+
         st.markdown(
-            '<div style="display:flex;flex-wrap:wrap;">' + chips + '</div>',
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;">'
+            '<div>'
+            '<div style="font-size:1rem;font-weight:700;color:#1A1A2E;">Most Widely Held Stocks</div>'
+            '<div style="font-size:.75rem;color:#9CA3AF;margin-top:2px;">Stocks held across the most funds in the registry</div>'
+            '</div>'
+            '<a href="?nav=stock_explorer" target="_self"'
+            ' style="font-size:.78rem;color:#6C3CE1;font-weight:600;text-decoration:none;">View all →</a>'
+            '</div>',
             unsafe_allow_html=True,
         )
 
+        left_col, right_col = st.columns(2, gap="large")
+        with left_col:
+            st.markdown(
+                '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;padding:1rem 1.25rem;">'
+                + stock_rows_html(top_stocks.iloc[:3]) + '</div>',
+                unsafe_allow_html=True,
+            )
+        with right_col:
+            st.markdown(
+                '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;padding:1rem 1.25rem;">'
+                + stock_rows_html(top_stocks.iloc[3:]) + '</div>',
+                unsafe_allow_html=True,
+            )
+
+    # ── Disclaimer ────────────────────────────────────────────────────────────
     st.markdown("""
     <div class="disclaimer">
         Investments in mutual funds are subject to market risks. This platform provides portfolio
@@ -567,14 +882,6 @@ def page_home():
 
 def page_category_select():
     nav_header(back_page="home", back_label="Home")
-
-    st.markdown("## Choose Fund Categories")
-    st.markdown(
-        "<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.5rem;'>"
-        "Select one or more categories — mix Large Cap with Mid Cap, ELSS, or any combination to compare across the market.</p>",
-        unsafe_allow_html=True,
-    )
-
     holdings = load_holdings()
     fund_counts = {}
     if not holdings.empty:
@@ -583,78 +890,92 @@ def page_category_select():
     if "selected_categories" not in st.session_state:
         st.session_state.selected_categories = []
 
-    categories = [
-        ("Large Cap",      "🏛️", "Top 100 companies by market cap. Lower risk, stable returns.",      True),
-        ("Mid Cap",        "📈", "Ranked 101–250. Higher growth potential with moderate risk.",          True),
-        ("Small Cap",      "🚀", "Ranked 251+. High growth potential, higher volatility.",               True),
-        ("Large & Mid Cap","⚖️", "Invests across top 250 companies — blend of large and mid cap.",      True),
-        ("Multi Cap",      "🔀", "Mandatory allocation across large, mid and small cap segments.",       True),
-        ("Flexi Cap",      "🔄", "Invests flexibly across large, mid and small caps — no constraints.", True),
-        ("ELSS",           "💰", "Tax saving under Sec 80C with 3-year lock-in period.",                True),
-    ]
-
-    cols = st.columns(3, gap="medium")
-    for i, (name, icon, desc, live) in enumerate(categories):
-        with cols[i % 3]:
-            count       = fund_counts.get(name, 0)
-            is_selected = name in st.session_state.selected_categories
-
-            # Card border/background changes when selected
-            border  = "2px solid #6C3CE1" if is_selected else "1.5px solid #E5E7EB"
-            bg      = "#F5F3FF"            if is_selected else "#fff"
-            chk     = "✓ "                 if is_selected else ""
-
-            if live:
-                badge = f'<span class="badge badge-live">{count} funds • Live Data</span>'
-            else:
-                badge = '<span class="badge badge-soon">Coming Soon</span>'
-
-            st.markdown(f"""
-            <div style="background:{bg};border:{border};border-radius:12px;
-                        padding:1.25rem;height:100%;">
-                <div style="font-size:2rem;">{icon}</div>
-                <div style="font-size:0.9rem;font-weight:700;color:#1A1A2E;
-                            margin:8px 0 4px;">{chk}{name}</div>
-                <div style="font-size:0.75rem;color:#6B7280;line-height:1.5;">{desc}</div>
-                <div style="margin-top:0.75rem;">{badge}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            if live:
-                btn_label = "✓ Selected" if is_selected else "Select"
-                btn_type  = "primary"    if is_selected else "secondary"
-                if st.button(btn_label, key=f"cat_{name}",
-                             use_container_width=True, type=btn_type):
-                    cats = list(st.session_state.selected_categories)
-                    if is_selected:
-                        cats = [c for c in cats if c != name]
-                    else:
-                        cats.append(name)
-                    st.session_state.selected_categories = cats
-                    st.rerun()
-            else:
-                st.button("Coming Soon", key=f"cat_{name}",
-                          use_container_width=True, disabled=True)
-
-    # ── Bottom CTA ──
-    st.markdown("<br>", unsafe_allow_html=True)
     n_sel = len(st.session_state.selected_categories)
 
-    if n_sel == 0:
-        st.info("Select one or more categories above to continue.")
-    else:
-        sel_labels = " + ".join(st.session_state.selected_categories)
-        c1, c2, c3 = st.columns([1, 2, 1])
-        with c2:
-            if st.button(
-                f"Explore {sel_labels} →",
-                use_container_width=True,
-                type="primary",
-                key="cat_explore_cta",
-            ):
+    # ── Header row: title left, Explore CTA right ────────────────────────────
+    h1, h2 = st.columns([3, 2], gap="medium")
+    with h1:
+        st.markdown(
+            '<div style="font-size:1.3rem;font-weight:800;color:#1A1A2E;margin-bottom:.2rem;">'
+            'Choose Fund Category</div>'
+            '<div style="font-size:.8rem;color:#9CA3AF;">'
+            'Tap a category to select · mix multiple for cross-category comparison</div>',
+            unsafe_allow_html=True,
+        )
+    with h2:
+        if n_sel > 0:
+            sel_labels = " + ".join(st.session_state.selected_categories)
+            if st.button(f"Explore {sel_labels} →", type="primary",
+                         use_container_width=True, key="cat_explore_top"):
                 st.session_state.selected_funds = []
                 st.session_state.page = "explorer"
                 st.rerun()
+        else:
+            st.markdown(
+                '<div style="text-align:right;font-size:.8rem;color:#D1D5DB;padding-top:.6rem;">'
+                'Select a category to continue →</div>',
+                unsafe_allow_html=True,
+            )
+
+    st.markdown('<div style="height:.6rem;"></div>', unsafe_allow_html=True)
+
+    # ── Category cards ────────────────────────────────────────────────────────
+    categories = [
+        ("Large Cap",       "🏛️", "Top 100 companies by market cap"),
+        ("Mid Cap",         "📈", "Ranked 101–250, moderate risk"),
+        ("Small Cap",       "🚀", "Ranked 251+, higher volatility"),
+        ("Large & Mid Cap", "⚖️", "Blend of top 250 companies"),
+        ("Multi Cap",       "🔀", "Mandatory across all cap sizes"),
+        ("Flexi Cap",       "🔄", "Flexible across all caps"),
+        ("ELSS",            "💰", "Tax saving, 3-year lock-in"),
+    ]
+
+    def cat_card(name, icon, desc, row_key):
+        count  = fund_counts.get(name, 0)
+        is_sel = name in st.session_state.selected_categories
+        sel_cls = " selected" if is_sel else ""
+        tc      = "#6C3CE1" if is_sel else "#1A1A2E"
+
+        st.markdown(
+            f'<div class="cat-card-inner{sel_cls}">'
+            f'<div style="font-size:1.5rem;margin-bottom:.35rem;">{icon}</div>'
+            f'<div style="font-size:.88rem;font-weight:700;color:{tc};margin-bottom:.2rem;">{name}</div>'
+            f'<div style="font-size:.7rem;color:#9CA3AF;margin-bottom:.5rem;line-height:1.4;">{desc}</div>'
+            f'<span style="background:#D1FAE5;color:#059669;border-radius:9999px;'
+            f'font-size:.62rem;font-weight:700;padding:2px 8px;">{count} funds</span>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        checked = st.checkbox("Select", value=is_sel, key=f"chk_{name}_{row_key}")
+        if checked != is_sel:
+            cats = list(st.session_state.selected_categories)
+            if checked:
+                cats.append(name)
+            else:
+                cats = [c for c in cats if c != name]
+            st.session_state.selected_categories = cats
+            st.rerun()
+
+    # Row 1: first 4
+    r1 = st.columns(4, gap="small")
+    for i, (name, icon, desc) in enumerate(categories[:4]):
+        with r1[i]:
+            cat_card(name, icon, desc, "r1")
+
+    st.markdown('<div style="height:.4rem;"></div>', unsafe_allow_html=True)
+
+    # Row 2: remaining 3 (last column intentionally empty)
+    r2 = st.columns(4, gap="small")
+    for i, (name, icon, desc) in enumerate(categories[4:]):
+        with r2[i]:
+            cat_card(name, icon, desc, "r2")
+
+    if n_sel == 0:
+        st.markdown(
+            '<div style="text-align:center;font-size:.8rem;color:#D1D5DB;margin-top:.5rem;">'
+            'Select one or more categories above to continue</div>',
+            unsafe_allow_html=True,
+        )
 
 
 # ── PAGE: FUND EXPLORER ───────────────────────────────────────────────────────
@@ -2351,15 +2672,30 @@ def page_overlap_drilldown():
 
 
 def main():
+    # Handle ?nav= query params from sidebar links and internal navigation
+    nav_target = st.query_params.get("nav", "")
+    if nav_target:
+        if "stock" in st.query_params:
+            st.session_state.preselected_stock = st.query_params.get("stock", "")
+        # Restore selected_categories when navigating back to explorer from compare
+        cats_param = st.query_params.get("cats", "")
+        if cats_param:
+            st.session_state.selected_categories = [
+                urllib.parse.unquote_plus(c) for c in cats_param.split("|") if c
+            ]
+        st.session_state.page = nav_target
+        st.query_params.clear()
+        st.rerun()
+
     if "cache_cleared" not in st.session_state:
         st.cache_data.clear()
         st.session_state["cache_cleared"] = True
 
     for key, default in [
-        ("page",              "home"),
-        ("selected_funds",    []),
+        ("page",                "home"),
+        ("selected_funds",      []),
         ("selected_categories", []),
-        ("preselected_stock", ""),
+        ("preselected_stock",   ""),
     ]:
         if key not in st.session_state:
             st.session_state[key] = default
@@ -2367,8 +2703,10 @@ def main():
     if "explorer_layout" not in st.session_state:
         st.session_state.explorer_layout = "D"
 
+    render_sidebar()
+
     routes = {
-        "home":               page_home,
+        "home":               render_welcome,
         "category":           page_category_select,
         "explorer":           page_fund_explorer,
         "compare":            page_compare,
@@ -2377,7 +2715,7 @@ def main():
         "stock_explorer":     page_stock_explorer,
         "overlap_drilldown":  page_overlap_drilldown,
     }
-    routes.get(st.session_state.page, page_home)()
+    routes.get(st.session_state.page, render_welcome)()
 
 
 main()
