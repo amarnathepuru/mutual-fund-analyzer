@@ -22,6 +22,7 @@ df["stock_name"] = (
     .str.replace("Ltd", "", regex=False)
     .str.replace(",", "", regex=False)
     .str.upper()
+    .str.strip()
 )
 
 # -----------------------------------

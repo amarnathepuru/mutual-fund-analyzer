@@ -131,7 +131,7 @@ a.metric-card-link:hover .metric-card,
 
 # ── DATA LOADING ──────────────────────────────────────────────────────────────
 
-@st.cache_data
+@st.cache_data(ttl=3600)
 def load_holdings():
     try:
         return pd.read_csv("data/processed/normalized_holdings.csv")
@@ -139,18 +139,22 @@ def load_holdings():
         return pd.DataFrame()
 
 
-@st.cache_data
+@st.cache_data(ttl=3600)
 def load_master():
     try:
-        return pd.read_csv("data/fund_master.csv")
+        return pd.read_csv("data/fund_master_auto.csv")
     except Exception:
         return pd.DataFrame()
 
 
-@st.cache_data
+@st.cache_data(ttl=3600)
 def load_similarity():
     try:
-        return pd.read_csv("data/processed/fund_similarity.csv")
+        df = pd.read_csv("data/processed/fund_similarity.csv")
+        # Backfill normalized_score if loading an older CSV that predates the column
+        if "normalized_score" not in df.columns and "similarity_score" in df.columns:
+            df["normalized_score"] = df["similarity_score"]
+        return df
     except Exception:
         return pd.DataFrame()
 
@@ -230,9 +234,9 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df):
 
     # 1. Highest-overlap pair — name the actual shared stocks
     if not sel_sim.empty:
-        worst    = sel_sim.loc[sel_sim["similarity_score"].idxmax()]
+        worst    = sel_sim.loc[sel_sim["normalized_score"].idxmax()]
         fa, fb   = worst["fund_a"], worst["fund_b"]
-        wscore   = worst["similarity_score"]
+        wscore   = worst["normalized_score"]
         wcommon  = int(worst["common_stocks"])
         h_a_set  = set(sel_h[sel_h["fund_name"] == fa]["stock_name"])
         h_b_set  = set(sel_h[sel_h["fund_name"] == fb]["stock_name"])
@@ -259,8 +263,8 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df):
 
     # 2. Best diversification pair
     if not sel_sim.empty and len(sel_sim) > 1:
-        best   = sel_sim.loc[sel_sim["similarity_score"].idxmin()]
-        bscore = best["similarity_score"]
+        best   = sel_sim.loc[sel_sim["normalized_score"].idxmin()]
+        bscore = best["normalized_score"]
         if bscore < 50:
             insights.append({
                 "type": "success", "icon": "✅",
@@ -408,7 +412,7 @@ def page_home():
 
     n_funds  = holdings["fund_name"].nunique()  if not holdings.empty else 0
     n_unique = holdings["stock_name"].nunique() if not holdings.empty else 0
-    max_sim  = similarity["similarity_score"].max() if not similarity.empty else 0
+    max_sim  = similarity["normalized_score"].max() if not similarity.empty else 0
 
     top5 = (
         holdings.groupby("stock_name").agg(
@@ -426,122 +430,129 @@ def page_home():
         unsafe_allow_html=True,
     )
 
-    # ── Stat cards ──
-    m1, m2, m3, m4 = st.columns(4)
-
-    for col, val, label, sub, nav in [
-        (m1, str(n_funds),      "Funds Analyzed",     "Large Cap · Live data",       "category"),
-        (m2, str(n_unique),     "Unique Stocks",       "Across all funds",            "stock_explorer"),
-        (m3, f"{max_sim:.0f}%", "Max Fund Overlap",    "Highest pairwise similarity", "overlap_drilldown"),
-    ]:
-        with col:
-            st.markdown(f"""
-            <a href="?nav={nav}" target="_self" class="metric-card-link">
-                <div class="metric-card">
-                    <div class="metric-value"
-                         style="font-size:{'1.4rem' if len(str(val)) > 8 else '2.25rem'};">
-                        {val}
-                    </div>
-                    <div class="metric-label">{label}</div>
-                    <div class="metric-sub">{sub}</div>
-                </div>
-            </a>""", unsafe_allow_html=True)
-
-    # Card 4 — Top 5 held stocks (individual row links)
-    with m4:
-        if not top5.empty:
-            rows_html = "".join(
-                f'<a href="?nav=stock_explorer&stock={row["stock_name"].replace(" ", "+")}" '
-                f'target="_self" style="all:unset;display:block;cursor:pointer;">'
-                f'<div style="display:flex;justify-content:space-between;align-items:center;'
-                f'padding:4px 2px;{"border-bottom:1px solid #F3F4F6;" if idx < 4 else ""}">'
-                f'<span style="font-size:0.75rem;font-weight:600;color:#1A1A2E;">{row["stock_name"]}</span>'
-                f'<span style="font-size:0.68rem;color:#6C3CE1;white-space:nowrap;margin-left:6px;">'
-                f'{row["funds"]}f&nbsp;·&nbsp;{row["avg_alloc"]:.1f}%</span>'
-                f'</div></a>'
-                for idx, (_, row) in enumerate(top5.iterrows())
-            )
-        else:
-            rows_html = '<div style="color:#9CA3AF;font-size:0.8rem;">No data</div>'
-
-        st.markdown(f"""
-        <div class="metric-card" style="cursor:default;">
-            <div style="font-size:0.72rem;font-weight:700;color:#6B7280;text-transform:uppercase;
-                        letter-spacing:0.5px;margin-bottom:0.6rem;text-align:center;">
-                Top Held Stocks</div>
-            {rows_html}
-        </div>""", unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # ── Journey cards (clickable anchor tags, hover-highlighted) ──
-    st.markdown(f"""
+    # ── Action cards with embedded stats ──
+    st.markdown("""
     <style>
-    a.action-card-link {{
-        all: unset;
-        display: block;
-        cursor: pointer;
-        margin-bottom: 0.75rem;
-    }}
-    .action-card {{
+    .action-card {
         background: #fff;
         border: 1.5px solid #E5E7EB;
         border-radius: 14px;
-        padding: 1.25rem 1.5rem;
+        overflow: hidden;
+        margin-bottom: 0.85rem;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+    .action-card:hover {
+        border-color: #6C3CE1;
+        box-shadow: 0 4px 20px rgba(108,60,225,0.12);
+        transform: translateY(-2px);
+    }
+    a.ac-body {
+        all: unset;
         display: flex;
         gap: 1.25rem;
         align-items: flex-start;
+        padding: 1.25rem 1.5rem;
         cursor: pointer;
-        transition: border-color 0.18s ease, background 0.18s ease,
-                    box-shadow 0.18s ease, transform 0.18s ease;
-    }}
-    .action-card:hover {{
-        border-color: #6C3CE1;
-        background: #F5F3FF;
-        box-shadow: 0 4px 20px rgba(108,60,225,0.12);
-        transform: translateY(-2px);
-    }}
-    .action-card-icon {{
-        font-size: 2rem;
-        flex-shrink: 0;
-        margin-top: 2px;
-    }}
-    .action-card-title {{
-        font-size: 1rem;
-        font-weight: 700;
-        color: #1A1A2E !important;
-        margin-bottom: 5px;
         text-decoration: none !important;
-    }}
-    .action-card-desc {{
-        font-size: 0.82rem;
-        color: #6B7280 !important;
-        line-height: 1.65;
+    }
+    a.ac-body:hover { background: #F5F3FF; }
+    .ac-icon  { font-size: 2rem; flex-shrink: 0; margin-top: 2px; }
+    .ac-title { font-size: 1rem; font-weight: 700; color: #1A1A2E !important;
+                margin-bottom: 5px; text-decoration: none !important; }
+    .ac-desc  { font-size: 0.82rem; color: #6B7280 !important;
+                line-height: 1.65; text-decoration: none !important; }
+    .ac-stats { display: flex; border-top: 1px solid #F3F4F6;
+                background: #FAFAFA; }
+    a.ac-stat-chip {
+        all: unset;
+        flex: 1;
+        cursor: pointer;
+        padding: 0.65rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        border-right: 1px solid #F3F4F6;
+        transition: background 0.15s;
         text-decoration: none !important;
-    }}
+    }
+    a.ac-stat-chip:last-child { border-right: none; }
+    a.ac-stat-chip:hover { background: #EDE9FE; }
+    .ac-stat-val   { font-size: 1.3rem; font-weight: 800; color: #6C3CE1 !important;
+                     line-height: 1; text-decoration: none !important; }
+    .ac-stat-label { font-size: 0.68rem; color: #6B7280 !important; font-weight: 500;
+                     text-decoration: none !important; }
     </style>
-    <a href="?nav=category" target="_self" class="action-card-link">
-        <div class="action-card">
-            <div class="action-card-icon">🔍</div>
-            <div>
-                <div class="action-card-title">Compare Mutual Funds</div>
-                <div class="action-card-desc">Pick up to 5 funds and instantly see portfolio overlap,
-                sector exposure, common holdings and redundancy — across {n_funds} large-cap funds.</div>
-            </div>
-        </div>
-    </a>
-    <a href="?nav=portfolio_upload" target="_self" class="action-card-link">
-        <div class="action-card">
-            <div class="action-card-icon">📋</div>
-            <div>
-                <div class="action-card-title">Portfolio X-Ray</div>
-                <div class="action-card-desc">Upload your existing mutual fund portfolio and discover
-                hidden stock exposure, duplicate funds, sector concentration and true diversification
-                across all your holdings.</div>
-            </div>
-        </div>
-    </a>
     """, unsafe_allow_html=True)
+
+    # Compare Mutual Funds card
+    st.markdown(
+        '<div class="action-card">'
+        '<a href="?nav=category" target="_self" class="ac-body">'
+        '<div class="ac-icon">🔍</div>'
+        '<div>'
+        '<div class="ac-title">Compare Mutual Funds</div>'
+        f'<div class="ac-desc">Pick up to 5 funds and instantly see portfolio overlap, sector exposure, '
+        f'common holdings and redundancy — across {n_funds} funds across 7 categories.</div>'
+        '</div></a>'
+        '<div class="ac-stats">'
+        f'<a href="?nav=stock_explorer" target="_self" class="ac-stat-chip">'
+        f'<div class="ac-stat-val">{n_unique}</div>'
+        '<div class="ac-stat-label">Unique Stocks &nbsp;↗</div>'
+        '</a>'
+        f'<a href="?nav=overlap_drilldown" target="_self" class="ac-stat-chip">'
+        f'<div class="ac-stat-val">{max_sim:.0f}%</div>'
+        '<div class="ac-stat-label">Max Fund Overlap &nbsp;↗</div>'
+        '</a>'
+        f'<div class="ac-stat-chip" style="cursor:default;">'
+        f'<div class="ac-stat-val">{n_funds}</div>'
+        '<div class="ac-stat-label">Funds in Registry</div>'
+        '</div>'
+        '</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Portfolio X-Ray card
+    st.markdown(
+        '<div class="action-card">'
+        '<a href="?nav=portfolio_upload" target="_self" class="ac-body">'
+        '<div class="ac-icon">📋</div>'
+        '<div>'
+        '<div class="ac-title">Portfolio X-Ray</div>'
+        '<div class="ac-desc">Upload your existing mutual fund portfolio and discover hidden stock '
+        'exposure, duplicate funds, sector concentration and true diversification across all your '
+        'holdings.</div>'
+        '</div></a>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Top 5 widely-held stocks as clickable chips ──
+    if not top5.empty:
+        st.markdown(
+            "<p style='font-size:0.75rem;font-weight:700;color:#6B7280;text-transform:uppercase;"
+            "letter-spacing:0.5px;margin:1.25rem 0 0.5rem;'>Most Widely Held Stocks</p>",
+            unsafe_allow_html=True,
+        )
+        chips = ""
+        for _, row in top5.iterrows():
+            slug = row["stock_name"].replace(" ", "+")
+            chips += (
+                '<a href="?nav=stock_explorer&stock=' + slug + '" target="_self" '
+                'style="all:unset;cursor:pointer;display:inline-block;margin:0 6px 6px 0;">'
+                '<div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:9999px;'
+                'padding:5px 14px;display:flex;align-items:center;gap:8px;'
+                'transition:background 0.15s,border-color 0.15s;">'
+                '<span style="font-size:0.78rem;font-weight:700;color:#1A1A2E;">'
+                + str(row["stock_name"]) + '</span>'
+                '<span style="font-size:0.68rem;color:#6C3CE1;font-weight:600;">'
+                + str(int(row["funds"])) + 'f&nbsp;·&nbsp;' + f'{row["avg_alloc"]:.1f}%' + '</span>'
+                '</div></a>'
+            )
+        st.markdown(
+            '<div style="display:flex;flex-wrap:wrap;">' + chips + '</div>',
+            unsafe_allow_html=True,
+        )
 
     st.markdown("""
     <div class="disclaimer">
@@ -573,12 +584,13 @@ def page_category_select():
         st.session_state.selected_categories = []
 
     categories = [
-        ("Large Cap",        "🏛️", "Top 100 companies by market cap. Lower risk, stable returns.",   True),
-        ("Mid Cap",          "📈", "Ranked 101–250. Higher growth potential with moderate risk.",       False),
-        ("Small Cap",        "🚀", "Ranked 251+. High growth potential, higher volatility.",            False),
-        ("Flexi Cap",        "🔄", "Invests flexibly across large, mid and small caps.",                False),
-        ("ELSS (Tax Saver)", "💰", "Tax saving under Sec 80C with 3-year lock-in.",                    False),
-        ("Index Funds",      "📊", "Passively track market indices with low cost.",                     False),
+        ("Large Cap",      "🏛️", "Top 100 companies by market cap. Lower risk, stable returns.",      True),
+        ("Mid Cap",        "📈", "Ranked 101–250. Higher growth potential with moderate risk.",          True),
+        ("Small Cap",      "🚀", "Ranked 251+. High growth potential, higher volatility.",               True),
+        ("Large & Mid Cap","⚖️", "Invests across top 250 companies — blend of large and mid cap.",      True),
+        ("Multi Cap",      "🔀", "Mandatory allocation across large, mid and small cap segments.",       True),
+        ("Flexi Cap",      "🔄", "Invests flexibly across large, mid and small caps — no constraints.", True),
+        ("ELSS",           "💰", "Tax saving under Sec 80C with 3-year lock-in period.",                True),
     ]
 
     cols = st.columns(3, gap="medium")
@@ -705,10 +717,16 @@ def page_fund_explorer():
         if cat != "All Categories":
             f = f[f["category"] == cat]
         sm = {
-            "AUM (High→Low)":           ("aum_cr",        False),
-            "AUM (Low→High)":           ("aum_cr",        True),
-            "Expense Ratio (Low→High)": ("expense_ratio",  True),
-            "Holdings Count":           ("holding_count",  False),
+            "Star Rating (High→Low)":             ("star_rating",             False),
+            "3Y Return (High→Low)":               ("return_3y",               False),
+            "1Y Return (High→Low)":               ("return_1y",               False),
+            "5Y Return (High→Low)":               ("return_5y",               False),
+            "Returns Since Inception (High→Low)": ("return_since_inception",   False),
+            "Consistency (High→Low)":             ("consistency_score",        False),
+            "AUM (High→Low)":                     ("aum_cr",                  False),
+            "AUM (Low→High)":                     ("aum_cr",                  True),
+            "Expense Ratio (Low→High)":           ("expense_ratio",           True),
+            "Holdings Count":                     ("holding_count",           False),
         }
         if sort in sm:
             sc, sa = sm[sort]
@@ -724,12 +742,22 @@ def page_fund_explorer():
             f'<span style="background:#FEF3C7;color:#92400E;border-radius:9999px;'
             f'padding:3px 10px;font-size:0.72rem;font-weight:600;">'
             f'⚠ {short_name(r["fund_a"])} ↔ {short_name(r["fund_b"])}: '
-            f'{r["similarity_score"]:.0f}% overlap</span>'
-            for _, r in sim[sim["similarity_score"] >= 60]
-                          .sort_values("similarity_score", ascending=False).head(2).iterrows()
+            f'{r["normalized_score"]:.0f}% overlap</span>'
+            for _, r in sim[sim["normalized_score"] >= 60]
+                          .sort_values("normalized_score", ascending=False).head(2).iterrows()
         ]
         return ('<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">'
                 + " ".join(parts) + "</div>") if parts else ""
+
+    def stars_html(rating):
+        if rating is None or (isinstance(rating, float) and np.isnan(rating)):
+            return '<span style="color:#D1D5DB;font-size:0.75rem;">Not rated</span>'
+        r = int(rating)
+        filled = "★" * r
+        empty  = "☆" * (5 - r)
+        colour = {5:"#F59E0B", 4:"#F59E0B", 3:"#6B7280", 2:"#EF4444", 1:"#EF4444"}.get(r, "#6B7280")
+        return (f'<span style="color:{colour};font-size:0.95rem;letter-spacing:1px;">{filled}</span>'
+                f'<span style="color:#D1D5DB;font-size:0.95rem;letter-spacing:1px;">{empty}</span>')
 
     def fund_info(fund):
         aum_str = format_aum(fund.get("aum_cr", ""))
@@ -740,7 +768,12 @@ def page_fund_explorer():
         top_sec = str(fund.get("top_sector") or "—").title()
         amc_str = str(fund.get("fund_house") or "—")
         cat_str = str(fund.get("category") or "")
-        return aum_str, er_str, hc_str, top_sec, amc_str, cat_str
+        r1y = fund.get("return_1y");  r1y_str = f"{r1y:+.1f}%" if pd.notna(r1y) else "—"
+        r3y = fund.get("return_3y");  r3y_str = f"{r3y:+.1f}%" if pd.notna(r3y) else "—"
+        r5y = fund.get("return_5y");  r5y_str = f"{r5y:+.1f}%" if pd.notna(r5y) else "—"
+        rsi = fund.get("return_since_inception"); rsi_str = f"{rsi:+.1f}%" if pd.notna(rsi) else "—"
+        star = fund.get("star_rating")
+        return aum_str, er_str, hc_str, top_sec, amc_str, cat_str, r1y_str, r3y_str, r5y_str, rsi_str, star
 
     def chips_html(sel):
         return "".join(
@@ -787,7 +820,7 @@ def page_fund_explorer():
         amc_filter = fc[1].selectbox("AMC", amcs_list,
                                       label_visibility="collapsed", key="a_amc")
         sort_by    = fc[2].selectbox(
-            "Sort", ["AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
+            "Sort", ["Star Rating (High→Low)", "3Y Return (High→Low)", "1Y Return (High→Low)", "5Y Return (High→Low)", "Returns Since Inception (High→Low)", "Consistency (High→Low)", "AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
             label_visibility="collapsed", key="a_sort",
         )
         cat_filter = "All Categories"
@@ -813,7 +846,7 @@ def page_fund_explorer():
                 fn     = fund["fund_name"]
                 is_sel = fn in selected
                 at_max = n_sel >= 5 and not is_sel
-                aum_str, er_str, hc_str, top_sec, amc_str, cat_str = fund_info(fund)
+                aum_str, er_str, hc_str, top_sec, amc_str, cat_str, r1y_str, r3y_str, r5y_str, rsi_str, star = fund_info(fund)
                 border = "2px solid #6C3CE1"               if is_sel else "1.5px solid #E5E7EB"
                 bg     = "#F5F3FF"                         if is_sel else "#FFFFFF"
                 shadow = "0 0 0 3px rgba(108,60,225,0.10)" if is_sel else "0 1px 3px rgba(0,0,0,0.06)"
@@ -827,26 +860,38 @@ def page_fund_explorer():
                     st.markdown(f"""
                     <div style="background:{bg};border:{border};border-radius:14px 14px 6px 6px;
                                 padding:1.25rem 1.25rem 0.75rem;box-shadow:{shadow};">
-                        <div style="font-size:0.85rem;font-weight:700;color:{name_c};
-                                    line-height:1.4;margin-bottom:4px;">{fn}</div>
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;">
+                            <div style="font-size:0.85rem;font-weight:700;color:{name_c};
+                                        line-height:1.4;flex:1;">{fn}</div>
+                        </div>
+                        <div style="margin-bottom:6px;">{stars_html(star)}</div>
                         <div style="font-size:0.72rem;color:#6B7280;margin-bottom:10px;">
                             {amc_str}{(' &nbsp;·&nbsp; '+cat_str) if show_cat_filter else ''}
                         </div>
-                        <div style="display:flex;gap:14px;margin-bottom:8px;">
+                        <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
                             <div>
-                                <div style="font-size:0.62rem;color:#9CA3AF;text-transform:uppercase;
-                                            letter-spacing:0.4px;">AUM</div>
-                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{aum_str}</div>
+                                <div style="font-size:0.6rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.4px;">1Y Ret</div>
+                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{r1y_str}</div>
                             </div>
                             <div>
-                                <div style="font-size:0.62rem;color:#9CA3AF;text-transform:uppercase;
-                                            letter-spacing:0.4px;">Exp. Ratio</div>
+                                <div style="font-size:0.6rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.4px;">3Y Ret</div>
+                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{r3y_str}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:0.6rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.4px;">5Y Ret</div>
+                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{r5y_str}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:0.6rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.4px;">Since Inc.</div>
+                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{rsi_str}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:0.6rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.4px;">Exp.</div>
                                 <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{er_str}</div>
                             </div>
                             <div>
-                                <div style="font-size:0.62rem;color:#9CA3AF;text-transform:uppercase;
-                                            letter-spacing:0.4px;">Holdings</div>
-                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{hc_str}</div>
+                                <div style="font-size:0.6rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.4px;">AUM</div>
+                                <div style="font-size:0.8rem;font-weight:600;color:#1A1A2E;">{aum_str}</div>
                             </div>
                         </div>
                         <div style="font-size:0.7rem;color:#6B7280;">
@@ -875,7 +920,7 @@ def page_fund_explorer():
         bc1, bc2 = st.columns(2)
         b_amc  = bc1.selectbox("AMC", amcs_list, label_visibility="collapsed", key="b_amc")
         b_sort = bc2.selectbox(
-            "Sort", ["AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
+            "Sort", ["Star Rating (High→Low)", "3Y Return (High→Low)", "1Y Return (High→Low)", "5Y Return (High→Low)", "Returns Since Inception (High→Low)", "Consistency (High→Low)", "AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
             label_visibility="collapsed", key="b_sort",
         )
         filtered = apply_filters(cat_funds, b_search, b_amc, "All Categories", b_sort)
@@ -890,7 +935,7 @@ def page_fund_explorer():
                 fn     = fund["fund_name"]
                 is_b   = fn in selected
                 at_b   = n_sel >= 5 and not is_b
-                aum_str, er_str, _, _, amc_str, _ = fund_info(fund)
+                aum_str, er_str, _, _, amc_str, _, r1y_str, r3y_str, r5y_str, rsi_str, star = fund_info(fund)
                 row_bg  = "#F5F3FF"             if is_b else "#FFFFFF"
                 row_bdr = "1.5px solid #6C3CE1" if is_b else "1px solid #E5E7EB"
                 r1, r2  = st.columns([4, 1])
@@ -900,8 +945,9 @@ def page_fund_explorer():
                                 padding:0.75rem 1rem;">
                         <div style="font-size:0.85rem;font-weight:700;color:#1A1A2E;
                                     margin-bottom:2px;">{fn}</div>
+                        <div style="margin-bottom:2px;">{stars_html(star)}</div>
                         <div style="font-size:0.72rem;color:#6B7280;">
-                            {amc_str} &nbsp;·&nbsp; AUM {aum_str} &nbsp;·&nbsp; ER {er_str}
+                            {amc_str} &nbsp;·&nbsp; 1Y {r1y_str} &nbsp;·&nbsp; 3Y {r3y_str} &nbsp;·&nbsp; 5Y {r5y_str} &nbsp;·&nbsp; Since Inc. {rsi_str} &nbsp;·&nbsp; ER {er_str} &nbsp;·&nbsp; AUM {aum_str}
                         </div>
                     </div>""", unsafe_allow_html=True)
                 with r2:
@@ -960,34 +1006,48 @@ def page_fund_explorer():
                                      label_visibility="collapsed", key="c_srch")
         c_amc    = cc[1].selectbox("AMC", amcs_list, label_visibility="collapsed", key="c_amc")
         c_sort   = cc[2].selectbox(
-            "Sort", ["AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
+            "Sort", ["Star Rating (High→Low)", "3Y Return (High→Low)", "1Y Return (High→Low)", "5Y Return (High→Low)", "Returns Since Inception (High→Low)", "Consistency (High→Low)", "AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
             label_visibility="collapsed", key="c_sort",
         )
         filtered = apply_filters(cat_funds, c_search, c_amc, "All Categories", c_sort)
 
-        c_tbl = filtered[["fund_name", "fund_house", "aum_cr",
+        c_tbl = filtered[["fund_name", "fund_house", "star_rating", "return_1y", "return_3y",
+                           "return_5y", "return_since_inception", "aum_cr",
                            "expense_ratio", "holding_count", "top_sector"]].copy()
         c_tbl = c_tbl.rename(columns={
-            "fund_name": "Fund", "fund_house": "AMC", "aum_cr": "AUM (₹ Cr)",
-            "expense_ratio": "Exp Ratio %", "holding_count": "Holdings", "top_sector": "Top Sector",
+            "fund_name": "Fund", "fund_house": "AMC", "star_rating": "★",
+            "return_1y": "1Y %", "return_3y": "3Y %", "return_5y": "5Y %",
+            "return_since_inception": "Since Inc. %",
+            "aum_cr": "AUM (₹ Cr)", "expense_ratio": "Exp Ratio %",
+            "holding_count": "Holdings", "top_sector": "Top Sector",
         })
-        c_tbl["AUM (₹ Cr)"]  = pd.to_numeric(c_tbl["AUM (₹ Cr)"],  errors="coerce")
-        c_tbl["Exp Ratio %"] = pd.to_numeric(c_tbl["Exp Ratio %"], errors="coerce")
-        c_tbl["Holdings"]    = pd.to_numeric(c_tbl["Holdings"],    errors="coerce").astype("Int64")
-        c_tbl["Select"]      = c_tbl["Fund"].isin(selected)
+        c_tbl["AUM (₹ Cr)"]     = pd.to_numeric(c_tbl["AUM (₹ Cr)"],     errors="coerce")
+        c_tbl["Exp Ratio %"]    = pd.to_numeric(c_tbl["Exp Ratio %"],    errors="coerce")
+        c_tbl["Holdings"]       = pd.to_numeric(c_tbl["Holdings"],       errors="coerce").astype("Int64")
+        c_tbl["★"]              = pd.to_numeric(c_tbl["★"],              errors="coerce").astype("Int64")
+        c_tbl["1Y %"]           = pd.to_numeric(c_tbl["1Y %"],           errors="coerce")
+        c_tbl["3Y %"]           = pd.to_numeric(c_tbl["3Y %"],           errors="coerce")
+        c_tbl["5Y %"]           = pd.to_numeric(c_tbl["5Y %"],           errors="coerce")
+        c_tbl["Since Inc. %"]   = pd.to_numeric(c_tbl["Since Inc. %"],   errors="coerce")
+        c_tbl["Select"]         = c_tbl["Fund"].isin(selected)
 
         edited = st.data_editor(
-            c_tbl[["Select", "Fund", "AMC", "AUM (₹ Cr)",
-                   "Exp Ratio %", "Holdings", "Top Sector"]].reset_index(drop=True),
+            c_tbl[["Select", "Fund", "AMC", "★", "1Y %", "3Y %", "5Y %", "Since Inc. %",
+                   "AUM (₹ Cr)", "Exp Ratio %", "Holdings", "Top Sector"]].reset_index(drop=True),
             use_container_width=True, height=440,
             column_config={
-                "Select":      st.column_config.CheckboxColumn("Select", width="small"),
-                "Fund":        st.column_config.TextColumn("Fund Name", width="large"),
-                "AMC":         st.column_config.TextColumn("AMC"),
-                "AUM (₹ Cr)": st.column_config.NumberColumn("AUM (₹ Cr)", format="₹%,.0f Cr"),
-                "Exp Ratio %": st.column_config.NumberColumn("Exp Ratio",  format="%.2f%%"),
-                "Holdings":    st.column_config.NumberColumn("Holdings",   format="%d"),
-                "Top Sector":  st.column_config.TextColumn("Top Sector"),
+                "Select":        st.column_config.CheckboxColumn("Select", width="small"),
+                "Fund":          st.column_config.TextColumn("Fund Name", width="large"),
+                "AMC":           st.column_config.TextColumn("AMC"),
+                "★":             st.column_config.NumberColumn("★ Rating", format="%d ★"),
+                "1Y %":          st.column_config.NumberColumn("1Y %",    format="%.1f%%"),
+                "3Y %":          st.column_config.NumberColumn("3Y %",    format="%.1f%%"),
+                "5Y %":          st.column_config.NumberColumn("5Y %",    format="%.1f%%"),
+                "Since Inc. %":  st.column_config.NumberColumn("Since Inc.", format="%.1f%%"),
+                "AUM (₹ Cr)":   st.column_config.NumberColumn("AUM (₹ Cr)", format="₹%,.0f Cr"),
+                "Exp Ratio %":   st.column_config.NumberColumn("Exp Ratio",  format="%.2f%%"),
+                "Holdings":      st.column_config.NumberColumn("Holdings",   format="%d"),
+                "Top Sector":    st.column_config.TextColumn("Top Sector"),
             },
             hide_index=True, key="c_editor",
         )
@@ -1048,7 +1108,7 @@ def page_fund_explorer():
         da1, da2 = st.columns(2)
         d_amc  = da1.selectbox("AMC", amcs_list, label_visibility="collapsed", key="d_amc")
         d_sort = da2.selectbox(
-            "Sort", ["AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
+            "Sort", ["Star Rating (High→Low)", "3Y Return (High→Low)", "1Y Return (High→Low)", "5Y Return (High→Low)", "Returns Since Inception (High→Low)", "Consistency (High→Low)", "AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
             label_visibility="collapsed", key="d_sort",
         )
         filtered = apply_filters(cat_funds, d_search, d_amc, "All Categories", d_sort)
@@ -1062,7 +1122,7 @@ def page_fund_explorer():
             fn     = fund["fund_name"]
             is_d   = fn in selected
             at_d   = n_sel >= 5 and not is_d
-            aum_str, er_str, hc_str, _, amc_str, _ = fund_info(fund)
+            aum_str, er_str, hc_str, _, amc_str, _, r1y_str, r3y_str, r5y_str, rsi_str, star = fund_info(fund)
             row_bg  = "#F5F3FF"             if is_d else "#FFFFFF"
             row_bdr = "1.5px solid #6C3CE1" if is_d else "1px solid #E5E7EB"
             dot_c   = "#6C3CE1"             if is_d else "#D1D5DB"
@@ -1073,11 +1133,13 @@ def page_fund_explorer():
                             padding:0.6rem 1rem;display:flex;align-items:center;gap:10px;">
                     <div style="width:8px;height:8px;border-radius:50%;background:{dot_c};
                                 flex-shrink:0;margin-top:2px;"></div>
-                    <div>
-                        <div style="font-size:0.85rem;font-weight:700;color:#1A1A2E;">{fn}</div>
+                    <div style="flex:1;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:1px;">
+                            <span style="font-size:0.85rem;font-weight:700;color:#1A1A2E;">{fn}</span>
+                            <span>{stars_html(star)}</span>
+                        </div>
                         <div style="font-size:0.7rem;color:#6B7280;">
-                            {amc_str} &nbsp;·&nbsp; {aum_str} &nbsp;·&nbsp;
-                            ER {er_str} &nbsp;·&nbsp; {hc_str} holdings
+                            {amc_str} &nbsp;·&nbsp; 1Y {r1y_str} &nbsp;·&nbsp; 3Y {r3y_str} &nbsp;·&nbsp; 5Y {r5y_str} &nbsp;·&nbsp; Since Inc. {rsi_str} &nbsp;·&nbsp; ER {er_str} &nbsp;·&nbsp; AUM {aum_str}
                         </div>
                     </div>
                 </div>""", unsafe_allow_html=True)
@@ -1119,8 +1181,8 @@ def page_compare():
     )
 
     # ── Top metrics ──
-    avg_sim  = sel_sim["similarity_score"].mean()  if not sel_sim.empty else 0
-    max_sim  = sel_sim["similarity_score"].max()   if not sel_sim.empty else 0
+    avg_sim  = sel_sim["normalized_score"].mean()  if not sel_sim.empty else 0
+    max_sim  = sel_sim["normalized_score"].max()   if not sel_sim.empty else 0
     n_unique = sel_h["stock_name"].nunique()
 
     stock_counts = sel_h.groupby("stock_name")["fund_name"].nunique()
@@ -1170,7 +1232,7 @@ def page_compare():
             common_lk = {}
             for _, row in sel_sim.iterrows():
                 for key in [(row["fund_a"], row["fund_b"]), (row["fund_b"], row["fund_a"])]:
-                    score_lk[key]  = row["similarity_score"]
+                    score_lk[key]  = row["normalized_score"]
                     common_lk[key] = int(row["common_stocks"])
 
             master  = load_master()
@@ -1372,10 +1434,10 @@ def page_compare():
     with tab_ol:
         st.markdown('<div class="section-title">Fund-Pair Overlap</div>', unsafe_allow_html=True)
         if not sel_sim.empty:
-            for _, row in sel_sim.sort_values("similarity_score", ascending=False).iterrows():
+            for _, row in sel_sim.sort_values("normalized_score", ascending=False).iterrows():
                 fa, fb, score, common = (
                     row["fund_a"], row["fund_b"],
-                    row["similarity_score"], int(row["common_stocks"]),
+                    row["normalized_score"], int(row["common_stocks"]),
                 )
                 label, cls = sim_badge(score)
                 st.markdown(f"""
@@ -1598,7 +1660,7 @@ def page_compare():
         sel_sec = sector_df[sector_df["fund_name"].isin(selected)]
         n_secs  = sel_sec["sector"].nunique()
         fin_pct = sel_sec[sel_sec["sector"] == "FINANCIAL"]["allocation_percent"].mean()
-        avg_s   = sel_sim["similarity_score"].mean() if not sel_sim.empty else 0
+        avg_s   = sel_sim["normalized_score"].mean() if not sel_sim.empty else 0
 
         c1, c2, c3 = st.columns(3)
         with c1:
@@ -1761,7 +1823,7 @@ def page_portfolio_xray():
 
     # ── Summary metrics ──
     n_unique = sel_h["stock_name"].nunique()
-    avg_sim  = sel_sim["similarity_score"].mean() if not sel_sim.empty else 0
+    avg_sim  = sel_sim["normalized_score"].mean() if not sel_sim.empty else 0
     n_secs   = sel_h["sector"].nunique()
     c1, c2, c3, c4 = st.columns(4)
     for col, val, label in [
@@ -1831,8 +1893,8 @@ def page_portfolio_xray():
         if sel_sim.empty:
             st.info("Need at least 2 matched funds to compute overlap.")
         else:
-            for _, row in sel_sim.sort_values("similarity_score", ascending=False).iterrows():
-                label, cls = sim_badge(row["similarity_score"])
+            for _, row in sel_sim.sort_values("normalized_score", ascending=False).iterrows():
+                label, cls = sim_badge(row["normalized_score"])
                 st.markdown(f"""
                 <div class="overlap-row">
                     <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -1842,12 +1904,12 @@ def page_portfolio_xray():
                             {short_name(row['fund_b'])}
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="font-size:1.4rem;font-weight:800;color:#6C3CE1;">{row['similarity_score']:.0f}%</span>
+                            <span style="font-size:1.4rem;font-weight:800;color:#6C3CE1;">{row['normalized_score']:.0f}%</span>
                             <span class="badge {cls}">{label} Overlap</span>
                         </div>
                     </div>
                     <div class="overlap-bar-bg">
-                        <div class="overlap-bar-fill" style="width:{row['similarity_score']}%;"></div>
+                        <div class="overlap-bar-fill" style="width:{row['normalized_score']}%;"></div>
                     </div>
                     <div style="font-size:0.72rem;color:#9CA3AF;margin-top:5px;">{int(row['common_stocks'])} common stocks</div>
                 </div>
@@ -1952,7 +2014,7 @@ def page_stock_explorer():
     # Metric row
     c1, c2, c3, c4 = st.columns(4)
     for col, val, label, sub in [
-        (c1, str(n_holding),        "Funds Holding",      f"Out of {total_funds} large-cap funds"),
+        (c1, str(n_holding),        "Funds Holding",      f"Out of {total_funds} funds"),
         (c2, f"{avg_alloc:.2f}%",   "Avg Allocation",     "Average across holding funds"),
         (c3, f"{max_alloc:.2f}%",   "Highest Allocation", max_fund[:28]),
         (c4, sector.title(),        "Sector",             "Primary classification"),
@@ -2041,15 +2103,15 @@ def page_stock_explorer():
         st.markdown(f"""<div class="insight-card insight-alert">
             <div class="insight-icon">⚠️</div>
             <div class="insight-text"><strong>High Concentration Risk</strong> — {selected_stock} appears in
-            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage). Investors holding multiple large-cap
-            funds likely have significant overlapping exposure to this stock.</div></div>""",
+            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage). Investors holding multiple funds
+            across categories likely have significant overlapping exposure to this stock.</div></div>""",
             unsafe_allow_html=True)
     elif coverage >= 50:
         st.markdown(f"""<div class="insight-card insight-warning">
             <div class="insight-icon">📊</div>
             <div class="insight-text"><strong>Moderate Coverage</strong> — {selected_stock} is held by
-            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage), a common but not universal
-            holding in the large-cap space.</div></div>""", unsafe_allow_html=True)
+            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage), a moderately common
+            holding across the registry.</div></div>""", unsafe_allow_html=True)
     else:
         st.markdown(f"""<div class="insight-card insight-info">
             <div class="insight-icon">🔍</div>
@@ -2106,12 +2168,12 @@ def page_overlap_drilldown():
         unsafe_allow_html=True,
     )
 
-    top_row    = similarity.nlargest(1, "similarity_score").iloc[0]
+    top_row    = similarity.nlargest(1, "normalized_score").iloc[0]
     max_pair_a = top_row["fund_a"]
     max_pair_b = top_row["fund_b"]
-    max_score  = top_row["similarity_score"]
+    max_score  = top_row["normalized_score"]
     max_common = int(top_row["common_stocks"])
-    high_count = int((similarity["similarity_score"] >= 60).sum())
+    high_count = int((similarity["normalized_score"] >= 60).sum())
 
     # ── Summary metrics ──
     c1, c2, c3, c4 = st.columns(4)
@@ -2137,17 +2199,17 @@ def page_overlap_drilldown():
         '<div class="section-sub">Higher score = more shared holdings = higher redundancy risk</div>',
         unsafe_allow_html=True,
     )
-    top15 = similarity.nlargest(15, "similarity_score").copy()
+    top15 = similarity.nlargest(15, "normalized_score").copy()
     top15["pair"] = top15.apply(
         lambda r: f"{_short(r['fund_a'])} ↔ {_short(r['fund_b'])}", axis=1
     )
     fig = px.bar(
         top15.iloc[::-1],
-        x="similarity_score", y="pair", orientation="h",
-        color="similarity_score",
+        x="normalized_score", y="pair", orientation="h",
+        color="normalized_score",
         color_continuous_scale=[[0, "#EDE9FE"], [0.6, "#9B7FE8"], [1, "#6C3CE1"]],
-        labels={"similarity_score": "Overlap %", "pair": ""},
-        text="similarity_score",
+        labels={"normalized_score": "Overlap %", "pair": ""},
+        text="normalized_score",
     )
     fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
     fig.update_layout(
@@ -2166,7 +2228,7 @@ def page_overlap_drilldown():
         unsafe_allow_html=True,
     )
 
-    sorted_sim = similarity.sort_values("similarity_score", ascending=False).reset_index(drop=True)
+    sorted_sim = similarity.sort_values("normalized_score", ascending=False).reset_index(drop=True)
 
     def _risk(score):
         if score >= 65: return "High"
@@ -2176,9 +2238,9 @@ def page_overlap_drilldown():
     disp = pd.DataFrame({
         "Fund A":        sorted_sim["fund_a"].apply(_short),
         "Fund B":        sorted_sim["fund_b"].apply(_short),
-        "Overlap %":     sorted_sim["similarity_score"],
+        "Overlap %":     sorted_sim["normalized_score"],
         "Common Stocks": sorted_sim["common_stocks"],
-        "Risk Level":    sorted_sim["similarity_score"].apply(_risk),
+        "Risk Level":    sorted_sim["normalized_score"].apply(_risk),
     })
 
     sel_result = st.dataframe(
@@ -2206,7 +2268,7 @@ def page_overlap_drilldown():
         row       = sorted_sim.iloc[sel_rows[0]]
         sel_a     = row["fund_a"]
         sel_b     = row["fund_b"]
-        sel_score = float(row["similarity_score"])
+        sel_score = float(row["normalized_score"])
         sel_n     = int(row["common_stocks"])
     else:
         sel_a, sel_b, sel_score, sel_n = max_pair_a, max_pair_b, max_score, max_common
@@ -2275,12 +2337,12 @@ def page_overlap_drilldown():
             together may provide less diversification than expected.</div></div>""",
             unsafe_allow_html=True)
 
-    median_overlap = similarity["similarity_score"].median()
+    median_overlap = similarity["normalized_score"].median()
     st.markdown(f"""<div class="insight-card insight-info">
         <div class="insight-icon">📊</div>
         <div class="insight-text"><strong>Median Overlap: {median_overlap:.1f}%</strong> —
-        The typical large-cap fund pair shares {median_overlap:.1f}% of their portfolio, reflecting
-        the structural concentration of the large-cap universe around a core set of index-dominant
+        The typical fund pair shares {median_overlap:.1f}% of their portfolio, reflecting
+        the structural concentration of equity funds around a core set of index-dominant
         stocks.</div></div>""", unsafe_allow_html=True)
 
     st.markdown("""<div class="disclaimer">
@@ -2289,6 +2351,10 @@ def page_overlap_drilldown():
 
 
 def main():
+    if "cache_cleared" not in st.session_state:
+        st.cache_data.clear()
+        st.session_state["cache_cleared"] = True
+
     for key, default in [
         ("page",              "home"),
         ("selected_funds",    []),

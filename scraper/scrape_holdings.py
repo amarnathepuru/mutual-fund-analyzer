@@ -63,7 +63,7 @@ def scrape_fund(fund):
         # PARSE HTML
         # -----------------------------------
 
-        soup = BeautifulSoup(response.text, "lxml")
+        soup = BeautifulSoup(response.text, "html.parser")
 
         # -----------------------------------
         # FIND HOLDINGS SECTION
@@ -230,8 +230,10 @@ def scrape_fund(fund):
 # -----------------------------------
 
 funds_df = pd.read_csv(
-    "data/fund_master.csv"
+    "data/fund_master_auto.csv"
 )
+# Only scrape funds with valid portfolio links
+funds_df = funds_df[funds_df["status"] == "ACTIVE"].reset_index(drop=True)
 
 print(f"\nLoaded {len(funds_df)} funds")
 

@@ -23,6 +23,13 @@ print(f"Found {len(funds)} funds")
 # BUILD SIMILARITY MATRIX
 # -----------------------------------
 
+# Pre-compute total allocation per fund once (avoids repeated groupby in loop)
+fund_totals = (
+    df.groupby("fund_name")["allocation_percent"]
+    .sum()
+    .to_dict()
+)
+
 results = []
 
 for fund_a, fund_b in combinations(funds, 2):
@@ -63,7 +70,9 @@ for fund_a, fund_b in combinations(funds, 2):
     common_stock_count = len(merged)
 
     # -----------------------------
-    # SIMILARITY SCORE
+    # RAW SIMILARITY SCORE
+    # Weighted intersection: sum of min(alloc_a, alloc_b)
+    # across all common stocks
     # -----------------------------
 
     similarity_score = (
@@ -78,17 +87,35 @@ for fund_a, fund_b in combinations(funds, 2):
     )
 
     # -----------------------------
+    # NORMALIZED SIMILARITY SCORE
+    # Divides by the smaller fund's total allocation
+    # so the score means "% of the smaller fund's
+    # portfolio weight that is shared" — comparable
+    # across category pairs regardless of fund size
+    # or number of holdings.
+    # Range: 0–100
+    # -----------------------------
+
+    total_a = fund_totals.get(fund_a, 0)
+    total_b = fund_totals.get(fund_b, 0)
+    min_total = min(total_a, total_b)
+
+    normalized_score = (
+        round(similarity_score / min_total * 100, 2)
+        if min_total > 0
+        else 0.0
+    )
+
+    # -----------------------------
     # STORE RESULTS
     # -----------------------------
 
     results.append({
-        "fund_a": fund_a,
-        "fund_b": fund_b,
-        "common_stocks": common_stock_count,
-        "similarity_score": round(
-            similarity_score,
-            2
-        )
+        "fund_a":             fund_a,
+        "fund_b":             fund_b,
+        "common_stocks":      common_stock_count,
+        "similarity_score":   round(similarity_score, 2),
+        "normalized_score":   normalized_score,
     })
 
 # -----------------------------------
@@ -102,7 +129,7 @@ similarity_df = pd.DataFrame(results)
 # -----------------------------------
 
 similarity_df = similarity_df.sort_values(
-    by="similarity_score",
+    by="normalized_score",
     ascending=False
 )
 
