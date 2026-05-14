@@ -6,7 +6,7 @@ import numpy as np
 import urllib.parse
 
 st.set_page_config(
-    page_title="FundInsight — Investment Intelligence",
+    page_title="FundLens — Investment Intelligence",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -715,7 +715,7 @@ def render_sidebar():
         st.markdown(
             '<div style="font-size:1.1rem;font-weight:800;color:#6C3CE1;'
             'display:flex;align-items:center;gap:.4rem;padding:.25rem 0 1.5rem;">'
-            '<span style="font-size:1.25rem;">📊</span> FundInsight</div>',
+            '<span style="font-size:1.25rem;">📊</span> FundLens</div>',
             unsafe_allow_html=True,
         )
 
@@ -795,7 +795,7 @@ def render_welcome():
         'Backed by <span style="color:#6C3CE1;">data.</span></div>'
         '<p style="font-size:.95rem;color:#6B7280;line-height:1.75;max-width:560px;margin:0 0 1.5rem;">'
         'Most mutual fund apps show NAV charts and SIP calculators. '
-        'FundInsight goes deeper — it reveals what\'s actually <em>inside</em> your funds.'
+        'FundLens goes deeper — it reveals what\'s actually <em>inside</em> your funds.'
         '</p>',
         unsafe_allow_html=True,
     )
@@ -885,7 +885,7 @@ def page_home():
     st.markdown(
         '<div style="display:flex;align-items:center;justify-content:space-between;'
         'padding-bottom:1.25rem;border-bottom:1px solid #E5E7EB;margin-bottom:2.5rem;">'
-        '<div class="app-logo">📊 FundInsight</div>'
+        '<div class="app-logo">📊 FundLens</div>'
         '<div style="display:flex;gap:1.5rem;align-items:center;">'
         '<a href="?nav=home" target="_self" style="font-size:.85rem;font-weight:600;color:#6C3CE1;text-decoration:none;">Home</a>'
         '<a href="?nav=category" target="_self" style="font-size:.85rem;font-weight:500;color:#6B7280;text-decoration:none;">Compare</a>'
