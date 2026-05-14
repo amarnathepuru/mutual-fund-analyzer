@@ -2468,70 +2468,200 @@ def page_compare():
 # ── PAGE: PORTFOLIO UPLOAD ────────────────────────────────────────────────────
 
 def page_portfolio_upload():
+    import difflib
     nav_header(back_page="home", back_label="Home")
 
     st.markdown("## Analyze Your MF Portfolio")
     st.markdown(
         "<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.5rem;'>"
-        "Upload your portfolio to discover hidden exposure, overlap and concentration insights.</p>",
+        "Upload your portfolio or build it manually — then get hidden exposure, overlap and concentration insights.</p>",
         unsafe_allow_html=True,
     )
+
+    holdings  = load_holdings()
+    all_funds = sorted(holdings["fund_name"].unique().tolist())
+    fund_set  = set(all_funds)
 
     col_up, col_info = st.columns([3, 2], gap="large")
 
     with col_up:
-        uploaded = st.file_uploader(
-            "Drop your portfolio CSV or XLSX here",
-            type=["csv", "xlsx"],
-            help="Expected columns: fund_name, invested_amount (optional), units (optional)",
+        entry_mode = st.radio(
+            "How would you like to add your portfolio?",
+            ["📁  Upload CSV / XLSX", "✏️  Enter Manually"],
+            horizontal=True,
+            key="portfolio_entry_mode",
         )
+        st.markdown("<br>", unsafe_allow_html=True)
 
-        st.markdown("<div style='text-align:center;color:#9CA3AF;margin:0.5rem 0;font-size:0.85rem;'>— or enter manually —</div>", unsafe_allow_html=True)
-
-        if st.toggle("Enter portfolio manually"):
-            manual_df = pd.DataFrame({
-                "fund_name":       ["HDFC Large Cap Fund", "ICICI Prudential Bluechip Fund"],
-                "invested_amount": [50000,  30000],
-                "units":           [100.50, 80.20],
-            })
-            edited = st.data_editor(manual_df, num_rows="dynamic", use_container_width=True, key="manual_edit")
-            if st.button("Run X-Ray →", type="primary", use_container_width=True):
-                st.session_state.portfolio_df = edited
-                st.session_state.page = "portfolio_xray"
-                st.rerun()
-
-        # Template download
-        template = pd.DataFrame({
-            "fund_name":       ["HDFC Large Cap Fund", "ICICI Prudential Bluechip Fund"],
-            "invested_amount": [50000, 30000],
-            "units":           [100.50, 80.20],
-        })
-        st.download_button(
-            "⬇️  Download CSV Template",
-            template.to_csv(index=False),
-            file_name="portfolio_template.csv",
-            mime="text/csv",
-            use_container_width=True,
-        )
-
-        if uploaded:
-            try:
-                portfolio_df = (
-                    pd.read_csv(uploaded)
-                    if uploaded.name.endswith(".csv")
-                    else pd.read_excel(uploaded)
+        # ── Manual entry ──────────────────────────────────────────────────────
+        if entry_mode == "✏️  Enter Manually":
+            st.markdown(
+                "<div style='font-size:0.85rem;font-weight:600;color:#1A1A2E;margin-bottom:4px;'>"
+                "Select your funds (search by name or AMC)</div>",
+                unsafe_allow_html=True,
+            )
+            selected_manual = st.multiselect(
+                "Funds",
+                options=all_funds,
+                key="manual_fund_select",
+                label_visibility="collapsed",
+                placeholder="Start typing a fund name…",
+            )
+            if selected_manual:
+                st.markdown(
+                    "<div style='font-size:0.85rem;font-weight:600;color:#1A1A2E;"
+                    "margin-top:1rem;margin-bottom:4px;'>Enter investment amounts</div>",
+                    unsafe_allow_html=True,
                 )
-                st.success(f"✓ {len(portfolio_df)} holdings loaded from **{uploaded.name}**")
-                st.dataframe(portfolio_df.head(10), use_container_width=True)
-                if st.button("Analyse My Portfolio →", type="primary", use_container_width=True):
-                    st.session_state.portfolio_df = portfolio_df
+                prev = {r["fund_name"]: r for r in st.session_state.get("_manual_rows", [])}
+                rows = [
+                    {
+                        "fund_name":       fund,
+                        "invested_amount": prev.get(fund, {}).get("invested_amount", 0),
+                        "units":           prev.get(fund, {}).get("units", 0.0),
+                    }
+                    for fund in selected_manual
+                ]
+                edited = st.data_editor(
+                    pd.DataFrame(rows),
+                    use_container_width=True,
+                    hide_index=True,
+                    key="manual_edit",
+                    column_config={
+                        "fund_name":       st.column_config.TextColumn("Fund", disabled=True),
+                        "invested_amount": st.column_config.NumberColumn(
+                            "Invested Amount (₹)", min_value=0, step=1000, format="₹%d"
+                        ),
+                        "units":           st.column_config.NumberColumn(
+                            "Units (optional)", min_value=0.0, format="%.2f"
+                        ),
+                    },
+                )
+                st.session_state["_manual_rows"] = edited.to_dict("records")
+                if st.button("Analyse My Portfolio →", type="primary",
+                             use_container_width=True, key="manual_go"):
+                    st.session_state.portfolio_df = edited
                     st.session_state.page = "portfolio_xray"
                     st.rerun()
-            except Exception as e:
-                st.error(f"Could not read file: {e}")
+            else:
+                st.info("Start typing above to search and add funds from our database.")
+
+        # ── File upload ───────────────────────────────────────────────────────
+        else:
+            template = pd.DataFrame({
+                "fund_name":       ["HDFC Large Cap Fund", "ICICI Prudential Bluechip Fund"],
+                "invested_amount": [50000, 30000],
+                "units":           [100.50, 80.20],
+            })
+            st.download_button(
+                "⬇️  Download CSV Template",
+                template.to_csv(index=False),
+                file_name="portfolio_template.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            uploaded = st.file_uploader(
+                "Drop your portfolio CSV or XLSX here",
+                type=["csv", "xlsx"],
+                help="Expected columns: fund_name, invested_amount (optional), units (optional)",
+            )
+
+            if uploaded:
+                try:
+                    portfolio_df = (
+                        pd.read_csv(uploaded)
+                        if uploaded.name.endswith(".csv")
+                        else pd.read_excel(uploaded)
+                    )
+                    fund_col = next(
+                        (c for c in portfolio_df.columns if "fund" in c.lower()), None
+                    )
+                    if not fund_col:
+                        st.error("Could not find a 'fund_name' column in your file.")
+                    else:
+                        user_funds = portfolio_df[fund_col].dropna().str.strip().unique().tolist()
+                        matched   = [f for f in user_funds if f in fund_set]
+                        unmatched = [f for f in user_funds if f not in fund_set]
+
+                        # ── Validation report ─────────────────────────────────
+                        st.markdown(
+                            "<div style='font-size:1rem;font-weight:700;color:#1A1A2E;"
+                            "margin-bottom:0.75rem;'>Validation Results</div>",
+                            unsafe_allow_html=True,
+                        )
+                        c_ok, c_err = st.columns(2)
+                        with c_ok:
+                            lines = "".join(
+                                f'<div style="font-size:0.78rem;color:#059669;'
+                                f'padding:3px 0;border-bottom:1px solid #D1FAE5;">'
+                                f'✓ {f}</div>'
+                                for f in matched
+                            ) or '<div style="font-size:0.78rem;color:#9CA3AF;">None matched</div>'
+                            st.markdown(
+                                f'<div style="background:#ECFDF5;border-radius:10px;padding:1rem;">'
+                                f'<div style="font-weight:700;color:#065F46;font-size:0.85rem;'
+                                f'margin-bottom:6px;">✅ {len(matched)} matched</div>'
+                                f'{lines}</div>',
+                                unsafe_allow_html=True,
+                            )
+                        with c_err:
+                            if unmatched:
+                                err_lines = ""
+                                for f in unmatched:
+                                    suggestions = difflib.get_close_matches(
+                                        f, all_funds, n=2, cutoff=0.4
+                                    )
+                                    sugg = (
+                                        f'<div style="font-size:0.68rem;color:#9CA3AF;'
+                                        f'margin-top:1px;">Did you mean: {" / ".join(suggestions)}?</div>'
+                                        if suggestions else ""
+                                    )
+                                    err_lines += (
+                                        f'<div style="font-size:0.78rem;color:#DC2626;'
+                                        f'padding:3px 0;border-bottom:1px solid #FEE2E2;">'
+                                        f'✗ {f}{sugg}</div>'
+                                    )
+                                st.markdown(
+                                    f'<div style="background:#FEF2F2;border-radius:10px;padding:1rem;">'
+                                    f'<div style="font-weight:700;color:#991B1B;font-size:0.85rem;'
+                                    f'margin-bottom:6px;">❌ {len(unmatched)} not found</div>'
+                                    f'{err_lines}</div>',
+                                    unsafe_allow_html=True,
+                                )
+                            else:
+                                st.markdown(
+                                    '<div style="background:#ECFDF5;border-radius:10px;padding:1rem;">'
+                                    '<div style="font-weight:700;color:#065F46;font-size:0.85rem;">'
+                                    '✅ All funds matched</div></div>',
+                                    unsafe_allow_html=True,
+                                )
+
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        if matched:
+                            if unmatched:
+                                st.caption(
+                                    f"⚠️ {len(unmatched)} unmatched fund(s) will be excluded. "
+                                    "Fix the names in your file and re-upload, or proceed with matched funds only."
+                                )
+                            if st.button("Analyse My Portfolio →", type="primary",
+                                         use_container_width=True, key="upload_go"):
+                                st.session_state.portfolio_df = portfolio_df
+                                st.session_state.page = "portfolio_xray"
+                                st.rerun()
+                        else:
+                            st.error(
+                                "No funds matched our database. "
+                                "Fund names must match exactly as listed on ETMoney. "
+                                "Use the CSV template as a reference."
+                            )
+
+                except Exception as e:
+                    st.error(f"Could not read file: {e}")
 
         st.markdown(
-            "<div style='text-align:center;font-size:0.72rem;color:#9CA3AF;margin-top:1rem;'>"
+            "<div style='text-align:center;font-size:0.72rem;color:#9CA3AF;margin-top:1.5rem;'>"
             "🔒 Your data stays in your browser session and is never stored or shared.</div>",
             unsafe_allow_html=True,
         )
@@ -2539,11 +2669,11 @@ def page_portfolio_upload():
     with col_info:
         st.markdown('<div class="section-title">What you\'ll discover</div>', unsafe_allow_html=True)
         for icon, title, desc in [
-            ("🏦", "Hidden Stock Exposure",  "See exactly which stocks you indirectly own and in what proportions across all funds."),
-            ("🔍", "Duplicate Fund Detection","Identify funds with near-identical portfolios that add no real diversification."),
-            ("📊", "Sector Concentration",   "Find if you're over-exposed to a single sector like BFSI or IT across your portfolio."),
-            ("🔗", "Portfolio Overlap Score", "A single score showing how truly diversified your combined fund portfolio is."),
-            ("📈", "Allocation Trends",      "See how fund managers have been adjusting stock weights over 3M, 6M and 1Y periods."),
+            ("🏦", "Hidden Stock Exposure",   "See exactly which stocks you indirectly own and in what proportions across all funds."),
+            ("🔍", "Duplicate Fund Detection", "Identify funds with near-identical portfolios that add no real diversification."),
+            ("📊", "Sector Concentration",    "Find if you're over-exposed to a single sector like BFSI or IT across your portfolio."),
+            ("🔗", "Portfolio Overlap Score",  "A single score showing how truly diversified your combined fund portfolio is."),
+            ("📈", "Allocation Trends",       "See how fund managers have been adjusting stock weights over 3M, 6M and 1Y periods."),
         ]:
             st.markdown(f"""
             <div style="display:flex;gap:0.75rem;margin-bottom:1rem;align-items:flex-start;">
