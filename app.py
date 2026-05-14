@@ -2673,7 +2673,8 @@ def page_portfolio_xray():
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    tab_exp, tab_perf, tab_ol, tab_sec, tab_risk, tab_ins = st.tabs([
+    tab_ov, tab_exp, tab_perf, tab_ol, tab_sec, tab_risk, tab_ins = st.tabs([
+        "📊 Overview",
         "🏦 Hidden Exposure",
         "📉 Fund Performance",
         "🔗 Fund Overlap",
@@ -2681,6 +2682,239 @@ def page_portfolio_xray():
         "⚡ Concentration Risks",
         "💡 Insights",
     ])
+
+    # ── Tab 0: Overview ───────────────────────────────────────────────────────
+    with tab_ov:
+        display_mode = st.radio(
+            "Show numbers as:",
+            ["% overlap", "plain words", "both"],
+            index=2,
+            horizontal=True,
+            key="xray_ov_display",
+        )
+
+        col_matrix, col_top = st.columns([3, 2], gap="large")
+
+        FUND_COLORS = ["#6C3CE1", "#F97316", "#0891B2", "#16A34A", "#E11D48"]
+
+        with col_matrix:
+            score_lk  = {}
+            common_lk = {}
+            for _, row in sel_sim.iterrows():
+                for key in [(row["fund_a"], row["fund_b"]), (row["fund_b"], row["fund_a"])]:
+                    score_lk[key]  = row["normalized_score"]
+                    common_lk[key] = int(row["common_stocks"])
+
+            cat_lk = dict(zip(master["fund_name"], master["category"])) if not master.empty else {}
+            cats   = [cat_lk.get(f, "") for f in matched_funds]
+
+            n_sel  = len(matched_funds)
+            cell_h = 86 if n_sel <= 3 else 74 if n_sel == 4 else 64
+            pct_fs = 20 if n_sel <= 3 else 17 if n_sel == 4 else 14
+            hdr_fs = 11 if n_sel <= 3 else 10
+            lbl_fs = 9  if n_sel <= 3 else 8
+            pad    = 3  if n_sel <= 3 else 2
+
+            def _xr_mx_name(name):
+                n = short_name(name)
+                return (n[:16] + "…") if len(n) > 16 else n
+
+            m_names = [_xr_mx_name(f) for f in matched_funds]
+
+            def _xr_cell_cfg(score, common):
+                if common == 0 and score == 0:
+                    return {"bg": "#F9FAFB", "txt": "#9CA3AF",
+                            "label": "No data",
+                            "bdg_bg": "#F3F4F6", "bdg_txt": "#9CA3AF"}
+                if score >= 65:
+                    return {"bg": "#1B4332", "txt": "#FFFFFF",
+                            "label": "Avoid pairing",
+                            "bdg_bg": "#FCA5A5", "bdg_txt": "#7F1D1D"}
+                if score >= 50:
+                    return {"bg": "#2D6A4F", "txt": "#FFFFFF",
+                            "label": "Mostly redundant",
+                            "bdg_bg": "#FDE68A", "bdg_txt": "#78350F"}
+                if score >= 35:
+                    return {"bg": "#52B788", "txt": "#FFFFFF",
+                            "label": "Some overlap",
+                            "bdg_bg": "#A7F3D0", "bdg_txt": "#064E3B"}
+                if score >= 20:
+                    return {"bg": "#B7E4C7", "txt": "#1B4332",
+                            "label": "Good pairing",
+                            "bdg_bg": "#D1FAE5", "bdg_txt": "#065F46"}
+                return {"bg": "#D8F3DC", "txt": "#1B4332",
+                        "label": "Best pairing",
+                        "bdg_bg": "#ECFDF5", "bdg_txt": "#065F46"}
+
+            hdr = '<td style="width:18%;"></td>'
+            for mn, cat in zip(m_names, cats):
+                hdr += (
+                    f'<td style="text-align:center;padding:0 2px {pad*3}px;vertical-align:bottom;">'
+                    f'<div style="font-weight:700;font-size:{hdr_fs}px;color:#1A1A2E;'
+                    f'line-height:1.3;word-break:break-word;">{mn}</div>'
+                    f'<div style="font-size:{lbl_fs}px;color:#6B7280;">{cat}</div>'
+                    f'</td>'
+                )
+
+            rows = ""
+            for fa, mn, fa_cat in zip(matched_funds, m_names, cats):
+                cells = ""
+                for fb in matched_funds:
+                    if fa == fb:
+                        cells += (
+                            f'<td style="padding:{pad}px;">'
+                            f'<div style="background:#F3F4F6;border-radius:8px;'
+                            f'width:100%;height:{cell_h}px;display:flex;align-items:center;justify-content:center;">'
+                            f'<span style="font-size:{lbl_fs}px;color:#9CA3AF;font-style:italic;">—</span>'
+                            f'</div></td>'
+                        )
+                    else:
+                        sc  = score_lk.get((fa, fb), 0)
+                        co  = common_lk.get((fa, fb), 0)
+                        cfg = _xr_cell_cfg(sc, co)
+                        pct = (
+                            f'<div style="font-size:{pct_fs}px;font-weight:800;'
+                            f'color:{cfg["txt"]};line-height:1;">{sc:.0f}%</div>'
+                            if display_mode in ("% overlap", "both") else ""
+                        )
+                        lbl = (
+                            f'<div style="background:{cfg["bdg_bg"]};color:{cfg["bdg_txt"]};'
+                            f'font-size:{lbl_fs}px;font-weight:700;border-radius:9999px;'
+                            f'padding:2px 5px;margin-top:4px;white-space:nowrap;text-align:center;">'
+                            f'{cfg["label"]}</div>'
+                            if display_mode in ("plain words", "both") else ""
+                        )
+                        cells += (
+                            f'<td style="padding:{pad}px;">'
+                            f'<div style="background:{cfg["bg"]};border-radius:8px;width:100%;'
+                            f'height:{cell_h}px;display:flex;flex-direction:column;'
+                            f'align-items:center;justify-content:center;padding:0 4px;">'
+                            f'{pct}{lbl}</div></td>'
+                        )
+                rows += (
+                    f'<tr>'
+                    f'<td style="padding:{pad}px 8px {pad}px 0;text-align:right;vertical-align:middle;">'
+                    f'<div style="font-weight:700;font-size:{hdr_fs}px;color:#1A1A2E;'
+                    f'word-break:break-word;line-height:1.3;">{mn}</div>'
+                    f'<div style="font-size:{lbl_fs}px;color:#6B7280;">{fa_cat}</div>'
+                    f'</td>{cells}</tr>'
+                )
+
+            st.markdown(
+                f'<table style="border-collapse:separate;border-spacing:0;'
+                f'width:100%;table-layout:fixed;">'
+                f'<thead><tr>{hdr}</tr></thead>'
+                f'<tbody>{rows}</tbody>'
+                f'</table>',
+                unsafe_allow_html=True,
+            )
+            st.markdown("""
+            <div style="display:flex;align-items:center;gap:8px;margin-top:14px;
+                        font-size:11px;color:#6B7280;flex-wrap:wrap;">
+                <span>Low overlap</span>
+                <div style="display:flex;gap:3px;align-items:center;">
+                    <div style="width:14px;height:14px;background:#D8F3DC;border-radius:3px;"></div>
+                    <div style="width:14px;height:14px;background:#B7E4C7;border-radius:3px;"></div>
+                    <div style="width:14px;height:14px;background:#52B788;border-radius:3px;"></div>
+                    <div style="width:14px;height:14px;background:#2D6A4F;border-radius:3px;"></div>
+                    <div style="width:14px;height:14px;background:#1B4332;border-radius:3px;"></div>
+                </div>
+                <span>High overlap &nbsp;·&nbsp; Higher = more redundant = less diversification</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_top:
+            st.markdown('<div class="section-title">Top Common Holdings</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="section-sub">Stocks held across the most funds in your portfolio, ranked by avg allocation</div>',
+                unsafe_allow_html=True,
+            )
+
+            top_com = (
+                sel_h.groupby("stock_name")
+                .agg(
+                    funds_holding=("fund_name",          "nunique"),
+                    avg_alloc    =("allocation_percent",  "mean"),
+                    sector       =("sector",              "first"),
+                )
+                .reset_index()
+                .sort_values(["funds_holding", "avg_alloc"], ascending=[False, False])
+                .head(12)
+            )
+            top_com["stock_name"] = top_com["stock_name"].str.strip()
+            top_com["avg_alloc"]  = top_com["avg_alloc"].round(2)
+
+            stock_to_funds_xr = (
+                sel_h.groupby("stock_name")["fund_name"]
+                .apply(set)
+                .to_dict()
+            )
+
+            max_alloc_top = float(top_com["avg_alloc"].max()) if not top_com.empty else 1.0
+
+            def _xr_ch_row(stock, alloc, sector_val):
+                bar_w    = min(100.0, alloc / max_alloc_top * 100) if max_alloc_top else 0
+                sec_str  = str(sector_val).strip() if pd.notna(sector_val) and str(sector_val).strip() not in ("", "nan") else ""
+                sec_tag  = (
+                    '<span style="font-size:0.58rem;background:#F3F4F6;color:#6B7280;'
+                    'border-radius:4px;padding:1px 5px;margin-left:4px;">'
+                    + sec_str.title() + '</span>'
+                ) if sec_str else ""
+                holding_funds = stock_to_funds_xr.get(stock, set())
+                dots = ""
+                for idx, fund_name in enumerate(matched_funds):
+                    bg = FUND_COLORS[idx % len(FUND_COLORS)] if fund_name in holding_funds else "#E5E7EB"
+                    dots += (
+                        '<span style="display:inline-block;width:9px;height:9px;'
+                        'border-radius:50%;background:' + bg + ';margin-right:2px;"></span>'
+                    )
+                return (
+                    '<div style="display:flex;align-items:center;padding:8px 0;'
+                    'border-bottom:1px solid #F9FAFB;gap:10px;">'
+                    '<div style="flex:1;min-width:0;">'
+                    '<div style="font-size:0.78rem;font-weight:700;color:#1A1A2E;'
+                    'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
+                    + stock + sec_tag +
+                    '</div>'
+                    '<div style="background:#EDE9FE;border-radius:3px;height:5px;'
+                    'margin-top:5px;overflow:hidden;">'
+                    '<div style="background:#6C3CE1;width:' + f"{bar_w:.1f}" + '%;'
+                    'height:100%;border-radius:3px;"></div>'
+                    '</div></div>'
+                    '<div style="flex-shrink:0;">' + dots + '</div>'
+                    '<div style="font-size:0.78rem;font-weight:800;color:#6C3CE1;'
+                    'width:38px;text-align:right;flex-shrink:0;">'
+                    + f"{alloc:.1f}%" +
+                    '</div></div>'
+                )
+
+            rows_html = "".join(
+                _xr_ch_row(r["stock_name"], r["avg_alloc"], r["sector"])
+                for _, r in top_com.iterrows()
+            )
+
+            legend_parts = []
+            for i, fund_name in enumerate(matched_funds):
+                dot_color = FUND_COLORS[i % len(FUND_COLORS)]
+                legend_parts.append(
+                    '<div style="display:flex;align-items:center;gap:4px;margin-right:10px;">'
+                    '<div style="width:9px;height:9px;border-radius:50%;background:' + dot_color + ';"></div>'
+                    '<span style="font-size:0.65rem;color:#6B7280;">' + display_name(fund_name) + '</span>'
+                    '</div>'
+                )
+
+            st.markdown(
+                '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:0.75rem 1rem;">'
+                '<div style="display:flex;flex-wrap:wrap;gap:2px;margin-bottom:8px;'
+                'padding-bottom:8px;border-bottom:1px solid #F3F4F6;">'
+                + "".join(legend_parts) +
+                '</div>'
+                + rows_html +
+                '<div style="font-size:0.62rem;color:#9CA3AF;margin-top:8px;text-align:right;">'
+                'Filled dots = fund holds stock &nbsp;·&nbsp; bar = avg allocation weight'
+                '</div></div>',
+                unsafe_allow_html=True,
+            )
 
     # ── Tab 1: Hidden Exposure ────────────────────────────────────────────────
     with tab_exp:
