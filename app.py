@@ -381,6 +381,53 @@ def format_aum(val):
         return "—"
 
 
+def render_risk_metric_explainer(key_suffix=""):
+    """Plain-English explainer panel for the 4 risk/efficiency metrics."""
+    with st.expander("ℹ️ What do these numbers mean?", expanded=False):
+        c1, c2, c3, c4 = st.columns(4)
+        for col, emoji, term, plain, good in [
+            (
+                c1, "📊", "Std Dev %",
+                "Measures how much the fund's returns jump around year to year. "
+                "A fund with 10% std dev might return anywhere from −10% to +30% in a given year. "
+                "Lower means a steadier, more predictable ride.",
+                "Lower = steadier",
+            ),
+            (
+                c2, "⚖️", "Sharpe Ratio",
+                "Tells you how much return you're getting for the risk you're taking. "
+                "Think of it as 'is the bumpy ride worth it?' "
+                "A score above 1.0 is generally considered good.",
+                "Higher = better reward for risk",
+            ),
+            (
+                c3, "🎯", "Alpha %",
+                "How much extra return the fund manager generated beyond what the market "
+                "naturally gave. +2% alpha means the manager added 2% on top of the benchmark. "
+                "Negative means they lagged the market.",
+                "Positive = manager added value",
+            ),
+            (
+                c4, "📡", "Beta",
+                "How much the fund swings when the market swings. "
+                "Beta 1.2 means if the market falls 10%, this fund typically falls 12%. "
+                "Beta 0.8 means it only falls 8%. Higher beta = bumpier ride in market swings.",
+                "< 1 = less market-sensitive",
+            ),
+        ]:
+            with col:
+                st.markdown(
+                    f'<div style="background:#F8FAFC;border-radius:8px;padding:0.75rem 0.8rem;'
+                    f'border-left:3px solid #6C3CE1;height:100%;">'
+                    f'<div style="font-size:1.3rem;margin-bottom:4px;">{emoji}</div>'
+                    f'<div style="font-weight:700;font-size:0.82rem;color:#1A1A2E;margin-bottom:5px;">{term}</div>'
+                    f'<div style="font-size:0.73rem;color:#4B5563;line-height:1.45;margin-bottom:8px;">{plain}</div>'
+                    f'<div style="font-size:0.68rem;font-weight:700;color:#6C3CE1;">{good}</div>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+
+
 def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_df=None):
     insights = []
     sel_sim = similarity_df[
@@ -1987,7 +2034,7 @@ def page_compare():
 
             # ── Section 2: Risk & Efficiency ────────────────────────────────
             st.markdown('<div class="section-title" style="font-size:0.9rem;">Risk & Efficiency</div>', unsafe_allow_html=True)
-            st.caption("Std Dev measures volatility · Sharpe = return per unit of risk · Alpha = excess return vs benchmark · Beta = sensitivity to market moves")
+            render_risk_metric_explainer("cmp")
 
             risk_cols = {
                 "std_dev":      "Std Dev (%)",
@@ -2021,15 +2068,16 @@ def page_compare():
                 col_cfg_risk = {
                     "Fund":        st.column_config.TextColumn("Fund",         width="medium"),
                     "Volatility":  st.column_config.TextColumn("Volatility",   width="small",
-                                       help="Based on Std Dev: <13% Low · 13–18% Moderate · >18% High"),
+                                       help="How steady is this fund? Based on Std Dev: below 13% = Low, 13–18% = Moderate, above 18% = High"),
                     "Std Dev (%)": st.column_config.ProgressColumn("Std Dev %", format="%.1f%%",
-                                       min_value=0, max_value=max_sd),
+                                       min_value=0, max_value=max_sd,
+                                       help="How much returns fluctuate year to year — lower means a more predictable ride"),
                     "Sharpe Ratio":st.column_config.NumberColumn("Sharpe",     format="%.2f", width="small",
-                                       help="Higher is better — return earned per unit of risk"),
+                                       help="Return earned per unit of risk taken — above 1.0 is generally good, higher is better"),
                     "Alpha (%)":   st.column_config.NumberColumn("Alpha %",    format="%+.2f%%", width="small",
-                                       help="Positive alpha = outperforming benchmark"),
+                                       help="Extra return added by the fund manager beyond the market — positive means they beat the benchmark"),
                     "Beta":        st.column_config.NumberColumn("Beta",       format="%.2f", width="small",
-                                       help="<1 = less volatile than market · >1 = more volatile"),
+                                       help="How much the fund swings with the market — below 1 means less sensitive, above 1 means amplified moves"),
                 }
                 st.dataframe(risk_tbl, use_container_width=True, hide_index=True,
                              height=36 * len(risk_tbl) + 38,
@@ -3190,7 +3238,7 @@ def page_portfolio_xray():
 
             # Risk & Efficiency
             st.markdown('<div class="section-title" style="font-size:0.9rem;">Risk & Efficiency</div>', unsafe_allow_html=True)
-            st.caption("Std Dev = volatility · Sharpe = return per unit of risk · Alpha = excess return vs benchmark · Beta = market sensitivity")
+            render_risk_metric_explainer("xray")
             risk_cols  = {"std_dev": "Std Dev %", "sharpe_ratio": "Sharpe", "alpha": "Alpha %", "beta": "Beta"}
             avail_risk = {k: v for k, v in risk_cols.items() if k in sel_master.columns}
             if avail_risk:
@@ -3207,12 +3255,17 @@ def page_portfolio_xray():
                     risk_tbl.insert(1, "Volatility", risk_tbl["Std Dev %"].apply(_rl))
                 max_sd = risk_tbl["Std Dev %"].max() * 1.25 if "Std Dev %" in risk_tbl.columns else 1.0
                 rcfg = {
-                    "Fund":       st.column_config.TextColumn("Fund",      width="medium"),
-                    "Volatility": st.column_config.TextColumn("Volatility",width="small"),
-                    "Std Dev %":  st.column_config.ProgressColumn("Std Dev %", format="%.1f%%", min_value=0, max_value=max_sd),
-                    "Sharpe":     st.column_config.NumberColumn("Sharpe",   format="%.2f",   width="small"),
-                    "Alpha %":    st.column_config.NumberColumn("Alpha %",  format="%+.2f%%",width="small"),
-                    "Beta":       st.column_config.NumberColumn("Beta",     format="%.2f",   width="small"),
+                    "Fund":       st.column_config.TextColumn("Fund",       width="medium"),
+                    "Volatility": st.column_config.TextColumn("Volatility", width="small",
+                                      help="How steady is this fund? Based on Std Dev: below 13% = Low, 13–18% = Moderate, above 18% = High"),
+                    "Std Dev %":  st.column_config.ProgressColumn("Std Dev %", format="%.1f%%", min_value=0, max_value=max_sd,
+                                      help="How much returns fluctuate year to year — lower means a more predictable ride"),
+                    "Sharpe":     st.column_config.NumberColumn("Sharpe",   format="%.2f",    width="small",
+                                      help="Return earned per unit of risk taken — above 1.0 is generally good, higher is better"),
+                    "Alpha %":    st.column_config.NumberColumn("Alpha %",  format="%+.2f%%", width="small",
+                                      help="Extra return added by the fund manager beyond the market — positive means they beat the benchmark"),
+                    "Beta":       st.column_config.NumberColumn("Beta",     format="%.2f",    width="small",
+                                      help="How much the fund swings with the market — below 1 means less sensitive, above 1 means amplified moves"),
                 }
                 st.dataframe(risk_tbl, use_container_width=True, hide_index=True,
                              height=36 * len(risk_tbl) + 38,
