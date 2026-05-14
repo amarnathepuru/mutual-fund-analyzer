@@ -2579,6 +2579,7 @@ def page_portfolio_xray():
 
     holdings   = load_holdings()
     similarity = load_similarity()
+    master     = load_master()
     sector_df  = get_sector_breakdown(holdings)
 
     fund_col = next((c for c in portfolio_df.columns if "fund" in c.lower()), None)
@@ -2590,91 +2591,265 @@ def page_portfolio_xray():
     matched_funds = [f for f in user_funds if f in holdings["fund_name"].values]
     unmatched     = [f for f in user_funds if f not in matched_funds]
 
-    st.markdown("## Portfolio X-Ray")
-    st.markdown(
-        f"<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.5rem;'>"
-        f"Analysis of {len(user_funds)} fund(s) — {len(matched_funds)} matched in our database</p>",
-        unsafe_allow_html=True,
-    )
-
     if unmatched:
-        st.info(f"⚠️  Funds not found in our database (will be excluded): {', '.join(unmatched)}")
+        st.info(f"⚠️  Not found in our database (excluded): {', '.join(unmatched)}")
     if not matched_funds:
         st.error("None of your funds matched our database. Please check fund names match those on ETMoney.")
         return
 
-    sel_h   = holdings[holdings["fund_name"].isin(matched_funds)].copy()
-    sel_sim = similarity[
-        similarity["fund_a"].isin(matched_funds) & similarity["fund_b"].isin(matched_funds)
-    ]
+    # ── Invested amount weighting ─────────────────────────────────────────────
+    has_amounts  = "invested_amount" in portfolio_df.columns
+    amount_map   = {}
+    if has_amounts:
+        for _, row in portfolio_df.iterrows():
+            fund = row.get(fund_col)
+            amt  = pd.to_numeric(row.get("invested_amount", None), errors="coerce")
+            if fund in matched_funds and pd.notna(amt) and amt > 0:
+                amount_map[fund] = float(amt)
+    if not amount_map:
+        amount_map = {f: 1.0 for f in matched_funds}
+    total_invested = sum(amount_map.values())
+    weight_map     = {f: amount_map.get(f, 0) / total_invested for f in matched_funds}
 
-    # ── Summary metrics ──
+    sel_h      = holdings[holdings["fund_name"].isin(matched_funds)].copy()
+    sel_sim    = similarity[similarity["fund_a"].isin(matched_funds) & similarity["fund_b"].isin(matched_funds)]
+    sel_master = master[master["fund_name"].isin(matched_funds)].copy()
+    if not sel_master.empty:
+        sel_master["_order"] = sel_master["fund_name"].apply(lambda f: matched_funds.index(f) if f in matched_funds else 99)
+        sel_master = sel_master.sort_values("_order").drop(columns=["_order"])
+        sel_master["short_name"] = sel_master["fund_name"].apply(display_name)
+
+    # ── Key portfolio metrics ─────────────────────────────────────────────────
     n_unique = sel_h["stock_name"].nunique()
     avg_sim  = sel_sim["normalized_score"].mean() if not sel_sim.empty else 0
     n_secs   = sel_h["sector"].nunique()
-    c1, c2, c3, c4 = st.columns(4)
-    for col, val, label in [
-        (c1, str(len(matched_funds)), "Funds Analyzed"),
-        (c2, str(n_unique),           "Unique Stocks You Own"),
-        (c3, f"{avg_sim:.0f}%",       "Avg Fund Overlap"),
-        (c4, str(n_secs),             "Sectors Covered"),
+
+    if avg_sim >= 60:
+        redun_label, redun_color = "High Redundancy",    "#DC2626"
+    elif avg_sim >= 35:
+        redun_label, redun_color = "Moderate Overlap",   "#D97706"
+    else:
+        redun_label, redun_color = "Well Diversified",   "#059669"
+
+    wtd_er = None
+    if not sel_master.empty and "expense_ratio" in sel_master.columns:
+        er_df = sel_master.dropna(subset=["expense_ratio"]).copy()
+        er_df["expense_ratio"] = pd.to_numeric(er_df["expense_ratio"], errors="coerce")
+        er_df = er_df.dropna(subset=["expense_ratio"])
+        if not er_df.empty:
+            wts   = [weight_map.get(f, 0) for f in er_df["fund_name"]]
+            wt_sum = sum(wts)
+            wtd_er = sum(er * wt for er, wt in zip(er_df["expense_ratio"], wts)) / wt_sum if wt_sum else None
+
+    # ── Summary header ────────────────────────────────────────────────────────
+    st.markdown("## Portfolio X-Ray")
+    st.markdown(
+        f"<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.5rem;'>"
+        f"{len(matched_funds)} funds analysed · {n_unique} unique stocks · {n_secs} sectors</p>",
+        unsafe_allow_html=True,
+    )
+
+    c1, c2, c3, c4, c5 = st.columns(5)
+    inv_val  = f"₹{total_invested/100000:.1f}L" if has_amounts and total_invested > 0 else "—"
+    er_val   = f"{wtd_er:.2f}%" if wtd_er else "—"
+    for col, val, label, sub in [
+        (c1, str(len(matched_funds)),     "Funds",              "in your portfolio"),
+        (c2, str(n_unique),               "Unique Stocks",      "across all funds"),
+        (c3, f"{avg_sim:.0f}%",           "Avg Overlap",        f'<span style="color:{redun_color};font-weight:700;">{redun_label}</span>'),
+        (c4, inv_val,                     "Total Invested",     "from your upload" if has_amounts else "upload amounts for this"),
+        (c5, er_val,                      "Wtd. Expense Ratio", "annual fee drag"),
     ]:
         with col:
             st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-value">{val}</div>
                 <div class="metric-label">{label}</div>
-            </div>
-            """, unsafe_allow_html=True)
+                <div class="metric-sub">{sub}</div>
+            </div>""", unsafe_allow_html=True)
+
+    if has_amounts and total_invested > 0 and wtd_er:
+        fee_drag = total_invested * wtd_er / 100
+        st.caption(f"💸 At {wtd_er:.2f}% weighted expense ratio, you're paying approx **₹{fee_drag:,.0f}/year** in fund management fees.")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    tab_exp, tab_ol, tab_sec, tab_ins = st.tabs([
+    tab_exp, tab_perf, tab_ol, tab_sec, tab_risk, tab_ins = st.tabs([
         "🏦 Hidden Exposure",
+        "📉 Fund Performance",
         "🔗 Fund Overlap",
-        "🏗️ Sector Concentration",
+        "🏗️ Sector & Cap Size",
+        "⚡ Concentration Risks",
         "💡 Insights",
     ])
 
+    # ── Tab 1: Hidden Exposure ────────────────────────────────────────────────
     with tab_exp:
         st.markdown('<div class="section-title">Your Indirect Stock Exposure</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-sub">Stocks you own through your mutual funds (by average allocation across holdings)</div>', unsafe_allow_html=True)
+
+        # Weighted effective exposure per stock
+        sel_h_wt = sel_h.copy()
+        sel_h_wt["weight"] = sel_h_wt["fund_name"].map(weight_map).fillna(0)
+        sel_h_wt["eff_alloc"] = sel_h_wt["allocation_percent"] * sel_h_wt["weight"]
 
         exp = (
-            sel_h.groupby("stock_name")
-            .agg(funds_holding=("fund_name", "nunique"), avg_alloc=("allocation_percent", "mean"), sector=("sector", "first"))
+            sel_h_wt.groupby("stock_name")
+            .agg(
+                funds_holding =("fund_name",        "nunique"),
+                eff_alloc     =("eff_alloc",         "sum"),
+                avg_alloc     =("allocation_percent", "mean"),
+                sector        =("sector",             "first"),
+            )
             .reset_index()
-            .sort_values("avg_alloc", ascending=False)
+            .sort_values("eff_alloc", ascending=False)
         )
         exp["stock_name"] = exp["stock_name"].str.strip()
 
+        if has_amounts and total_invested > 0:
+            st.markdown('<div class="section-sub">Effective exposure = weighted by your invested amount in each fund</div>', unsafe_allow_html=True)
+            x_col, x_label = "eff_alloc", "Effective Exposure %"
+        else:
+            st.markdown('<div class="section-sub">Average allocation across your funds — upload invested amounts for weighted view</div>', unsafe_allow_html=True)
+            x_col, x_label = "avg_alloc", "Avg Allocation %"
+
         fig_e = px.bar(
-            exp.head(15), x="avg_alloc", y="stock_name", orientation="h",
-            color="sector", labels={"avg_alloc": "Avg Allocation %", "stock_name": ""},
-            height=420,
+            exp.head(15), x=x_col, y="stock_name", orientation="h",
+            color="sector",
+            labels={x_col: x_label, "stock_name": ""},
+            height=440,
         )
         fig_e.update_layout(
             yaxis=dict(autorange="reversed"),
             margin=dict(l=0, r=0, t=10, b=0),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
             legend=dict(orientation="h", yanchor="top", y=-0.15),
             font=dict(family="Inter, sans-serif"),
         )
-        st.plotly_chart(fig_e, use_container_width=True)
+        fig_e.update_traces(marker_line_width=0)
+        st.plotly_chart(fig_e, use_container_width=True, config={"displayModeBar": False})
 
+        max_exp = float(exp[x_col].max()) * 1.25 if not exp.empty else 1.0
         st.dataframe(
             exp.reset_index(drop=True),
-            use_container_width=True, height=380,
-            column_config={
-                "stock_name":    st.column_config.TextColumn("Stock"),
-                "funds_holding": st.column_config.NumberColumn("Funds Holding", format="%d"),
-                "avg_alloc":     st.column_config.NumberColumn("Avg Alloc %",   format="%.2f%%"),
-                "sector":        st.column_config.TextColumn("Sector"),
-            },
+            use_container_width=True, height=400,
             hide_index=True,
+            column_config={
+                "stock_name":    st.column_config.TextColumn("Stock",          width="medium"),
+                "funds_holding": st.column_config.NumberColumn("# Funds",      format="%d",     width="small"),
+                "eff_alloc":     st.column_config.ProgressColumn("Eff. Exp %", format="%.2f%%", min_value=0, max_value=max_exp),
+                "avg_alloc":     st.column_config.NumberColumn("Avg Alloc %",  format="%.2f%%", width="small"),
+                "sector":        st.column_config.TextColumn("Sector",         width="small"),
+            },
         )
 
+    # ── Tab 2: Fund Performance ───────────────────────────────────────────────
+    with tab_perf:
+        st.markdown('<div class="section-title">Fund Performance Comparison</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-sub">Returns, risk and cost metrics for each fund in your portfolio</div>', unsafe_allow_html=True)
+
+        PERF_COLORS = ["#6C3CE1", "#F97316", "#0891B2", "#16A34A", "#E11D48"]
+
+        if sel_master.empty:
+            st.info("Performance data not available.")
+        else:
+            fund_color_map = {row["short_name"]: PERF_COLORS[i % len(PERF_COLORS)] for i, (_, row) in enumerate(sel_master.iterrows())}
+
+            # Returns chart
+            st.markdown('<div class="section-title" style="font-size:0.9rem;margin-top:0.25rem;">Returns (%)</div>', unsafe_allow_html=True)
+            return_cols = {"return_1y": "1Y", "return_3y": "3Y", "return_5y": "5Y", "return_since_inception": "Since Inc."}
+            avail_ret   = {k: v for k, v in return_cols.items() if k in sel_master.columns}
+
+            if avail_ret:
+                ret_rows = []
+                for _, row in sel_master.iterrows():
+                    for col, label in avail_ret.items():
+                        val = pd.to_numeric(row.get(col), errors="coerce")
+                        if pd.notna(val):
+                            ret_rows.append({"Fund": row["short_name"], "Period": label, "Return (%)": val})
+                if ret_rows:
+                    ret_df = pd.DataFrame(ret_rows)
+                    fig = px.bar(ret_df, x="Period", y="Return (%)", color="Fund",
+                                 barmode="group", color_discrete_map=fund_color_map,
+                                 category_orders={"Period": list(avail_ret.values())},
+                                 text="Return (%)")
+                    fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside",
+                                      textfont=dict(size=11, family="Inter, sans-serif"),
+                                      marker_line_width=0, opacity=0.92)
+                    fig.update_layout(height=380, margin=dict(t=40, b=10, l=10, r=10),
+                                      plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF",
+                                      font=dict(family="Inter, sans-serif"),
+                                      bargap=0.25, bargroupgap=0.08,
+                                      legend=dict(orientation="h", yanchor="bottom", y=1.04, xanchor="left", x=0),
+                                      xaxis=dict(showgrid=False, tickfont=dict(size=13)),
+                                      yaxis=dict(showgrid=True, gridcolor="#F3F4F6",
+                                                 zeroline=True, zerolinecolor="#E5E7EB",
+                                                 ticksuffix="%", tickfont=dict(size=11, color="#9CA3AF"), title=""))
+                    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            # Risk & Efficiency
+            st.markdown('<div class="section-title" style="font-size:0.9rem;">Risk & Efficiency</div>', unsafe_allow_html=True)
+            st.caption("Std Dev = volatility · Sharpe = return per unit of risk · Alpha = excess return vs benchmark · Beta = market sensitivity")
+            risk_cols  = {"std_dev": "Std Dev %", "sharpe_ratio": "Sharpe", "alpha": "Alpha %", "beta": "Beta"}
+            avail_risk = {k: v for k, v in risk_cols.items() if k in sel_master.columns}
+            if avail_risk:
+                def _rl(v):
+                    try:
+                        v = float(v)
+                        return "🟢 Low" if v < 13 else ("🟡 Moderate" if v < 18 else "🔴 High")
+                    except Exception: return "—"
+                risk_tbl = sel_master[["short_name"] + list(avail_risk.keys())].copy()
+                risk_tbl = risk_tbl.rename(columns={"short_name": "Fund", **avail_risk})
+                for c in avail_risk.values():
+                    risk_tbl[c] = pd.to_numeric(risk_tbl[c], errors="coerce")
+                if "Std Dev %" in risk_tbl.columns:
+                    risk_tbl.insert(1, "Volatility", risk_tbl["Std Dev %"].apply(_rl))
+                max_sd = risk_tbl["Std Dev %"].max() * 1.25 if "Std Dev %" in risk_tbl.columns else 1.0
+                rcfg = {
+                    "Fund":       st.column_config.TextColumn("Fund",      width="medium"),
+                    "Volatility": st.column_config.TextColumn("Volatility",width="small"),
+                    "Std Dev %":  st.column_config.ProgressColumn("Std Dev %", format="%.1f%%", min_value=0, max_value=max_sd),
+                    "Sharpe":     st.column_config.NumberColumn("Sharpe",   format="%.2f",   width="small"),
+                    "Alpha %":    st.column_config.NumberColumn("Alpha %",  format="%+.2f%%",width="small"),
+                    "Beta":       st.column_config.NumberColumn("Beta",     format="%.2f",   width="small"),
+                }
+                st.dataframe(risk_tbl, use_container_width=True, hide_index=True,
+                             height=36 * len(risk_tbl) + 38,
+                             column_config={k: v for k, v in rcfg.items() if k in risk_tbl.columns})
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            # Fund profile + cost
+            st.markdown('<div class="section-title" style="font-size:0.9rem;">Cost & Fund Profile</div>', unsafe_allow_html=True)
+            if has_amounts and total_invested > 0 and wtd_er:
+                st.caption(f"Portfolio weighted expense ratio: **{wtd_er:.2f}%** — approx **₹{total_invested * wtd_er / 100:,.0f}/year** in fees on your invested amount.")
+            prof_cols  = {"star_rating": "★ Rating", "expense_ratio": "Exp Ratio %", "aum_cr": "AUM (₹Cr)", "consistency_score": "Consistency", "category_rank": "Cat. Rank"}
+            avail_prof = {k: v for k, v in prof_cols.items() if k in sel_master.columns}
+            prof_tbl   = sel_master[["short_name"] + list(avail_prof.keys())].copy()
+            prof_tbl   = prof_tbl.rename(columns={"short_name": "Fund", **avail_prof})
+            if has_amounts and total_invested > 0:
+                prof_tbl.insert(1, "Invested", prof_tbl["Fund"].apply(
+                    lambda fn: amount_map.get(next((f for f in matched_funds if display_name(f) == fn), ""), 0)
+                ))
+            for c in ["Exp Ratio %", "AUM (₹Cr)", "Consistency", "Cat. Rank"]:
+                if c in prof_tbl.columns:
+                    prof_tbl[c] = pd.to_numeric(prof_tbl[c], errors="coerce")
+            max_aum = prof_tbl["AUM (₹Cr)"].max() * 1.25 if "AUM (₹Cr)" in prof_tbl.columns else 1.0
+            max_er  = prof_tbl["Exp Ratio %"].max() * 1.25 if "Exp Ratio %" in prof_tbl.columns else 1.0
+            pcfg = {
+                "Fund":        st.column_config.TextColumn("Fund",         width="medium"),
+                "Invested":    st.column_config.NumberColumn("Invested ₹", format="₹%,.0f",  width="small"),
+                "★ Rating":    st.column_config.NumberColumn("★",          format="%d ★",    width="small"),
+                "Exp Ratio %": st.column_config.ProgressColumn("Exp Ratio %", format="%.2f%%", min_value=0, max_value=max_er),
+                "AUM (₹Cr)":  st.column_config.ProgressColumn("AUM (₹Cr)",   format="%.0f",   min_value=0, max_value=max_aum),
+                "Consistency": st.column_config.ProgressColumn("Consistency", format="%.1f",   min_value=0, max_value=100),
+                "Cat. Rank":   st.column_config.NumberColumn("Cat. Rank",  format="#%d",     width="small"),
+            }
+            st.dataframe(prof_tbl, use_container_width=True, hide_index=True,
+                         height=36 * len(prof_tbl) + 38,
+                         column_config={k: v for k, v in pcfg.items() if k in prof_tbl.columns})
+
+    # ── Tab 3: Fund Overlap ───────────────────────────────────────────────────
     with tab_ol:
         st.markdown('<div class="section-title">Overlap Between Your Funds</div>', unsafe_allow_html=True)
         if sel_sim.empty:
@@ -2699,11 +2874,56 @@ def page_portfolio_xray():
                         <div class="overlap-bar-fill" style="width:{row['normalized_score']}%;"></div>
                     </div>
                     <div style="font-size:0.72rem;color:#9CA3AF;margin-top:5px;">{int(row['common_stocks'])} common stocks</div>
-                </div>
-                """, unsafe_allow_html=True)
+                </div>""", unsafe_allow_html=True)
 
+        # What-If: fund removal impact
+        if len(matched_funds) >= 2:
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown('<div class="section-title">What-If: Remove a Fund</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-sub">See how much diversification you would lose (or gain) by removing each fund</div>', unsafe_allow_html=True)
+
+            all_stocks = set(sel_h["stock_name"].str.strip())
+            whatif_rows = []
+            for fund in matched_funds:
+                others       = [f for f in matched_funds if f != fund]
+                others_h     = holdings[holdings["fund_name"].isin(others)]
+                others_stocks = set(others_h["stock_name"].str.strip())
+                fund_stocks  = set(sel_h[sel_h["fund_name"] == fund]["stock_name"].str.strip())
+                unique_lost  = len(fund_stocks - others_stocks)
+                overlap_without = (
+                    similarity[similarity["fund_a"].isin(others) & similarity["fund_b"].isin(others)]
+                    ["normalized_score"].mean()
+                    if len(others) >= 2 else 0
+                )
+                overlap_change = overlap_without - avg_sim
+                whatif_rows.append({
+                    "Fund":             display_name(fund),
+                    "Unique Stocks Lost": unique_lost,
+                    "Overlap After":    round(overlap_without, 1),
+                    "Overlap Change":   round(overlap_change, 1),
+                    "Verdict":          (
+                        "✂️ Consider removing" if unique_lost <= 3 and overlap_change <= 2
+                        else "⚠️ Significant loss" if unique_lost > 15
+                        else "🔄 Moderate impact"
+                    ),
+                })
+            wf_df = pd.DataFrame(whatif_rows)
+            st.dataframe(
+                wf_df, use_container_width=True, hide_index=True,
+                height=36 * len(wf_df) + 38,
+                column_config={
+                    "Fund":               st.column_config.TextColumn("Fund",              width="medium"),
+                    "Unique Stocks Lost": st.column_config.NumberColumn("Unique Stocks Lost", format="%d stocks", width="small"),
+                    "Overlap After":      st.column_config.ProgressColumn("Overlap After %", format="%.1f%%", min_value=0, max_value=100),
+                    "Overlap Change":     st.column_config.NumberColumn("Overlap Δ",        format="%+.1f%%", width="small"),
+                    "Verdict":            st.column_config.TextColumn("Verdict",            width="medium"),
+                },
+            )
+            st.caption("'Consider removing' = fund adds ≤3 unique stocks and barely changes overlap · not investment advice.")
+
+    # ── Tab 4: Sector & Cap Size ──────────────────────────────────────────────
     with tab_sec:
-        st.markdown('<div class="section-title">Sector Concentration in Your Portfolio</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Sector Concentration</div>', unsafe_allow_html=True)
 
         sel_sector = sector_df[sector_df["fund_name"].isin(matched_funds)]
         avg_sec    = sel_sector.groupby("sector")["allocation_percent"].mean().reset_index()
@@ -2711,53 +2931,188 @@ def page_portfolio_xray():
 
         c_donut, c_table = st.columns([2, 3])
         with c_donut:
-            fig_d = px.pie(
-                avg_sec.head(8), names="sector", values="allocation_percent",
-                hole=0.52, height=340,
-            )
-            fig_d.update_layout(
-                margin=dict(l=0, r=0, t=10, b=0),
-                paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter, sans-serif"),
-                legend=dict(orientation="v", yanchor="middle", y=0.5),
-            )
+            fig_d = px.pie(avg_sec.head(8), names="sector", values="allocation_percent", hole=0.52, height=340)
+            fig_d.update_layout(margin=dict(l=0, r=0, t=10, b=0),
+                                 paper_bgcolor="rgba(0,0,0,0)",
+                                 font=dict(family="Inter, sans-serif"),
+                                 legend=dict(orientation="v", yanchor="middle", y=0.5))
             fig_d.update_traces(textposition="outside", textinfo="percent+label")
-            st.plotly_chart(fig_d, use_container_width=True)
-
+            st.plotly_chart(fig_d, use_container_width=True, config={"displayModeBar": False})
         with c_table:
             avg_sec["bar"] = avg_sec["allocation_percent"].round(1)
-            st.dataframe(
-                avg_sec.reset_index(drop=True),
-                use_container_width=True, height=340,
-                column_config={
-                    "sector":             st.column_config.TextColumn("Sector"),
-                    "allocation_percent": st.column_config.NumberColumn("Avg Allocation %", format="%.1f%%"),
-                    "bar":                st.column_config.ProgressColumn("Weight", min_value=0, max_value=50),
-                },
-                hide_index=True,
-            )
+            st.dataframe(avg_sec.reset_index(drop=True), use_container_width=True, height=340,
+                         hide_index=True,
+                         column_config={
+                             "sector":             st.column_config.TextColumn("Sector"),
+                             "allocation_percent": st.column_config.NumberColumn("Avg Alloc %", format="%.1f%%"),
+                             "bar":                st.column_config.ProgressColumn("Weight", min_value=0, max_value=50),
+                         })
 
+        # Cap-size breakdown
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Cap Size Distribution</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-sub">How your investment is spread across market cap categories</div>', unsafe_allow_html=True)
+
+        if not master.empty and "category" in master.columns:
+            cat_map = dict(zip(master["fund_name"], master["category"]))
+            cap_rows = []
+            for fund in matched_funds:
+                cat = cat_map.get(fund, "Other")
+                cap_rows.append({"category": cat, "weight": weight_map.get(fund, 0), "fund": display_name(fund)})
+            cap_df = pd.DataFrame(cap_rows)
+            cap_agg = cap_df.groupby("category")["weight"].sum().reset_index()
+            cap_agg["pct"] = (cap_agg["weight"] / cap_agg["weight"].sum() * 100).round(1)
+            cap_agg = cap_agg.sort_values("pct", ascending=False)
+
+            CAP_COLORS = {
+                "Large Cap": "#6C3CE1", "Mid Cap": "#F97316", "Small Cap": "#0891B2",
+                "Large & Mid Cap": "#16A34A", "Multi Cap": "#E11D48",
+                "Flexi Cap": "#8B5CF6", "ELSS": "#F59E0B", "Other": "#9CA3AF",
+            }
+            fig_cap = px.bar(
+                cap_agg, x="pct", y="category", orientation="h",
+                color="category", color_discrete_map=CAP_COLORS,
+                labels={"pct": "Portfolio Weight %", "category": ""},
+                text="pct", height=max(200, 50 * len(cap_agg)),
+            )
+            fig_cap.update_traces(texttemplate="%{text:.1f}%", textposition="outside",
+                                   marker_line_width=0, showlegend=False)
+            fig_cap.update_layout(margin=dict(l=0, r=60, t=10, b=10),
+                                   plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF",
+                                   font=dict(family="Inter, sans-serif"),
+                                   xaxis=dict(showgrid=False, title=""),
+                                   yaxis=dict(showgrid=False))
+            st.plotly_chart(fig_cap, use_container_width=True, config={"displayModeBar": False})
+
+            # Fund-level cap table
+            fund_cap_tbl = cap_df[["fund", "category"]].copy()
+            fund_cap_tbl.columns = ["Fund", "Category"]
+            if has_amounts and total_invested > 0:
+                fund_cap_tbl["Invested ₹"] = fund_cap_tbl["Fund"].apply(
+                    lambda fn: amount_map.get(next((f for f in matched_funds if display_name(f) == fn), ""), 0)
+                )
+            st.dataframe(fund_cap_tbl, use_container_width=True, hide_index=True,
+                         height=36 * len(fund_cap_tbl) + 38)
+
+    # ── Tab 5: Concentration Risks ────────────────────────────────────────────
+    with tab_risk:
+        st.markdown('<div class="section-title">Concentration Risk Flags</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-sub">Potential over-exposure areas in your portfolio — for analysis only</div>', unsafe_allow_html=True)
+
+        flags_found = False
+
+        # Flag 1: High-overlap fund pairs
+        if not sel_sim.empty:
+            high_ol = sel_sim[sel_sim["normalized_score"] >= 65]
+            for _, row in high_ol.iterrows():
+                flags_found = True
+                st.markdown(f"""<div class="insight-card insight-alert">
+                    <div class="insight-icon">🔁</div>
+                    <div class="insight-text"><strong>Redundant Fund Pair</strong> —
+                    <strong>{display_name(row['fund_a'])}</strong> and <strong>{display_name(row['fund_b'])}</strong>
+                    overlap by <strong>{row['normalized_score']:.0f}%</strong> ({int(row['common_stocks'])} shared stocks).
+                    Holding both adds minimal diversification benefit.</div></div>""", unsafe_allow_html=True)
+
+        # Flag 2: Stock concentration > 5% effective exposure
+        sel_h_wt2 = sel_h.copy()
+        sel_h_wt2["weight"]    = sel_h_wt2["fund_name"].map(weight_map).fillna(0)
+        sel_h_wt2["eff_alloc"] = sel_h_wt2["allocation_percent"] * sel_h_wt2["weight"]
+        eff_exp = sel_h_wt2.groupby("stock_name")["eff_alloc"].sum()
+        heavy_stocks = eff_exp[eff_exp > 5].sort_values(ascending=False)
+        if not heavy_stocks.empty:
+            flags_found = True
+            stocks_txt = ", ".join(f"<strong>{s}</strong> ({v:.1f}%)" for s, v in heavy_stocks.items())
+            st.markdown(f"""<div class="insight-card insight-warning">
+                <div class="insight-icon">📌</div>
+                <div class="insight-text"><strong>High Single-Stock Exposure</strong> —
+                The following stocks account for more than 5% of your effective portfolio:
+                {stocks_txt}. A single company event could materially impact your portfolio.</div></div>""",
+                unsafe_allow_html=True)
+
+        # Flag 3: Sector > 40%
+        if not sel_sector.empty:
+            avg_by_sec = sel_sector.groupby("sector")["allocation_percent"].mean()
+            heavy_secs = avg_by_sec[avg_by_sec > 40].sort_values(ascending=False)
+            for sec, pct in heavy_secs.items():
+                flags_found = True
+                st.markdown(f"""<div class="insight-card insight-warning">
+                    <div class="insight-icon">🏗️</div>
+                    <div class="insight-text"><strong>Sector Over-Concentration</strong> —
+                    <strong>{sec.title()}</strong> accounts for <strong>{pct:.1f}%</strong> of average
+                    fund allocation across your portfolio. Heavy sector concentration increases
+                    sensitivity to sector-level downturns.</div></div>""", unsafe_allow_html=True)
+
+        # Flag 4: All funds in the same cap category
+        if not master.empty and "category" in master.columns:
+            cat_map2  = dict(zip(master["fund_name"], master["category"]))
+            fund_cats = list({cat_map2.get(f, "Other") for f in matched_funds})
+            if len(fund_cats) == 1:
+                flags_found = True
+                st.markdown(f"""<div class="insight-card insight-info">
+                    <div class="insight-icon">📊</div>
+                    <div class="insight-text"><strong>Single Cap-Size Exposure</strong> —
+                    All your funds are in the <strong>{fund_cats[0]}</strong> category.
+                    Consider adding a fund from a different market cap segment for broader diversification.</div></div>""",
+                    unsafe_allow_html=True)
+
+        # Flag 5: Cost outlier — any fund > 2× cheapest
+        if not sel_master.empty and "expense_ratio" in sel_master.columns:
+            er_vals = pd.to_numeric(sel_master["expense_ratio"], errors="coerce").dropna()
+            if len(er_vals) > 1 and er_vals.min() > 0:
+                most_exp = sel_master.loc[er_vals.idxmax()]
+                cheapest = sel_master.loc[er_vals.idxmin()]
+                if er_vals.max() > er_vals.min() * 2:
+                    flags_found = True
+                    st.markdown(f"""<div class="insight-card insight-info">
+                        <div class="insight-icon">💸</div>
+                        <div class="insight-text"><strong>Cost Outlier</strong> —
+                        <strong>{display_name(most_exp['fund_name'])}</strong> charges
+                        <strong>{float(most_exp['expense_ratio']):.2f}%</strong> vs
+                        <strong>{display_name(cheapest['fund_name'])}</strong> at
+                        <strong>{float(cheapest['expense_ratio']):.2f}%</strong> — more than 2× the cost
+                        for potentially similar exposure.</div></div>""", unsafe_allow_html=True)
+
+        if not flags_found:
+            st.success("✅ No major concentration risks detected in your portfolio.")
+
+        st.markdown("""<div class="disclaimer">Risk flags are data-driven observations for analytical purposes only — not investment advice.</div>""", unsafe_allow_html=True)
+
+    # ── Tab 6: Insights ───────────────────────────────────────────────────────
     with tab_ins:
         st.markdown('<div class="section-title">Portfolio X-Ray Insights</div>', unsafe_allow_html=True)
         st.markdown('<div class="section-sub">Findings based on your uploaded portfolio — for analysis only</div>', unsafe_allow_html=True)
 
         insights = generate_insights(matched_funds, similarity, holdings, sector_df, master)
-        for ins in insights:
-            cls_map = {"alert": "insight-alert", "warning": "insight-warning",
-                       "info": "insight-info", "success": "insight-success"}
-            st.markdown(f"""
-            <div class="insight-card {cls_map[ins['type']]}">
-                <div class="insight-icon">{ins['icon']}</div>
-                <div class="insight-text">{ins['text']}</div>
-            </div>
-            """, unsafe_allow_html=True)
+        cls_map  = {"alert": "insight-alert", "warning": "insight-warning",
+                    "info": "insight-info", "success": "insight-success"}
 
-        st.markdown("""
-        <div class="disclaimer">
-            Insights are generated from portfolio holdings data for informational and analytical purposes only.
-            They do not constitute investment advice, buy/sell recommendations, or financial planning guidance.
-        </div>
-        """, unsafe_allow_html=True)
+        CATEGORIES = [
+            ("overlap",   "🔗 Overlap & Redundancy",   "How much your funds duplicate each other's holdings"),
+            ("sector",    "🏗️ Sector Concentration",   "Which sectors dominate across your funds"),
+            ("unique",    "🔬 Unique Exposure",          "What each fund contributes that no other holds"),
+            ("momentum",  "📈 Allocation Momentum",      "Stocks fund managers are collectively buying or selling"),
+            ("cost_risk", "💰 Cost & Risk",              "Expense ratio and volatility comparison"),
+        ]
+        if not insights:
+            st.info("No significant patterns detected.")
+        else:
+            for cat_key, cat_title, cat_sub in CATEGORIES:
+                cat_ins = [i for i in insights if i.get("category") == cat_key]
+                if not cat_ins:
+                    continue
+                st.markdown(
+                    f'<div style="margin:1.4rem 0 0.35rem;">'
+                    f'<div style="font-size:0.95rem;font-weight:700;color:#1A1A2E;">{cat_title}</div>'
+                    f'<div style="font-size:0.72rem;color:#9CA3AF;margin-top:2px;">{cat_sub}</div>'
+                    f'</div>', unsafe_allow_html=True)
+                for ins in cat_ins:
+                    st.markdown(
+                        f'<div class="insight-card {cls_map[ins["type"]]}">'
+                        f'<div class="insight-icon">{ins["icon"]}</div>'
+                        f'<div class="insight-text">{ins["text"]}</div></div>',
+                        unsafe_allow_html=True)
+
+        st.markdown("""<div class="disclaimer">Insights are for informational and analytical purposes only — not investment advice.</div>""", unsafe_allow_html=True)
 
 
 # ── ROUTER ────────────────────────────────────────────────────────────────────
