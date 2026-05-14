@@ -2508,39 +2508,43 @@ def page_portfolio_upload():
                 placeholder="Start typing a fund name…",
             )
             if selected_manual:
-                st.markdown(
-                    "<div style='font-size:0.85rem;font-weight:600;color:#1A1A2E;"
-                    "margin-top:1rem;margin-bottom:4px;'>Enter investment amounts</div>",
-                    unsafe_allow_html=True,
-                )
-                prev = {r["fund_name"]: r for r in st.session_state.get("_manual_rows", [])}
-                rows = [
-                    {
-                        "fund_name":       fund,
-                        "invested_amount": prev.get(fund, {}).get("invested_amount", 0),
-                        "units":           prev.get(fund, {}).get("units", 0.0),
-                    }
-                    for fund in selected_manual
-                ]
-                edited = st.data_editor(
-                    pd.DataFrame(rows),
-                    use_container_width=True,
-                    hide_index=True,
-                    key="manual_edit",
-                    column_config={
-                        "fund_name":       st.column_config.TextColumn("Fund", disabled=True),
-                        "invested_amount": st.column_config.NumberColumn(
-                            "Invested Amount (₹)", min_value=0, step=1000, format="₹%d"
-                        ),
-                        "units":           st.column_config.NumberColumn(
-                            "Units (optional)", min_value=0.0, format="%.2f"
-                        ),
-                    },
-                )
-                st.session_state["_manual_rows"] = edited.to_dict("records")
+                st.markdown("<br>", unsafe_allow_html=True)
+                # Column headers
+                h1, h2, h3 = st.columns([4, 3, 2])
+                h1.markdown("<div style='font-size:0.78rem;font-weight:700;color:#6B7280;'>FUND</div>", unsafe_allow_html=True)
+                h2.markdown("<div style='font-size:0.78rem;font-weight:700;color:#6B7280;'>INVESTED AMOUNT (₹)</div>", unsafe_allow_html=True)
+                h3.markdown("<div style='font-size:0.78rem;font-weight:700;color:#6B7280;'>UNITS (optional)</div>", unsafe_allow_html=True)
+                st.markdown("<div style='height:1px;background:#E5E7EB;margin-bottom:4px;'></div>", unsafe_allow_html=True)
+
+                # One stable-key number_input per fund — values persist across reruns
+                manual_rows = []
+                for fund in selected_manual:
+                    safe_key = fund.replace(" ", "_").replace("/", "_")
+                    c1, c2, c3 = st.columns([4, 3, 2])
+                    with c1:
+                        st.markdown(
+                            f'<div style="font-size:0.82rem;color:#1A1A2E;padding-top:6px;'
+                            f'line-height:1.3;">{display_name(fund)}</div>',
+                            unsafe_allow_html=True,
+                        )
+                    with c2:
+                        amt = st.number_input(
+                            "amt", min_value=0, step=1000,
+                            key=f"m_amt_{safe_key}",
+                            label_visibility="collapsed",
+                        )
+                    with c3:
+                        units = st.number_input(
+                            "units", min_value=0.0, step=1.0, format="%.2f",
+                            key=f"m_units_{safe_key}",
+                            label_visibility="collapsed",
+                        )
+                    manual_rows.append({"fund_name": fund, "invested_amount": amt, "units": units})
+
+                st.markdown("<br>", unsafe_allow_html=True)
                 if st.button("Analyse My Portfolio →", type="primary",
                              use_container_width=True, key="manual_go"):
-                    st.session_state.portfolio_df = edited
+                    st.session_state.portfolio_df = pd.DataFrame(manual_rows)
                     st.session_state.page = "portfolio_xray"
                     st.rerun()
             else:
