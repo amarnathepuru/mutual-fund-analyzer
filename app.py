@@ -2849,37 +2849,74 @@ def page_stock_explorer():
         "sector", "change_3m_percent", "change_6m_percent", "change_1y_percent",
     ]].copy()
 
-    def _trend_arrow(v):
-        try:
-            return "↑" if float(v) > 0.3 else ("↓" if float(v) < -0.3 else "→")
-        except Exception:
-            return "→"
+    # Shorten fund names so the table fits without horizontal scroll
+    display_df["fund_name"] = display_df["fund_name"].apply(display_name)
 
-    display_df.insert(1, "Trend", display_df["change_3m_percent"].apply(_trend_arrow))
+    def _trend_arrow(row):
+        try:
+            v3 = float(row["change_3m_percent"])
+            v6 = float(row["change_6m_percent"])
+            v1 = float(row["change_1y_percent"])
+            if v3 >= v6 >= v1:
+                return "↑"
+            elif v3 <= v6 <= v1:
+                return "↓"
+            else:
+                return "→"
+        except Exception:
+            return "—"
+
+    display_df.insert(1, "Trend", display_df.apply(_trend_arrow, axis=1))
     display_df.columns = ["Fund", "Trend", "Alloc %", "Sector", "3M Δ%", "6M Δ%", "1Y Δ%"]
 
-    max_alloc_val = float(display_df["Alloc %"].max()) * 1.25
-    tbl_height    = min(580, 36 * len(display_df) + 38)
+    # Split rows that have change data vs those that don't
+    has_changes  = display_df[["3M Δ%", "6M Δ%", "1Y Δ%"]].notna().any(axis=1)
+    df_with_data = display_df[has_changes].reset_index(drop=True)
+    df_no_data   = display_df[~has_changes].reset_index(drop=True)
 
-    st.dataframe(
-        display_df,
-        use_container_width=True,
-        hide_index=True,
-        height=tbl_height,
-        column_config={
-            "Fund":   st.column_config.TextColumn("Fund", width="large"),
-            "Trend":  st.column_config.TextColumn("Trend", width=60,
-                          help="↑ allocation growing · ↓ declining · → stable (3M)"),
-            "Alloc %": st.column_config.ProgressColumn(
-                "Allocation %", format="%.2f%%",
-                min_value=0, max_value=max_alloc_val, width="medium",
-            ),
-            "Sector": st.column_config.TextColumn("Sector", width="medium"),
-            "3M Δ%":  st.column_config.NumberColumn("3M Δ%",  format="%+.2f%%", width="small"),
-            "6M Δ%":  st.column_config.NumberColumn("6M Δ%",  format="%+.2f%%", width="small"),
-            "1Y Δ%":  st.column_config.NumberColumn("1Y Δ%",  format="%+.2f%%", width="small"),
-        },
-    )
+    max_alloc_val = float(display_df["Alloc %"].max()) * 1.25
+
+    col_cfg = {
+        "Fund":    st.column_config.TextColumn("Fund",         width="medium"),
+        "Trend":   st.column_config.TextColumn("Trend",        width=55,
+                       help="↑ allocation growing · ↓ declining · → stable · — no history"),
+        "Alloc %": st.column_config.ProgressColumn(
+                       "Alloc %", format="%.2f%%",
+                       min_value=0, max_value=max_alloc_val, width="medium"),
+        "Sector":  st.column_config.TextColumn("Sector",       width="small"),
+        "3M Δ%":   st.column_config.NumberColumn("3M Δ%",      format="%+.2f%%", width="small"),
+        "6M Δ%":   st.column_config.NumberColumn("6M Δ%",      format="%+.2f%%", width="small"),
+        "1Y Δ%":   st.column_config.NumberColumn("1Y Δ%",      format="%+.2f%%", width="small"),
+    }
+
+    if not df_with_data.empty:
+        st.dataframe(
+            df_with_data,
+            use_container_width=True,
+            hide_index=True,
+            height=min(560, 36 * len(df_with_data) + 38),
+            column_config=col_cfg,
+        )
+
+    if not df_no_data.empty:
+        with st.expander(f"⚠ {len(df_no_data)} fund{'s' if len(df_no_data) > 1 else ''} with no allocation history"):
+            st.caption(
+                "These funds hold the stock but have no 3M/6M/1Y change data — "
+                "likely a recent addition to their portfolio."
+            )
+            st.dataframe(
+                df_no_data[["Fund", "Alloc %", "Sector"]],
+                use_container_width=True,
+                hide_index=True,
+                height=min(300, 36 * len(df_no_data) + 38),
+                column_config={
+                    "Fund":    st.column_config.TextColumn("Fund",   width="medium"),
+                    "Alloc %": st.column_config.ProgressColumn(
+                                   "Alloc %", format="%.2f%%",
+                                   min_value=0, max_value=max_alloc_val, width="medium"),
+                    "Sector":  st.column_config.TextColumn("Sector", width="small"),
+                },
+            )
 
     # Insights
     st.markdown("<br>", unsafe_allow_html=True)
