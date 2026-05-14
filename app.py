@@ -686,7 +686,7 @@ def render_sidebar():
              "Full category overlap matrix",
              ["Every fund-pair scored 0–100%", "Spot near-identical funds instantly", "Works across all 7 categories"]),
             ("portfolio_upload",  ["portfolio_upload", "portfolio_xray"],
-             "📋", "Portfolio X-Ray", "Upload your holdings",         "#FEF3C7", "#D97706",
+             "📋", "Know Your Portfolio", "Upload your holdings",         "#FEF3C7", "#D97706",
              "X-Ray your portfolio",
              ["CSV / XLSX upload or manual entry", "Hidden stock & sector exposure", "Detect duplicate fund holdings"]),
         ]
@@ -760,7 +760,7 @@ def render_welcome():
          "You might think you own 5 funds. But you actually own 12% HDFC Bank — sitting inside every single one of them. We surface that."),
         ("⊞", "Overlap matrix",
          "See the full overlap heatmap across every fund pair in a category. Instantly spot which funds are practically identical."),
-        ("📋", "Portfolio X-Ray",
+        ("📋", "Know Your Portfolio",
          "Upload your existing holdings (CSV/XLSX) and get a full breakdown of true diversification, hidden concentration and duplicate funds."),
         ("📈", "Stock-level intelligence",
          "Pick any stock and see every fund that holds it, with allocation % and 3-month change — useful for tracking institutional conviction."),
@@ -884,7 +884,7 @@ def page_home():
          "Pick up to 5 funds and instantly see portfolio overlap, sector exposure, common holdings and hidden redundancy.",
          f"{n_funds} funds · {n_cats} categories →"),
         (fc2, "?nav=portfolio_upload",
-         "📋", "Portfolio X-Ray",
+         "📋", "Know Your Portfolio",
          "Upload your existing mutual fund portfolio and uncover hidden stock exposure, duplicate funds and sector concentration.",
          "CSV / XLSX upload →"),
         (fc3, "?nav=category",
@@ -2523,7 +2523,7 @@ def page_portfolio_upload():
                 )
                 st.success(f"✓ {len(portfolio_df)} holdings loaded from **{uploaded.name}**")
                 st.dataframe(portfolio_df.head(10), use_container_width=True)
-                if st.button("Run Portfolio X-Ray →", type="primary", use_container_width=True):
+                if st.button("Analyse My Portfolio →", type="primary", use_container_width=True):
                     st.session_state.portfolio_df = portfolio_df
                     st.session_state.page = "portfolio_xray"
                     st.rerun()
@@ -2642,7 +2642,7 @@ def page_portfolio_xray():
             wtd_er = sum(er * wt for er, wt in zip(er_df["expense_ratio"], wts)) / wt_sum if wt_sum else None
 
     # ── Summary header ────────────────────────────────────────────────────────
-    st.markdown("## Portfolio X-Ray")
+    st.markdown("## Know Your Portfolio")
     st.markdown(
         f"<p style='color:#6B7280;margin-top:-0.5rem;margin-bottom:1.5rem;'>"
         f"{len(matched_funds)} funds analysed · {n_unique} unique stocks · {n_secs} sectors</p>",
@@ -3322,7 +3322,7 @@ def page_portfolio_xray():
 
     # ── Tab 6: Insights ───────────────────────────────────────────────────────
     with tab_ins:
-        st.markdown('<div class="section-title">Portfolio X-Ray Insights</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Portfolio Insights</div>', unsafe_allow_html=True)
         st.markdown('<div class="section-sub">Findings based on your uploaded portfolio — for analysis only</div>', unsafe_allow_html=True)
 
         insights = generate_insights(matched_funds, similarity, holdings, sector_df, master)
