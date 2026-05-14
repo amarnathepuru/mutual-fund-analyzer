@@ -2099,24 +2099,38 @@ def page_compare():
             prof_tbl   = sel_master[["short_name"] + list(avail_prof.keys())].copy()
             prof_tbl   = prof_tbl.rename(columns={"short_name": "Fund", **avail_prof})
 
-            for col in ["Exp Ratio (%)", "AUM (₹ Cr)", "Consistency", "Category Rank"]:
+            for col in ["Exp Ratio (%)", "AUM (₹ Cr)", "Category Rank"]:
                 if col in prof_tbl.columns:
                     prof_tbl[col] = pd.to_numeric(prof_tbl[col], errors="coerce")
 
-            max_aum  = prof_tbl["AUM (₹ Cr)"].max()      * 1.25 if "AUM (₹ Cr)"    in prof_tbl.columns else 1.0
-            max_er   = prof_tbl["Exp Ratio (%)"].max()   * 1.25 if "Exp Ratio (%)" in prof_tbl.columns else 1.0
-            max_cons = prof_tbl["Consistency"].max()      * 1.25 if "Consistency"   in prof_tbl.columns else 1.0
+            # -1 = no rank data — show blank
+            if "Category Rank" in prof_tbl.columns:
+                prof_tbl["Category Rank"] = prof_tbl["Category Rank"].replace(-1, float("nan"))
+
+            # Convert numeric consistency score (0–4) to readable label
+            _CONS_LABEL = {4: "Very High", 3: "High", 2: "Moderate", 1: "Low", 0: "—"}
+            if "Consistency" in prof_tbl.columns:
+                prof_tbl["Consistency"] = (
+                    pd.to_numeric(prof_tbl["Consistency"], errors="coerce")
+                    .apply(lambda v: _CONS_LABEL.get(int(v), "—") if pd.notna(v) else "—")
+                )
+
+            max_aum = prof_tbl["AUM (₹ Cr)"].max()    * 1.25 if "AUM (₹ Cr)"    in prof_tbl.columns else 1.0
+            max_er  = prof_tbl["Exp Ratio (%)"].max() * 1.25 if "Exp Ratio (%)" in prof_tbl.columns else 1.0
 
             col_cfg_prof = {
-                "Fund":           st.column_config.TextColumn("Fund",          width="medium"),
-                "★ Rating":       st.column_config.NumberColumn("★ Rating",    format="%d ★",   width="small"),
+                "Fund":           st.column_config.TextColumn("Fund",           width="medium"),
+                "★ Rating":       st.column_config.NumberColumn("★ Rating",     format="%d ★",  width="small"),
                 "Exp Ratio (%)":  st.column_config.ProgressColumn("Exp Ratio %", format="%.2f%%",
-                                      min_value=0, max_value=max_er, width="medium"),
+                                      min_value=0, max_value=max_er, width="medium",
+                                      help="Annual fee charged by the fund — lower is better for the same level of performance"),
                 "AUM (₹ Cr)":    st.column_config.ProgressColumn("AUM (₹ Cr)", format="%.0f",
-                                      min_value=0, max_value=max_aum, width="medium"),
-                "Consistency":    st.column_config.ProgressColumn("Consistency", format="%.1f",
-                                      min_value=0, max_value=max_cons, width="small"),
-                "Category Rank":  st.column_config.NumberColumn("Cat. Rank",   format="#%d",    width="small"),
+                                      min_value=0, max_value=max_aum, width="medium",
+                                      help="Total money managed by the fund — larger AUM generally means more stability"),
+                "Consistency":    st.column_config.TextColumn("Consistency",    width="small",
+                                      help="How consistently this fund stays in the top performers across different time periods — Very High means it rarely has bad years"),
+                "Category Rank":  st.column_config.NumberColumn("Cat. Rank",    format="#%d",   width="small",
+                                      help="Rank among all funds in the same category — #1 is the best performer"),
             }
             st.dataframe(prof_tbl, use_container_width=True, hide_index=True,
                          height=36 * len(prof_tbl) + 38,
@@ -3285,19 +3299,36 @@ def page_portfolio_xray():
                 prof_tbl.insert(1, "Invested", prof_tbl["Fund"].apply(
                     lambda fn: amount_map.get(next((f for f in matched_funds if display_name(f) == fn), ""), 0)
                 ))
-            for c in ["Exp Ratio %", "AUM (₹Cr)", "Consistency", "Cat. Rank"]:
+            for c in ["Exp Ratio %", "AUM (₹Cr)", "Cat. Rank"]:
                 if c in prof_tbl.columns:
                     prof_tbl[c] = pd.to_numeric(prof_tbl[c], errors="coerce")
+
+            # -1 = no rank data — show blank
+            if "Cat. Rank" in prof_tbl.columns:
+                prof_tbl["Cat. Rank"] = prof_tbl["Cat. Rank"].replace(-1, float("nan"))
+
+            # Convert numeric consistency score (0–4) to readable label
+            _CONS_LABEL_XR = {4: "Very High", 3: "High", 2: "Moderate", 1: "Low", 0: "—"}
+            if "Consistency" in prof_tbl.columns:
+                prof_tbl["Consistency"] = (
+                    pd.to_numeric(prof_tbl["Consistency"], errors="coerce")
+                    .apply(lambda v: _CONS_LABEL_XR.get(int(v), "—") if pd.notna(v) else "—")
+                )
+
             max_aum = prof_tbl["AUM (₹Cr)"].max() * 1.25 if "AUM (₹Cr)" in prof_tbl.columns else 1.0
             max_er  = prof_tbl["Exp Ratio %"].max() * 1.25 if "Exp Ratio %" in prof_tbl.columns else 1.0
             pcfg = {
-                "Fund":        st.column_config.TextColumn("Fund",         width="medium"),
-                "Invested":    st.column_config.NumberColumn("Invested ₹", format="₹%,.0f",  width="small"),
-                "★ Rating":    st.column_config.NumberColumn("★",          format="%d ★",    width="small"),
-                "Exp Ratio %": st.column_config.ProgressColumn("Exp Ratio %", format="%.2f%%", min_value=0, max_value=max_er),
-                "AUM (₹Cr)":  st.column_config.ProgressColumn("AUM (₹Cr)",   format="%.0f",   min_value=0, max_value=max_aum),
-                "Consistency": st.column_config.ProgressColumn("Consistency", format="%.1f",   min_value=0, max_value=100),
-                "Cat. Rank":   st.column_config.NumberColumn("Cat. Rank",  format="#%d",     width="small"),
+                "Fund":        st.column_config.TextColumn("Fund",          width="medium"),
+                "Invested":    st.column_config.NumberColumn("Invested ₹",  format="₹%,.0f",  width="small"),
+                "★ Rating":    st.column_config.NumberColumn("★",           format="%d ★",    width="small"),
+                "Exp Ratio %": st.column_config.ProgressColumn("Exp Ratio %", format="%.2f%%", min_value=0, max_value=max_er,
+                                   help="Annual fee charged by the fund — lower is better for the same level of performance"),
+                "AUM (₹Cr)":  st.column_config.ProgressColumn("AUM (₹Cr)", format="%.0f",    min_value=0, max_value=max_aum,
+                                   help="Total money managed by the fund — larger AUM generally means more stability"),
+                "Consistency": st.column_config.TextColumn("Consistency",   width="small",
+                                   help="How consistently this fund stays in the top performers across different time periods — Very High means it rarely has bad years"),
+                "Cat. Rank":   st.column_config.NumberColumn("Cat. Rank",   format="#%d",     width="small",
+                                   help="Rank among all funds in the same category — #1 is the best performer"),
             }
             st.dataframe(prof_tbl, use_container_width=True, hide_index=True,
                          height=36 * len(prof_tbl) + 38,
