@@ -2581,80 +2581,104 @@ def page_portfolio_upload():
                     if not fund_col:
                         st.error("Could not find a 'fund_name' column in your file.")
                     else:
-                        user_funds = portfolio_df[fund_col].dropna().str.strip().unique().tolist()
+                        portfolio_df[fund_col] = portfolio_df[fund_col].astype(str).str.strip()
+                        user_funds = portfolio_df[fund_col].dropna().unique().tolist()
                         matched   = [f for f in user_funds if f in fund_set]
                         unmatched = [f for f in user_funds if f not in fund_set]
 
-                        # ── Validation report ─────────────────────────────────
+                        # ── Matched funds summary ─────────────────────────────
                         st.markdown(
                             "<div style='font-size:1rem;font-weight:700;color:#1A1A2E;"
-                            "margin-bottom:0.75rem;'>Validation Results</div>",
+                            "margin-bottom:0.5rem;'>Validation Results</div>",
                             unsafe_allow_html=True,
                         )
-                        c_ok, c_err = st.columns(2)
-                        with c_ok:
-                            lines = "".join(
-                                f'<div style="font-size:0.78rem;color:#059669;'
-                                f'padding:3px 0;border-bottom:1px solid #D1FAE5;">'
-                                f'✓ {f}</div>'
+                        if matched:
+                            chips = "".join(
+                                f'<span style="display:inline-block;background:#ECFDF5;'
+                                f'color:#065F46;border-radius:6px;padding:3px 10px;'
+                                f'font-size:0.75rem;font-weight:600;margin:3px 4px 3px 0;">'
+                                f'✓ {f}</span>'
                                 for f in matched
-                            ) or '<div style="font-size:0.78rem;color:#9CA3AF;">None matched</div>'
+                            )
                             st.markdown(
-                                f'<div style="background:#ECFDF5;border-radius:10px;padding:1rem;">'
-                                f'<div style="font-weight:700;color:#065F46;font-size:0.85rem;'
-                                f'margin-bottom:6px;">✅ {len(matched)} matched</div>'
-                                f'{lines}</div>',
+                                f'<div style="margin-bottom:0.75rem;">{chips}</div>',
                                 unsafe_allow_html=True,
                             )
-                        with c_err:
-                            if unmatched:
-                                err_lines = ""
-                                for f in unmatched:
-                                    suggestions = difflib.get_close_matches(
-                                        f, all_funds, n=2, cutoff=0.4
-                                    )
-                                    sugg = (
-                                        f'<div style="font-size:0.68rem;color:#9CA3AF;'
-                                        f'margin-top:1px;">Did you mean: {" / ".join(suggestions)}?</div>'
-                                        if suggestions else ""
-                                    )
-                                    err_lines += (
-                                        f'<div style="font-size:0.78rem;color:#DC2626;'
-                                        f'padding:3px 0;border-bottom:1px solid #FEE2E2;">'
-                                        f'✗ {f}{sugg}</div>'
-                                    )
-                                st.markdown(
-                                    f'<div style="background:#FEF2F2;border-radius:10px;padding:1rem;">'
-                                    f'<div style="font-weight:700;color:#991B1B;font-size:0.85rem;'
-                                    f'margin-bottom:6px;">❌ {len(unmatched)} not found</div>'
-                                    f'{err_lines}</div>',
-                                    unsafe_allow_html=True,
+
+                        # ── Interactive correction for unmatched ──────────────
+                        corrections = {}
+                        if unmatched:
+                            st.markdown(
+                                f'<div style="background:#FEF2F2;border:1px solid #FECACA;'
+                                f'border-radius:10px;padding:0.9rem 1rem;margin-bottom:0.75rem;">'
+                                f'<div style="font-weight:700;color:#991B1B;font-size:0.85rem;'
+                                f'margin-bottom:0.6rem;">❌ {len(unmatched)} fund(s) not recognised — '
+                                f'select the correct name or skip</div></div>',
+                                unsafe_allow_html=True,
+                            )
+                            for fund in unmatched:
+                                suggestions = difflib.get_close_matches(
+                                    fund, all_funds, n=5, cutoff=0.35
                                 )
-                            else:
+                                # Put close matches first, then rest of list
+                                ordered = suggestions + [f for f in all_funds if f not in suggestions]
+                                c_label, c_pick = st.columns([2, 3])
+                                with c_label:
+                                    st.markdown(
+                                        f'<div style="font-size:0.78rem;color:#DC2626;font-weight:600;'
+                                        f'padding-top:8px;word-break:break-word;">✗ {fund}</div>',
+                                        unsafe_allow_html=True,
+                                    )
+                                with c_pick:
+                                    skip_label = "— Skip (exclude from analysis) —"
+                                    # Pre-select the top suggestion if one exists
+                                    default_idx = 1 if suggestions else 0
+                                    choice = st.selectbox(
+                                        f"fix_{fund}",
+                                        options=[skip_label] + ordered,
+                                        index=default_idx,
+                                        key=f"fix__{fund}",
+                                        label_visibility="collapsed",
+                                    )
+                                    if choice != skip_label:
+                                        corrections[fund] = choice
                                 st.markdown(
-                                    '<div style="background:#ECFDF5;border-radius:10px;padding:1rem;">'
-                                    '<div style="font-weight:700;color:#065F46;font-size:0.85rem;">'
-                                    '✅ All funds matched</div></div>',
+                                    "<div style='height:1px;background:#FEE2E2;margin:2px 0;'></div>",
                                     unsafe_allow_html=True,
                                 )
 
+                        # ── Summary + proceed button ──────────────────────────
                         st.markdown("<br>", unsafe_allow_html=True)
-                        if matched:
+                        n_corrected = len(corrections)
+                        n_skipped   = len(unmatched) - n_corrected
+                        total_ready = len(matched) + n_corrected
+
+                        if total_ready > 0:
                             if unmatched:
-                                st.caption(
-                                    f"⚠️ {len(unmatched)} unmatched fund(s) will be excluded. "
-                                    "Fix the names in your file and re-upload, or proceed with matched funds only."
-                                )
+                                parts = []
+                                if matched:
+                                    parts.append(f"{len(matched)} matched")
+                                if n_corrected:
+                                    parts.append(f"{n_corrected} corrected")
+                                if n_skipped:
+                                    parts.append(f"{n_skipped} skipped")
+                                st.caption(f"Ready to analyse: {' · '.join(parts)} → {total_ready} fund(s) will be used.")
                             if st.button("Analyse My Portfolio →", type="primary",
                                          use_container_width=True, key="upload_go"):
-                                st.session_state.portfolio_df = portfolio_df
+                                # Apply corrections to the dataframe
+                                final_df = portfolio_df.copy()
+                                for orig, fixed in corrections.items():
+                                    final_df.loc[final_df[fund_col] == orig, fund_col] = fixed
+                                # Drop rows still unmatched (skipped)
+                                skipped_funds = [f for f in unmatched if f not in corrections]
+                                final_df = final_df[~final_df[fund_col].isin(skipped_funds)]
+                                st.session_state.portfolio_df = final_df
                                 st.session_state.page = "portfolio_xray"
                                 st.rerun()
                         else:
                             st.error(
-                                "No funds matched our database. "
-                                "Fund names must match exactly as listed on ETMoney. "
-                                "Use the CSV template as a reference."
+                                "No funds are ready for analysis. "
+                                "Please correct the fund names above or use the CSV template as a reference."
                             )
 
                 except Exception as e:
