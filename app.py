@@ -3337,74 +3337,180 @@ def page_portfolio_xray():
     # ── Tab 3: Fund Overlap ───────────────────────────────────────────────────
     with tab_ol:
         st.markdown('<div class="section-title">Overlap Between Your Funds</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-sub">Click any pair to see exactly which stocks are shared and which are unique to each fund</div>', unsafe_allow_html=True)
+
         if sel_sim.empty:
             st.info("Need at least 2 matched funds to compute overlap.")
         else:
+            sector_map_ol = (
+                sel_h.assign(stock_name=sel_h["stock_name"].str.strip())
+                .dropna(subset=["sector"])
+                .groupby("stock_name")["sector"].first().to_dict()
+            )
             for _, row in sel_sim.sort_values("normalized_score", ascending=False).iterrows():
-                label, cls = sim_badge(row["normalized_score"])
-                st.markdown(f"""
-                <div class="overlap-row">
-                    <div style="display:flex;align-items:center;justify-content:space-between;">
-                        <div style="font-size:0.9rem;font-weight:600;color:#1A1A2E;">
-                            {display_name(row['fund_a'])}
-                            <span style="color:#9CA3AF;font-weight:400;margin:0 6px;">vs</span>
-                            {display_name(row['fund_b'])}
-                        </div>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="font-size:1.4rem;font-weight:800;color:#6C3CE1;">{row['normalized_score']:.0f}%</span>
-                            <span class="badge {cls}">{label} Overlap</span>
-                        </div>
-                    </div>
-                    <div class="overlap-bar-bg">
-                        <div class="overlap-bar-fill" style="width:{row['normalized_score']}%;"></div>
-                    </div>
-                    <div style="font-size:0.72rem;color:#9CA3AF;margin-top:5px;">{int(row['common_stocks'])} common stocks</div>
-                </div>""", unsafe_allow_html=True)
+                fa, fb   = row["fund_a"], row["fund_b"]
+                score    = row["normalized_score"]
+                n_common = int(row["common_stocks"])
+                label, cls = sim_badge(score)
 
-        # What-If: fund removal impact
+                with st.expander(
+                    f"**{display_name(fa)}** vs **{display_name(fb)}** — "
+                    f"{score:.0f}% overlap · {n_common} shared stocks · _{label}_",
+                    expanded=False,
+                ):
+                    # Mini overlap bar
+                    bar_color = "#1B4332" if score >= 65 else "#52B788" if score >= 35 else "#B7E4C7"
+                    st.markdown(
+                        f'<div style="background:#F3F4F6;border-radius:4px;height:8px;margin-bottom:1rem;">'
+                        f'<div style="background:{bar_color};width:{score}%;height:100%;border-radius:4px;"></div>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+
+                    h_a = sel_h[sel_h["fund_name"] == fa].copy()
+                    h_b = sel_h[sel_h["fund_name"] == fb].copy()
+                    h_a["stock_name"] = h_a["stock_name"].str.strip()
+                    h_b["stock_name"] = h_b["stock_name"].str.strip()
+
+                    stocks_a = set(h_a["stock_name"])
+                    stocks_b = set(h_b["stock_name"])
+                    common   = stocks_a & stocks_b
+                    excl_a   = stocks_a - stocks_b
+                    excl_b   = stocks_b - stocks_a
+
+                    dn_a = display_name(fa)
+                    dn_b = display_name(fb)
+
+                    t_shared, t_only_a, t_only_b = st.tabs([
+                        f"🔗 {len(common)} Shared",
+                        f"◀ {len(excl_a)} Only in {dn_a}",
+                        f"▶ {len(excl_b)} Only in {dn_b}",
+                    ])
+
+                    def _build_drill(stocks_set, ha_df, hb_df, col_a, col_b):
+                        rows = []
+                        for s in stocks_set:
+                            alloc_a = ha_df.loc[ha_df["stock_name"] == s, "allocation_percent"].values
+                            alloc_b = hb_df.loc[hb_df["stock_name"] == s, "allocation_percent"].values
+                            rows.append({
+                                "Stock":  s,
+                                "Sector": sector_map_ol.get(s, "—"),
+                                col_a:    round(float(alloc_a[0]), 2) if len(alloc_a) else 0.0,
+                                col_b:    round(float(alloc_b[0]), 2) if len(alloc_b) else 0.0,
+                            })
+                        df = pd.DataFrame(rows).sort_values(col_a if col_a else col_b, ascending=False)
+                        max_v = max(df[col_a].max() if col_a else 0, df[col_b].max() if col_b else 0) * 1.25 or 1.0
+                        cfg = {
+                            "Stock":  st.column_config.TextColumn("Stock",  width="medium"),
+                            "Sector": st.column_config.TextColumn("Sector", width="small"),
+                        }
+                        if col_a:
+                            cfg[col_a] = st.column_config.ProgressColumn(col_a, format="%.2f%%", min_value=0, max_value=max_v)
+                        if col_b:
+                            cfg[col_b] = st.column_config.ProgressColumn(col_b, format="%.2f%%", min_value=0, max_value=max_v)
+                        cols_to_show = ["Stock", "Sector"] + ([col_a] if col_a else []) + ([col_b] if col_b else [])
+                        st.dataframe(df[cols_to_show], use_container_width=True,
+                                     hide_index=True, height=min(400, 36 * len(df) + 38),
+                                     column_config=cfg)
+
+                    with t_shared:
+                        if common:
+                            _build_drill(common, h_a, h_b, dn_a, dn_b)
+                        else:
+                            st.info("No stocks in common.")
+
+                    with t_only_a:
+                        if excl_a:
+                            _build_drill(excl_a, h_a, h_b, dn_a, None)
+                        else:
+                            st.info(f"No stocks exclusive to {dn_a}.")
+
+                    with t_only_b:
+                        if excl_b:
+                            _build_drill(excl_b, h_a, h_b, None, dn_b)
+                        else:
+                            st.info(f"No stocks exclusive to {dn_b}.")
+
+        # ── What-If: plain-English narrative cards ────────────────────────────
         if len(matched_funds) >= 2:
             st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown('<div class="section-title">What-If: Remove a Fund</div>', unsafe_allow_html=True)
-            st.markdown('<div class="section-sub">See how much diversification you would lose (or gain) by removing each fund</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-title">What happens if you remove a fund?</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="section-sub">Each card shows the impact of dropping that one fund from your portfolio</div>',
+                unsafe_allow_html=True,
+            )
 
-            all_stocks = set(sel_h["stock_name"].str.strip())
-            whatif_rows = []
             for fund in matched_funds:
-                others       = [f for f in matched_funds if f != fund]
-                others_h     = holdings[holdings["fund_name"].isin(others)]
+                others        = [f for f in matched_funds if f != fund]
+                others_h      = holdings[holdings["fund_name"].isin(others)]
                 others_stocks = set(others_h["stock_name"].str.strip())
-                fund_stocks  = set(sel_h[sel_h["fund_name"] == fund]["stock_name"].str.strip())
-                unique_lost  = len(fund_stocks - others_stocks)
+                fund_stocks   = set(sel_h[sel_h["fund_name"] == fund]["stock_name"].str.strip())
+                unique_lost   = len(fund_stocks - others_stocks)
+                top_unique    = sorted(fund_stocks - others_stocks)[:4]
+
                 overlap_without = (
                     similarity[similarity["fund_a"].isin(others) & similarity["fund_b"].isin(others)]
                     ["normalized_score"].mean()
-                    if len(others) >= 2 else 0
+                    if len(others) >= 2 else 0.0
                 )
                 overlap_change = overlap_without - avg_sim
-                whatif_rows.append({
-                    "Fund":             display_name(fund),
-                    "Unique Stocks Lost": unique_lost,
-                    "Overlap After":    round(overlap_without, 1),
-                    "Overlap Change":   round(overlap_change, 1),
-                    "Verdict":          (
-                        "✂️ Consider removing" if unique_lost <= 3 and overlap_change <= 2
-                        else "⚠️ Significant loss" if unique_lost > 15
-                        else "🔄 Moderate impact"
-                    ),
-                })
-            wf_df = pd.DataFrame(whatif_rows)
-            st.dataframe(
-                wf_df, use_container_width=True, hide_index=True,
-                height=36 * len(wf_df) + 38,
-                column_config={
-                    "Fund":               st.column_config.TextColumn("Fund",              width="medium"),
-                    "Unique Stocks Lost": st.column_config.NumberColumn("Unique Stocks Lost", format="%d stocks", width="small"),
-                    "Overlap After":      st.column_config.ProgressColumn("Overlap After %", format="%.1f%%", min_value=0, max_value=100),
-                    "Overlap Change":     st.column_config.NumberColumn("Overlap Δ",        format="%+.1f%%", width="small"),
-                    "Verdict":            st.column_config.TextColumn("Verdict",            width="medium"),
-                },
-            )
-            st.caption("'Consider removing' = fund adds ≤3 unique stocks and barely changes overlap · not investment advice.")
+
+                if unique_lost <= 3 and abs(overlap_change) <= 2:
+                    bg, border, icon = "#F0FDF4", "#86EFAC", "✂️"
+                    verdict = (
+                        f"This fund is largely <strong>redundant</strong> — it adds only "
+                        f"<strong>{unique_lost} unique stock{'s' if unique_lost != 1 else ''}</strong> "
+                        f"that your other funds don't already hold. "
+                        f"Removing it would barely change your diversification."
+                    )
+                elif unique_lost > 15:
+                    bg, border, icon = "#FEF2F2", "#FCA5A5", "⚠️"
+                    verdict = (
+                        f"This fund plays a <strong>significant role</strong> — it contributes "
+                        f"<strong>{unique_lost} unique stocks</strong> that no other fund in your portfolio holds. "
+                        f"Removing it would noticeably reduce your exposure."
+                    )
+                else:
+                    bg, border, icon = "#FFFBEB", "#FDE68A", "🔄"
+                    verdict = (
+                        f"This fund has a <strong>moderate contribution</strong> — it adds "
+                        f"<strong>{unique_lost} unique stocks</strong> to your portfolio. "
+                        f"Removing it would have some impact on diversification."
+                    )
+
+                ol_dir   = "rise" if overlap_change > 0 else "fall"
+                ol_arrow = "↑" if overlap_change > 0 else "↓"
+                ol_color = "#DC2626" if overlap_change > 0 else "#059669"
+
+                unique_txt = (
+                    f'<div style="font-size:0.72rem;color:#6B7280;margin-top:2px;">'
+                    f'e.g. {", ".join(top_unique[:3])}{"…" if len(top_unique) == 4 else ""}'
+                    f'</div>'
+                ) if top_unique else ""
+
+                st.markdown(
+                    f'<div style="background:{bg};border:1px solid {border};border-radius:12px;'
+                    f'padding:1rem 1.1rem;margin-bottom:0.75rem;">'
+                    f'<div style="font-size:0.9rem;font-weight:700;color:#1A1A2E;margin-bottom:0.6rem;">'
+                    f'{icon} Remove <span style="color:#6C3CE1;">{display_name(fund)}</span></div>'
+                    f'<div style="display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:0.65rem;">'
+                    f'<div>'
+                    f'<div style="font-size:1.4rem;font-weight:800;color:#1A1A2E;">{unique_lost}</div>'
+                    f'<div style="font-size:0.72rem;color:#6B7280;font-weight:600;">unique stocks you\'d lose</div>'
+                    f'{unique_txt}'
+                    f'</div>'
+                    f'<div>'
+                    f'<div style="font-size:1.4rem;font-weight:800;color:{ol_color};">'
+                    f'{ol_arrow} {abs(overlap_change):.0f}%</div>'
+                    f'<div style="font-size:0.72rem;color:#6B7280;font-weight:600;">'
+                    f'overlap would {ol_dir} (to {overlap_without:.0f}%)</div>'
+                    f'</div>'
+                    f'</div>'
+                    f'<div style="font-size:0.8rem;color:#374151;line-height:1.5;">{verdict}</div>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+            st.caption("Analysis only — not investment advice.")
 
     # ── Tab 4: Sector & Cap Size ──────────────────────────────────────────────
     with tab_sec:
