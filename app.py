@@ -3103,17 +3103,26 @@ def page_portfolio_xray():
             st.markdown('<div class="section-sub">Average allocation across your funds — upload invested amounts for weighted view</div>', unsafe_allow_html=True)
             x_col, x_label = "avg_alloc", "Avg Allocation %"
 
+        n_bars = min(15, len(exp))
         fig_e = px.bar(
             exp.head(15), x=x_col, y="stock_name", orientation="h",
             color="sector",
             labels={x_col: x_label, "stock_name": ""},
-            height=440,
+            height=max(380, n_bars * 34 + 140),
         )
         fig_e.update_layout(
-            yaxis=dict(autorange="reversed"),
-            margin=dict(l=0, r=0, t=10, b=0),
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            legend=dict(orientation="h", yanchor="top", y=-0.15),
+            yaxis=dict(autorange="reversed", tickfont=dict(size=11)),
+            xaxis=dict(showgrid=True, gridcolor="#F3F4F6", title=x_label),
+            margin=dict(l=10, r=30, t=15, b=110),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            legend=dict(
+                orientation="h",
+                yanchor="top", y=-0.18,
+                xanchor="left", x=0,
+                title=None,
+                font=dict(size=11),
+            ),
             font=dict(family="Inter, sans-serif"),
         )
         fig_e.update_traces(marker_line_width=0)
