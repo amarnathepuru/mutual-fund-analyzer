@@ -2895,7 +2895,7 @@ def page_portfolio_xray():
 
     tab_ov, tab_exp, tab_perf, tab_ol, tab_sec, tab_risk, tab_ins = st.tabs([
         "📊 Overview",
-        "🏦 Hidden Exposure",
+        "🔍 What You Actually Own",
         "📉 Fund Performance",
         "🔗 Fund Overlap",
         "🏗️ Sector & Cap Size",
@@ -3136,9 +3136,9 @@ def page_portfolio_xray():
                 unsafe_allow_html=True,
             )
 
-    # ── Tab 1: Hidden Exposure ────────────────────────────────────────────────
+    # ── Tab 1: What You Actually Own ────────────────────────────────────────────────
     with tab_exp:
-        st.markdown('<div class="section-title">Your Indirect Stock Exposure</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">What You Actually Own</div>', unsafe_allow_html=True)
 
         # Weighted effective exposure per stock
         sel_h_wt = sel_h.copy()
