@@ -3165,22 +3165,31 @@ def page_portfolio_xray():
 
         c_donut, c_table = st.columns([2, 3])
         with c_donut:
-            fig_d = px.pie(avg_sec.head(8), names="sector", values="allocation_percent", hole=0.52, height=340)
-            fig_d.update_layout(margin=dict(l=0, r=0, t=10, b=0),
-                                 paper_bgcolor="rgba(0,0,0,0)",
-                                 font=dict(family="Inter, sans-serif"),
-                                 legend=dict(orientation="v", yanchor="middle", y=0.5))
-            fig_d.update_traces(textposition="outside", textinfo="percent+label")
+            fig_d = px.pie(avg_sec.head(8), names="sector", values="allocation_percent", hole=0.52, height=360)
+            fig_d.update_layout(
+                margin=dict(l=10, r=10, t=10, b=10),
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter, sans-serif"),
+                legend=dict(
+                    orientation="h",
+                    yanchor="top", y=-0.08,
+                    xanchor="center", x=0.5,
+                    font=dict(size=10),
+                ),
+            )
+            fig_d.update_traces(textposition="inside", textinfo="percent", insidetextfont=dict(size=11))
             st.plotly_chart(fig_d, use_container_width=True, config={"displayModeBar": False})
         with c_table:
-            avg_sec["bar"] = avg_sec["allocation_percent"].round(1)
-            st.dataframe(avg_sec.reset_index(drop=True), use_container_width=True, height=340,
-                         hide_index=True,
-                         column_config={
-                             "sector":             st.column_config.TextColumn("Sector"),
-                             "allocation_percent": st.column_config.NumberColumn("Avg Alloc %", format="%.1f%%"),
-                             "bar":                st.column_config.ProgressColumn("Weight", min_value=0, max_value=50),
-                         })
+            st.dataframe(
+                avg_sec[["sector", "allocation_percent"]].reset_index(drop=True),
+                use_container_width=True, height=360, hide_index=True,
+                column_config={
+                    "sector":             st.column_config.TextColumn("Sector"),
+                    "allocation_percent": st.column_config.ProgressColumn(
+                        "Avg Allocation %", format="%.1f%%", min_value=0, max_value=float(avg_sec["allocation_percent"].max()) if not avg_sec.empty else 50
+                    ),
+                },
+            )
 
         # Cap-size breakdown
         st.markdown("<br>", unsafe_allow_html=True)
