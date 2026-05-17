@@ -5812,10 +5812,11 @@ def page_stock_explorer():
                   zip(cat_df["avg_alloc"], cat_df["fund_count"])],
             textposition="outside",
             textfont=dict(size=11, color=_bd),
+            cliponaxis=False,
         ))
         fig_cat.update_layout(**_dark_layout(
             height=max(200, len(cat_df) * 42 + 40),
-            margin=dict(l=10, r=120, t=10, b=10),
+            margin=dict(l=10, r=180, t=10, b=10),
             xaxis=_dark_xaxis(showgrid=True, gridcolor=_CHART_GRID),
             yaxis=dict(tickfont=dict(size=11, color=_bd), showgrid=False),
         ))
