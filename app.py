@@ -5824,69 +5824,6 @@ def page_stock_explorer():
         ))
         st.plotly_chart(fig_cat, use_container_width=True)
 
-        # Chart 2 — Conviction map
-        st.markdown(
-            f'<div class="section-title">Conviction Map</div>'
-            f'<div class="section-sub">'
-            f'Each dot = one fund. X = how much they hold · Y = whether they\'re buying or selling'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-        scatter_df = stock_df.dropna(subset=["change_3m_percent"]).copy()
-        scatter_df["short_name"] = scatter_df["fund_name"].apply(lambda n: display_name(n, 28))
-
-        if not scatter_df.empty:
-            _dot_colors = [
-                "#059669" if v > 0.3 else "#DC2626" if v < -0.3 else "#6366F1"
-                for v in scatter_df["change_3m_percent"]
-            ]
-            fig_sc = go.Figure(go.Scatter(
-                x=scatter_df["allocation_percent"],
-                y=scatter_df["change_3m_percent"],
-                mode="markers+text",
-                marker=dict(size=10, color=_dot_colors, line=dict(width=1, color=_bg)),
-                text=scatter_df["short_name"],
-                textposition="top center",
-                textfont=dict(size=9, color=_bd),
-                hovertemplate=(
-                    "<b>%{text}</b><br>"
-                    "Allocation: %{x:.2f}%<br>"
-                    "3M Change: %{y:+.2f}%<extra></extra>"
-                ),
-            ))
-            fig_sc.add_hline(y=0, line_dash="dot", line_color=_bdr, line_width=1)
-            fig_sc.update_layout(**_dark_layout(
-                height=300,
-                margin=dict(l=10, r=10, t=10, b=40),
-                xaxis=_dark_xaxis(
-                    showgrid=True, gridcolor=_CHART_GRID,
-                    title="Allocation %", title_font=dict(size=11, color=_sb),
-                ),
-                yaxis=_dark_yaxis(
-                    title="3M Change %", title_font=dict(size=11, color=_sb),
-                ),
-                showlegend=False,
-            ))
-            # Quadrant labels
-            x_mid = scatter_df["allocation_percent"].median()
-            fig_sc.add_annotation(
-                x=scatter_df["allocation_percent"].max(), y=scatter_df["change_3m_percent"].max(),
-                text="High conviction · Buying more", showarrow=False,
-                font=dict(size=9, color="#059669"), xanchor="right",
-            )
-            fig_sc.add_annotation(
-                x=scatter_df["allocation_percent"].max(), y=scatter_df["change_3m_percent"].min(),
-                text="High conviction · Trimming", showarrow=False,
-                font=dict(size=9, color="#DC2626"), xanchor="right",
-            )
-            st.plotly_chart(fig_sc, use_container_width=True)
-        else:
-            st.markdown(
-                f'<div style="background:{_cd};border:1px solid {_bdr};border-radius:10px;'
-                f'padding:2rem;text-align:center;color:{_sb};font-size:0.82rem;">'
-                f'No 3-month trend data available for this stock.</div>',
-                unsafe_allow_html=True,
-            )
 
     # ── Full breakdown — collapsible ─────────────────────────────────────────────
     st.markdown("<br>", unsafe_allow_html=True)
