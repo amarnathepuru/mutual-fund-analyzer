@@ -6049,7 +6049,7 @@ def page_stock_explorer():
 
     st.markdown(
         '<div class="disclaimer">Stock exposure data is for informational and analytical purposes '
-        'only — not investment advice. Data sourced from ETMoney.</div>',
+        'only — not investment advice.</div>',
         unsafe_allow_html=True)
 
 
@@ -6261,8 +6261,7 @@ def page_overlap_drilldown():
         stocks.</div></div>""", unsafe_allow_html=True)
 
     st.markdown("""<div class="disclaimer">
-        Overlap analysis is for informational and analytical purposes only — not investment advice.
-        Data sourced from ETMoney.</div>""", unsafe_allow_html=True)
+        Overlap analysis is for informational and analytical purposes only — not investment advice.</div>""", unsafe_allow_html=True)
 
 
 def main():
