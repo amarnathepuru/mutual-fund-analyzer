@@ -5720,8 +5720,8 @@ def page_stock_explorer():
     # ── LEFT: ranked fund card strip ─────────────────────────────────────────────
     with col_left:
         st.markdown(
-            f'<div class="section-title">Fund Rankings</div>'
-            f'<div class="section-sub">Sorted by allocation — highest conviction first</div>',
+            f'<div class="section-title">Who Holds It & How Much?</div>'
+            f'<div class="section-sub">Funds sorted by allocation — highest at the top</div>',
             unsafe_allow_html=True,
         )
 
