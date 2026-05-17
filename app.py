@@ -1311,13 +1311,15 @@ def page_home():
     max_sim  = similarity["normalized_score"].max() if not similarity.empty else 0
 
     _feats = [
-        ("rgba(83,74,183,0.12)",  "🔍", "Hidden overlap — surfaced",
-         f"Your {n_funds} funds might own the same 30 stocks. "
-         "We show you exactly that."),
-        ("rgba(16,185,129,0.12)", "🏦", "Stock-level conviction",
-         "See which funds are buying or cutting any stock and by how much."),
-        ("rgba(249,115,22,0.12)", "🔗", "Category-wide redundancy",
-         "Full pairwise overlap matrix — spot identical fund pairs instantly."),
+        ("rgba(83,74,183,0.12)",  "🔀", "Find out how much your funds actually overlap",
+         "Pick any two funds and see the percentage of holdings they share, the common stocks, "
+         "and whether holding both is adding any real diversification."),
+        ("rgba(16,185,129,0.12)", "🏦", "Track how funds are betting on individual stocks",
+         "Search any stock — HDFC Bank, Infosys, Reliance — and see which funds hold it, "
+         "how heavily they're positioned, and how that's changed recently."),
+        ("rgba(249,115,22,0.12)", "🔗", "See which funds in a category are just copies of each other",
+         f"The overlap matrix maps every fund pair in a category. We found two large cap funds "
+         f"sharing {int(max_sim)}% of holdings — charging different expense ratios."),
     ]
     feats_html = "".join(
         f'<div class="fl-feat">'
@@ -1330,18 +1332,12 @@ def page_home():
     st.markdown(
         f'<div class="fl-body">'
         f'<div>'
-        f'<div class="fl-tag"><span class="fl-tag-dot"></span>Mutual fund intelligence</div>'
-        f'<div class="fl-h1">Your funds are hiding something. <em>We find it.</em></div>'
-        f'<div class="fl-sub">Most apps show NAV and SIP calculators. FundLens goes deeper — '
-        f'revealing overlap, hidden stock concentration, and whether your portfolio is truly '
-        f'diversified or just looks that way.</div>'
+        f'<div class="fl-tag"><span class="fl-tag-dot"></span>Mutual fund transparency</div>'
+        f'<div class="fl-h1">Do your funds <em>actually</em> diversify your portfolio?</div>'
+        f'<div class="fl-sub">Most investors hold 4–6 mutual funds thinking they\'re diversified. '
+        f'FundLens checks that assumption — by looking inside every fund and showing you what you '
+        f'really own.</div>'
         f'{feats_html}'
-        f'<div class="fl-stats">'
-        f'<div class="fl-stat"><div class="fl-stat-v">{n_funds}</div><div class="fl-stat-l">Funds tracked</div></div>'
-        f'<div class="fl-stat"><div class="fl-stat-v">{n_unique}</div><div class="fl-stat-l">Unique stocks</div></div>'
-        f'<div class="fl-stat"><div class="fl-stat-v">{int(max_sim)}%</div><div class="fl-stat-l">Max overlap</div></div>'
-        f'<div class="fl-stat"><div class="fl-stat-v">{n_cats}</div><div class="fl-stat-l">Categories</div></div>'
-        f'</div>'
         f'</div>'
         f'<div>'
         f'<div class="fl-ask">'
