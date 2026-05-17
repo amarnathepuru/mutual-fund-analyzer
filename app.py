@@ -5824,6 +5824,76 @@ def page_stock_explorer():
         ))
         st.plotly_chart(fig_cat, use_container_width=True)
 
+        # Chart 2 — Category allocation trend over time
+        st.markdown(
+            f'<div class="section-title" style="margin-top:1rem;">How Has Each Category\'s Holding Changed?</div>'
+            f'<div class="section-sub">Average allocation per category reconstructed across 4 time points</div>',
+            unsafe_allow_html=True,
+        )
+
+        _time_labels = ["1Y ago", "6M ago", "3M ago", "Now"]
+        trend_rows = []
+        for _, row in stock_df.iterrows():
+            cat = str(row.get("category", "Other")).replace("nan", "Other")
+            cur = row["allocation_percent"]
+            try:
+                d3 = cur - float(row["change_3m_percent"])
+            except Exception:
+                d3 = None
+            try:
+                d6 = cur - float(row["change_6m_percent"])
+            except Exception:
+                d6 = None
+            try:
+                d1y = cur - float(row["change_1y_percent"])
+            except Exception:
+                d1y = None
+            trend_rows.append({"category": cat, "1Y ago": d1y, "6M ago": d6, "3M ago": d3, "Now": cur})
+
+        trend_df = pd.DataFrame(trend_rows)
+        cat_trend = trend_df.groupby("category")[_time_labels].mean().reset_index()
+        # Only keep categories with at least some non-null history
+        cat_trend = cat_trend.dropna(subset=["1Y ago", "6M ago", "3M ago"], how="all")
+
+        _CAT_COLORS_LINE = {
+            "Large Cap": "#6366F1", "Mid Cap": "#F59E0B", "Small Cap": "#10B981",
+            "Large & Mid Cap": "#06B6D4", "Multi Cap": "#8B5CF6",
+            "Flexi Cap": "#F472B6", "ELSS": "#34D399", "Other": "#94A3B8",
+        }
+
+        fig_trend = go.Figure()
+        for _, crow in cat_trend.iterrows():
+            cat  = crow["category"]
+            col  = _CAT_COLORS_LINE.get(cat, "#94A3B8")
+            vals = [crow[t] for t in _time_labels]
+            # Only plot time points that have data
+            x_pts = [t for t, v in zip(_time_labels, vals) if pd.notna(v)]
+            y_pts = [v for v in vals if pd.notna(v)]
+            if len(x_pts) < 2:
+                continue
+            fig_trend.add_trace(go.Scatter(
+                x=x_pts, y=y_pts, mode="lines+markers",
+                name=cat,
+                line=dict(color=col, width=2.5),
+                marker=dict(size=7, color=col, line=dict(width=1.5, color=_bg)),
+                hovertemplate=f"<b>{cat}</b><br>%{{x}}: %{{y:.2f}}%<extra></extra>",
+            ))
+
+        fig_trend.update_layout(**_dark_layout(
+            height=280,
+            margin=dict(l=10, r=10, t=10, b=10),
+            xaxis=_dark_xaxis(showgrid=False),
+            yaxis=_dark_yaxis(
+                title="Avg allocation %", title_font=dict(size=10, color=_sb),
+                gridcolor=_CHART_GRID,
+            ),
+            legend=dict(
+                orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0,
+                font=dict(size=10, color=_bd), bgcolor="rgba(0,0,0,0)",
+            ),
+        ))
+        st.plotly_chart(fig_trend, use_container_width=True)
+
 
     # ── Full breakdown — collapsible ─────────────────────────────────────────────
     st.markdown("<br>", unsafe_allow_html=True)
