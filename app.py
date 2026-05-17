@@ -4382,7 +4382,7 @@ def page_compare():
         with c2:
             st.metric("Avg Financial Exposure", f"{fin_pct:.1f}%" if not np.isnan(fin_pct) else "—")
         with c3:
-            st.metric("Portfolio Overlap Score", f"{avg_s:.0f}%")
+            st.metric("Portfolio Overlap Score", f"{int(avg_s)}%")
 
         st.markdown("""
         <div class="disclaimer">
