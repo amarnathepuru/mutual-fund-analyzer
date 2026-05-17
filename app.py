@@ -1241,6 +1241,7 @@ def _fl_render_navbar(t, t_name, active_page):
         links_html += f'<a href="?nav={key}&theme={t_name}" target="_self" class="fl-nav-link{active_cls}">{label}</a>'
 
     # Pure HTML <details> theme picker — no Streamlit widget, full CSS control
+    _current_page = st.session_state.get("page", active_page)
     _theme_rows = ""
     for tk, (tc, tname) in _FL_THEME_META.items():
         _is_sel   = tk == t_name
@@ -1249,7 +1250,7 @@ def _fl_render_navbar(t, t_name, active_page):
         _name_wt  = "700" if _is_sel else "500"
         _check    = f'<span style="margin-left:auto;color:{t["a"]};font-size:0.65rem;">✓</span>' if _is_sel else ""
         _theme_rows += (
-            f'<a href="?nav={active_page}&theme={tk}" target="_self" '
+            f'<a href="?nav={_current_page}&theme={tk}" target="_self" '
             f'style="display:flex;align-items:center;gap:9px;padding:6px 8px;'
             f'border-radius:7px;text-decoration:none;background:{_row_bg};margin-bottom:1px;">'
             f'<div style="width:12px;height:12px;border-radius:50%;background:{tc};'
