@@ -5828,43 +5828,99 @@ def page_stock_explorer():
     # ── Full breakdown — collapsible ─────────────────────────────────────────────
     st.markdown("<br>", unsafe_allow_html=True)
     with st.expander(f"📋 Full breakdown — all {n_holding} funds with allocation & trend data"):
-        display_df = stock_df[[
-            "fund_name", "allocation_percent",
-            "category", "change_3m_percent", "change_6m_percent", "change_1y_percent",
-        ]].copy()
-        display_df["fund_name"] = display_df["fund_name"].apply(display_name)
+        _CAT_COLORS_TBL = {
+            "Large Cap": "#6366F1", "Mid Cap": "#F59E0B", "Small Cap": "#10B981",
+            "Large & Mid Cap": "#06B6D4", "Multi Cap": "#8B5CF6",
+            "Flexi Cap": "#F472B6", "ELSS": "#34D399", "Other": "#94A3B8",
+        }
 
-        def _trend_arrow(row):
+        def _delta_cell(val):
+            try:
+                v = float(val)
+                if v > 0:
+                    return f'<span style="color:#059669;font-weight:600;">+{v:.2f}%</span>'
+                elif v < 0:
+                    return f'<span style="color:#DC2626;font-weight:600;">{v:.2f}%</span>'
+                else:
+                    return f'<span style="color:#94A3B8;">0.00%</span>'
+            except Exception:
+                return f'<span style="color:#94A3B8;">—</span>'
+
+        def _trend_badge(row):
             try:
                 v3 = float(row["change_3m_percent"])
-                v6 = float(row["change_6m_percent"])
-                if v3 >= v6:
-                    return "↑"
+                if v3 > 0.3:
+                    return '<span style="color:#059669;font-size:0.7rem;font-weight:700;">↑ Buying</span>'
+                elif v3 < -0.3:
+                    return '<span style="color:#DC2626;font-size:0.7rem;font-weight:700;">↓ Trimming</span>'
                 else:
-                    return "↓"
+                    return '<span style="color:#6366F1;font-size:0.7rem;font-weight:700;">→ Holding</span>'
             except Exception:
-                return "—"
+                return '<span style="color:#94A3B8;font-size:0.7rem;">— No data</span>'
 
-        display_df.insert(1, "Trend", display_df.apply(_trend_arrow, axis=1))
-        display_df.columns = ["Fund", "Trend", "Alloc %", "Category", "3M Δ%", "6M Δ%", "1Y Δ%"]
-        max_alloc_val = float(display_df["Alloc %"].max()) * 1.25
-        st.dataframe(
-            display_df,
-            use_container_width=True,
-            hide_index=True,
-            height=min(500, 36 * len(display_df) + 38),
-            column_config={
-                "Fund":     st.column_config.TextColumn("Fund",     width="medium"),
-                "Trend":    st.column_config.TextColumn("Trend",    width=55),
-                "Alloc %":  st.column_config.ProgressColumn(
-                                "Alloc %", format="%.2f%%",
-                                min_value=0, max_value=max_alloc_val, width="medium"),
-                "Category": st.column_config.TextColumn("Category", width="small"),
-                "3M Δ%":    st.column_config.NumberColumn("3M Δ%",  format="%+.2f%%", width="small"),
-                "6M Δ%":    st.column_config.NumberColumn("6M Δ%",  format="%+.2f%%", width="small"),
-                "1Y Δ%":    st.column_config.NumberColumn("1Y Δ%",  format="%+.2f%%", width="small"),
-            },
+        _max_alloc = stock_df["allocation_percent"].max()
+
+        rows_html = ""
+        for i, row in stock_df.iterrows():
+            fn       = display_name(row["fund_name"], 36)
+            alloc    = row["allocation_percent"]
+            bar_w    = int(alloc / _max_alloc * 100) if _max_alloc > 0 else 0
+            cat      = str(row.get("category", "Other")).replace("nan", "Other")
+            cat_col  = _CAT_COLORS_TBL.get(cat, "#94A3B8")
+            row_bg   = _al if i % 2 == 0 else _cd
+
+            rows_html += (
+                f'<tr style="background:{row_bg};border-bottom:1px solid {_bdr};">'
+                # Fund name + category pill
+                f'<td style="padding:10px 14px;min-width:200px;">'
+                f'<div style="font-size:0.78rem;font-weight:600;color:{_hd};line-height:1.3;">{fn}</div>'
+                f'<span style="font-size:0.6rem;font-weight:600;color:{cat_col};'
+                f'background:{cat_col}20;border-radius:20px;padding:2px 7px;'
+                f'display:inline-block;margin-top:3px;">{cat}</span>'
+                f'</td>'
+                # Allocation bar + value
+                f'<td style="padding:10px 14px;min-width:140px;">'
+                f'<div style="display:flex;align-items:center;gap:8px;">'
+                f'<div style="flex:1;height:6px;border-radius:3px;background:{_bdr};">'
+                f'<div style="width:{bar_w}%;height:100%;border-radius:3px;background:{_a};"></div>'
+                f'</div>'
+                f'<span style="font-size:0.78rem;font-weight:700;color:{_a};white-space:nowrap;">'
+                f'{alloc:.2f}%</span>'
+                f'</div>'
+                f'</td>'
+                # Trend badge
+                f'<td style="padding:10px 14px;white-space:nowrap;">{_trend_badge(row)}</td>'
+                # Delta columns
+                f'<td style="padding:10px 14px;text-align:right;">{_delta_cell(row.get("change_3m_percent"))}</td>'
+                f'<td style="padding:10px 14px;text-align:right;">{_delta_cell(row.get("change_6m_percent"))}</td>'
+                f'<td style="padding:10px 14px;text-align:right;">{_delta_cell(row.get("change_1y_percent"))}</td>'
+                f'</tr>'
+            )
+
+        tbl_html = (
+            f'<div style="overflow-x:auto;border-radius:12px;border:1px solid {_bdr};">'
+            f'<table style="width:100%;border-collapse:collapse;">'
+            f'<thead>'
+            f'<tr style="background:{_al};border-bottom:2px solid {_bdr};">'
+            f'<th style="padding:10px 14px;text-align:left;font-size:0.7rem;font-weight:700;'
+            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">Fund</th>'
+            f'<th style="padding:10px 14px;text-align:left;font-size:0.7rem;font-weight:700;'
+            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">Allocation</th>'
+            f'<th style="padding:10px 14px;text-align:left;font-size:0.7rem;font-weight:700;'
+            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">3M Trend</th>'
+            f'<th style="padding:10px 14px;text-align:right;font-size:0.7rem;font-weight:700;'
+            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">3M Δ</th>'
+            f'<th style="padding:10px 14px;text-align:right;font-size:0.7rem;font-weight:700;'
+            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">6M Δ</th>'
+            f'<th style="padding:10px 14px;text-align:right;font-size:0.7rem;font-weight:700;'
+            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">1Y Δ</th>'
+            f'</tr>'
+            f'</thead>'
+            f'<tbody>{rows_html}</tbody>'
+            f'</table>'
+            f'</div>'
         )
+        st.markdown(tbl_html, unsafe_allow_html=True)
 
     # ── Insights ─────────────────────────────────────────────────────────────────
     st.markdown("<br>", unsafe_allow_html=True)
