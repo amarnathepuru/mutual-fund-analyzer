@@ -1124,15 +1124,19 @@ button[data-testid="baseButton-primary"]:hover{{background:{a}!important;opacity
 .block-container>[data-testid="stVerticalBlock"]>[data-testid="stHorizontalBlock"]:first-child>[data-testid="stColumn"]{{
   display:flex!important;align-items:center!important;
   padding:.4rem .6rem!important;min-height:58px!important;}}
-.block-container>[data-testid="stVerticalBlock"]>[data-testid="stHorizontalBlock"]:first-child [data-testid="stSelectbox"]>label{{
-  display:none!important;}}
-.block-container>[data-testid="stVerticalBlock"]>[data-testid="stHorizontalBlock"]:first-child [data-testid="stSelectbox"]>div>div{{
-  background:transparent!important;border:1px solid {bdr}!important;
-  border-radius:20px!important;font-size:.82rem!important;font-weight:500!important;
-  color:{bd}!important;min-height:28px!important;padding:.15rem .85rem!important;
-  cursor:pointer!important;}}
-.block-container>[data-testid="stVerticalBlock"]>[data-testid="stHorizontalBlock"]:first-child [data-testid="stSelectbox"] svg{{
-  width:13px!important;height:13px!important;color:{sb}!important;}}
+.fl-theme-picker{{position:relative;display:inline-block;}}
+.fl-theme-picker summary{{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  border:1px solid {bdr};border-radius:20px;font-size:0.72rem;font-weight:500;
+  color:{bd};background:transparent;cursor:pointer;list-style:none;
+  user-select:none;white-space:nowrap;}}
+.fl-theme-picker summary::-webkit-details-marker{{display:none;}}
+.fl-theme-picker[open] summary{{border-color:{a};color:{a};}}
+.fl-theme-picker summary:hover{{background:{bdr};border-color:{a};color:{a};}}
+.fl-theme-dropdown{{
+  position:absolute;right:0;top:calc(100% + 6px);background:{cd};
+  border:1px solid {bdr};border-radius:10px;padding:8px 6px;min-width:168px;
+  z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.10);}}
 .fl-logo{{font-size:1.05rem;font-weight:800;color:{a};text-decoration:none!important;
   letter-spacing:-.02em;display:flex;align-items:center;gap:.4rem;}}
 .fl-nav-links{{display:flex;height:100%;align-items:center;gap:.05rem;}}
@@ -1236,7 +1240,33 @@ def _fl_render_navbar(t, t_name, active_page):
         active_cls = " active" if key == active_page else ""
         links_html += f'<a href="?nav={key}&theme={t_name}" target="_self" class="fl-nav-link{active_cls}">{label}</a>'
 
-    col_l, col_c, col_r = st.columns([2, 9, 2])
+    # Pure HTML <details> theme picker — no Streamlit widget, full CSS control
+    _theme_rows = ""
+    for tk, (tc, tname) in _FL_THEME_META.items():
+        _is_sel   = tk == t_name
+        _row_bg   = t["al"] if _is_sel else "transparent"
+        _name_col = t["a"] if _is_sel else t["body"]
+        _name_wt  = "700" if _is_sel else "500"
+        _check    = f'<span style="margin-left:auto;color:{t["a"]};font-size:0.65rem;">✓</span>' if _is_sel else ""
+        _theme_rows += (
+            f'<a href="?nav={active_page}&theme={tk}" target="_self" '
+            f'style="display:flex;align-items:center;gap:9px;padding:6px 8px;'
+            f'border-radius:7px;text-decoration:none;background:{_row_bg};margin-bottom:1px;">'
+            f'<div style="width:12px;height:12px;border-radius:50%;background:{tc};'
+            f'box-shadow:0 0 0 1.5px {t["bdr"]};flex-shrink:0;"></div>'
+            f'<span style="font-size:0.75rem;font-weight:{_name_wt};color:{_name_col};">{tname}</span>'
+            f'{_check}</a>'
+        )
+    _theme_picker = (
+        f'<details class="fl-theme-picker">'
+        f'<summary>🎨&nbsp;&nbsp;Theme</summary>'
+        f'<div class="fl-theme-dropdown">'
+        f'<div style="font-size:0.6rem;font-weight:700;color:{t["sub"]};text-transform:uppercase;'
+        f'letter-spacing:0.6px;padding:2px 8px 8px;">Select theme</div>'
+        f'{_theme_rows}</div></details>'
+    )
+
+    col_l, col_c, col_r = st.columns([2, 10, 1.2])
     with col_l:
         st.markdown(
             f'<a href="?nav=home&theme={t_name}" target="_self" class="fl-logo">📊 FundLens</a>',
@@ -1248,18 +1278,7 @@ def _fl_render_navbar(t, t_name, active_page):
             unsafe_allow_html=True,
         )
     with col_r:
-        theme_keys = list(_FL_THEME_META.keys())
-        selected = st.selectbox(
-            "Theme",
-            options=theme_keys,
-            index=theme_keys.index(t_name),
-            format_func=lambda k: f"🎨 {_FL_THEME_META[k][1]}",
-            label_visibility="collapsed",
-            key="fl_theme_picker",
-        )
-        if selected != t_name:
-            st.session_state.fl_theme = selected
-            st.rerun()
+        st.markdown(_theme_picker, unsafe_allow_html=True)
 
 
 def _fl_render_breadcrumb(crumbs):
