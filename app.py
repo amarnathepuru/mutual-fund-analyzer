@@ -5784,7 +5784,7 @@ def page_stock_explorer():
         # Chart 1 — Category breakdown
         st.markdown(
             f'<div class="section-title">Which Categories Hold It Most?</div>'
-            f'<div class="section-sub">Average allocation per fund category</div>',
+            f'<div class="section-sub">On average, what % of a fund\'s total portfolio is allocated to this stock — grouped by category</div>',
             unsafe_allow_html=True,
         )
         master_tmp = load_master()
@@ -5808,7 +5808,7 @@ def page_stock_explorer():
         fig_cat = go.Figure(go.Bar(
             x=cat_df["avg_alloc"], y=cat_df["category"], orientation="h",
             marker_color=bar_colors, marker_line_width=0,
-            text=[f'{v:.2f}%  ({int(n)} fund{"s" if n > 1 else ""})' for v, n in
+            text=[f'avg {v:.2f}% of portfolio  ·  {int(n)} fund{"s" if n > 1 else ""}' for v, n in
                   zip(cat_df["avg_alloc"], cat_df["fund_count"])],
             textposition="outside",
             textfont=dict(size=11, color=_bd),
@@ -5817,7 +5817,9 @@ def page_stock_explorer():
         fig_cat.update_layout(**_dark_layout(
             height=max(200, len(cat_df) * 42 + 40),
             margin=dict(l=10, r=180, t=10, b=10),
-            xaxis=_dark_xaxis(showgrid=True, gridcolor=_CHART_GRID),
+            xaxis=_dark_xaxis(showgrid=True, gridcolor=_CHART_GRID,
+                              title="Avg % of fund portfolio allocated to this stock",
+                              title_font=dict(size=10, color=_sb)),
             yaxis=dict(tickfont=dict(size=11, color=_bd), showgrid=False),
         ))
         st.plotly_chart(fig_cat, use_container_width=True)
