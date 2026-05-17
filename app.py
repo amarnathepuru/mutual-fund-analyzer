@@ -609,15 +609,15 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
         top3_txt = ", ".join(f"<strong>{s}</strong>" for s in top3)
         stype    = "alert" if wscore >= 60 else "warning"
         icon     = "⚠️"   if wscore >= 60 else "📊"
-        tail     = ("Holding both adds minimal diversification benefit."
+        tail     = ("You're essentially paying for two funds but getting the same underlying bets. There is very little reason to hold both."
                     if wscore >= 60 else
-                    "Moderate overlap — monitor combined concentration in shared positions.")
+                    "Worth watching — a large chunk of your money ends up in the same companies across both funds.")
         insights.append({
             "category": "overlap", "type": stype, "icon": icon,
             "text": (
-                f"<strong>{display_name(fa)}</strong> and <strong>{display_name(fb)}</strong> share "
-                f"<strong>{wscore:.0f}% portfolio similarity</strong> ({wcommon} stocks in common). "
-                f"Their largest shared positions are: {top3_txt}. {tail}"
+                f"<strong>{display_name(fa)}</strong> and <strong>{display_name(fb)}</strong> own "
+                f"<strong>{wcommon} of the same companies</strong> ({wscore:.0f}% identical). "
+                f"The biggest names they both hold are: {top3_txt}. {tail}"
             ),
         })
 
@@ -630,9 +630,9 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
                 "category": "overlap", "type": "success", "icon": "✅",
                 "text": (
                     f"<strong>{display_name(best['fund_a'])}</strong> and "
-                    f"<strong>{display_name(best['fund_b'])}</strong> are the most complementary pair "
-                    f"with only <strong>{bscore:.0f}% overlap</strong> — they bring the most distinct "
-                    "exposure when held together."
+                    f"<strong>{display_name(best['fund_b'])}</strong> are your most different funds — "
+                    f"only <strong>{bscore:.0f}% of their stocks overlap</strong>. "
+                    "Pairing these two gives you the most genuine spread across different companies."
                 ),
             })
 
@@ -650,9 +650,9 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
             insights.append({
                 "category": "overlap", "type": "info", "icon": "📌",
                 "text": (
-                    f"<strong>{len(unani_stocks)} stock{'s' if len(unani_stocks) > 1 else ''}</strong> "
-                    f"appear in all {len(fund_list)} selected funds — your indirect exposure to these "
-                    f"is multiplied across every fund you hold: {top5_txt}."
+                    f"<strong>{len(unani_stocks)} {'companies appear' if len(unani_stocks) > 1 else 'company appears'}</strong> "
+                    f"in every one of your {len(fund_list)} selected funds: {top5_txt}. "
+                    "No matter which of your funds you look at, your money always ends up in these same stocks."
                 ),
             })
 
@@ -673,14 +673,14 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
             if len(by_fund) > 1:
                 lo_fund = display_name(by_fund.iloc[-1]["fund_name"])
                 lo_pct  = by_fund.iloc[-1]["allocation_percent"]
-                lo_txt  = (f" <strong>{lo_fund}</strong> has the lowest at "
-                           f"<strong>{lo_pct:.1f}%</strong> — the widest spread in this selection.")
+                lo_txt  = (f" <strong>{lo_fund}</strong> has the least at <strong>{lo_pct:.0f}%</strong>.")
             insights.append({
                 "category": "sector", "type": "warning", "icon": "🏦",
                 "text": (
-                    f"<strong>{top_s.title()}</strong> dominates all selected funds (avg "
-                    f"<strong>{top_pct:.1f}%</strong>). <strong>{hi_fund}</strong> carries the highest "
-                    f"concentration at <strong>{hi_pct:.1f}%</strong>.{lo_txt}"
+                    f"On average, <strong>{top_pct:.0f}% of each fund's money</strong> is in "
+                    f"<strong>{top_s.title()} sector</strong> stocks. <strong>{hi_fund}</strong> leans "
+                    f"the heaviest at <strong>{hi_pct:.0f}%</strong>.{lo_txt} "
+                    f"If the {top_s.title()} sector has a bad year, all your funds will feel it together."
                 ),
             })
 
@@ -692,9 +692,10 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
                 insights.append({
                     "category": "sector", "type": "info", "icon": "🏗️",
                     "text": (
-                        f"<strong>{sec_s.title()}</strong> is the second-largest sector across selected funds "
-                        f"with an average allocation of <strong>{sec_pct:.1f}%</strong>. "
-                        f"Combined with {top_s.title()}, these two sectors account for the majority of exposure."
+                        f"<strong>{sec_s.title()}</strong> is the next biggest slice at "
+                        f"<strong>{sec_pct:.0f}%</strong> on average. "
+                        f"Add that to {top_s.title()} and these two sectors alone account for most of "
+                        "where your combined fund money actually goes."
                     ),
                 })
 
@@ -713,9 +714,10 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
                 insights.append({
                     "category": "unique", "type": "info", "icon": "🔬",
                     "text": (
-                        f"<strong>{display_name(fund)}</strong> holds <strong>{len(unique)} exclusive "
-                        f"positions</strong> not found in any other selected fund, including: {u_txt}. "
-                        "These represent the unique exposure this fund adds to the mix."
+                        f"<strong>{display_name(fund)}</strong> is the only fund holding "
+                        f"<strong>{len(unique)} companies</strong> that none of your other funds touch, "
+                        f"including: {u_txt}. This is the unique value this fund adds — without it, "
+                        "you'd miss out on these positions entirely."
                     ),
                 })
 
@@ -736,8 +738,8 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
             insights.append({
                 "category": "momentum", "type": "success", "icon": "📈",
                 "text": (
-                    f"Fund managers across the selection have been consistently "
-                    f"<strong>increasing allocation</strong> to: {g_txt} over the last 3 months."
+                    f"Fund managers have been steadily <strong>buying more</strong> of: {g_txt} "
+                    "over the past 3 months — a sign they're placing stronger bets on these companies."
                 ),
             })
         if not declining.empty:
@@ -748,8 +750,8 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
             insights.append({
                 "category": "momentum", "type": "warning", "icon": "📉",
                 "text": (
-                    f"Fund managers across the selection have been consistently "
-                    f"<strong>reducing allocation</strong> to: {d_txt} over the last 3 months."
+                    f"Fund managers have been steadily <strong>trimming their stakes</strong> in: {d_txt} "
+                    "over the past 3 months — a signal of reduced confidence in these companies."
                 ),
             })
 
@@ -767,21 +769,21 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
             er_gap    = costliest["expense_ratio"] - cheapest["expense_ratio"]
 
             if er_gap > 0.3:
-                # Flag the gap — worse when paired with high overlap
                 worst_overlap = sel_sim["normalized_score"].max() if not sel_sim.empty else 0
                 overlap_note  = (
-                    f" Given that these funds overlap by <strong>{worst_overlap:.0f}%</strong>, "
-                    "the extra cost buys very little additional diversification."
+                    f" Since both funds hold <strong>{worst_overlap:.0f}% of the same stocks</strong>, "
+                    "the pricier fund isn't giving you any extra variety for that extra fee."
                     if worst_overlap >= 50 else ""
                 )
                 insights.append({
                     "category": "cost_risk", "type": "warning", "icon": "💸",
                     "text": (
-                        f"<strong>{display_name(costliest['fund_name'])}</strong> has an expense ratio of "
-                        f"<strong>{costliest['expense_ratio']:.2f}%</strong>, while "
+                        f"<strong>{display_name(costliest['fund_name'])}</strong> charges "
+                        f"<strong>{costliest['expense_ratio']:.2f}%</strong> per year in fees, while "
                         f"<strong>{display_name(cheapest['fund_name'])}</strong> charges only "
-                        f"<strong>{cheapest['expense_ratio']:.2f}%</strong> — a gap of "
-                        f"<strong>{er_gap:.2f}%</strong> per year compounding over time.{overlap_note}"
+                        f"<strong>{cheapest['expense_ratio']:.2f}%</strong>. That "
+                        f"<strong>{er_gap:.2f}% gap</strong> quietly eats into your returns every single "
+                        f"year — and the impact grows larger the longer you stay invested.{overlap_note}"
                     ),
                 })
             elif len(er_df) > 1:
@@ -789,9 +791,9 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
                 insights.append({
                     "category": "cost_risk", "type": "success", "icon": "✅",
                     "text": (
-                        f"All selected funds have similar expense ratios "
-                        f"(avg <strong>{avg_er:.2f}%</strong>, max gap <strong>{er_gap:.2f}%</strong>) — "
-                        "cost is not a meaningful differentiator in this comparison."
+                        f"All selected funds charge similar annual fees "
+                        f"(around <strong>{avg_er:.2f}%</strong>, with barely <strong>{er_gap:.2f}%</strong> "
+                        "difference between the cheapest and most expensive). Cost is a non-issue here."
                     ),
                 })
 
@@ -814,25 +816,23 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
                 insights.append({
                     "category": "cost_risk", "type": "info", "icon": "📊",
                     "text": (
-                        f"The selected funds have <strong>divergent volatility profiles</strong>. "
-                        f"<strong>{display_name(riskiest['fund_name'])}</strong> is the most volatile "
-                        f"(<strong>{_risk_label(riskiest['std_dev'])} risk</strong>, "
-                        f"std dev {riskiest['std_dev']:.1f}%), while "
-                        f"<strong>{display_name(steadiest['fund_name'])}</strong> is the steadiest "
-                        f"(<strong>{_risk_label(steadiest['std_dev'])} risk</strong>, "
-                        f"std dev {steadiest['std_dev']:.1f}%). "
-                        "Combining them provides a natural volatility buffer."
+                        f"<strong>{display_name(riskiest['fund_name'])}</strong> swings more sharply "
+                        f"with the market — bigger gains in good times, steeper drops in bad ones "
+                        f"(<strong>{_risk_label(riskiest['std_dev'])} risk</strong>). "
+                        f"<strong>{display_name(steadiest['fund_name'])}</strong> is much steadier "
+                        f"(<strong>{_risk_label(steadiest['std_dev'])} risk</strong>). "
+                        "Holding both together gives you a smoother overall ride."
                     ),
                 })
             else:
                 risk_labels = sd_df["_risk"].unique().tolist()
-                label_str   = risk_labels[0] if len(risk_labels) == 1 else "similar"
+                label_str   = risk_labels[0].lower() if len(risk_labels) == 1 else "similar"
                 insights.append({
                     "category": "cost_risk", "type": "info", "icon": "📊",
                     "text": (
-                        f"All selected funds carry a <strong>{label_str} volatility profile</strong> "
-                        f"(std dev range: {steadiest['std_dev']:.1f}% – {riskiest['std_dev']:.1f}%). "
-                        "Combining them does not meaningfully reduce overall portfolio volatility."
+                        f"All your selected funds move at a <strong>{label_str} pace</strong> with the "
+                        "market. They'll tend to rise and fall together, so holding multiple funds here "
+                        "won't reduce your risk much — you're not getting a smoother ride."
                     ),
                 })
 
@@ -3142,34 +3142,35 @@ def page_compare():
                 ("🚀", "Highest Short-Term Return", _hs_fn,  f"{_hs_v:+.1f}%"  if _hs_v  is not None else None, "1 Year Return",          _hs_c),
             ]
 
-            _sc_cols = st.columns([3, 3, 3, 3, 2])
-            for _sci, (ico, title, fn, val, sub, fc) in enumerate(_sum_cards):
-                with _sc_cols[_sci]:
-                    if fn:
-                        st.markdown(
-                            f'<div style="background:{_cd};border:1px solid {_bdr};border-radius:12px;'
-                            f'padding:0.9rem 1rem;height:100%;">'
-                            f'<div style="font-size:1.1rem;margin-bottom:4px;">{ico}</div>'
-                            f'<div style="font-size:0.65rem;color:{_sb};font-weight:600;text-transform:uppercase;'
-                            f'letter-spacing:0.4px;margin-bottom:6px;">{title}</div>'
-                            f'<div style="font-size:0.88rem;font-weight:700;color:{fc};margin-bottom:2px;">{fn}</div>'
-                            + (f'<div style="font-size:1.2rem;font-weight:800;color:{fc};">{val}</div>' if val else "")
-                            + f'<div style="font-size:0.65rem;color:{_sb};margin-top:2px;">{sub}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True,
-                        )
-            with _sc_cols[4]:
-                st.markdown(
-                    f'<div style="background:{_al};border:1px solid {_bdr};border-radius:12px;'
-                    f'padding:0.9rem 1rem;height:100%;">'
-                    f'<div style="font-size:0.68rem;font-weight:700;color:{_a};margin-bottom:8px;">ℹ️ How to read this?</div>'
-                    f'<div style="font-size:0.68rem;color:{_sb};line-height:1.6;">'
-                    f'Returns are annualised for periods &gt; 1 year.<br><br>'
-                    f'Past performance is not indicative of future results.<br><br>'
-                    f'<span style="color:{_a};font-weight:600;cursor:pointer;">Scroll down for deeper analysis ↓</span>'
-                    f'</div></div>',
-                    unsafe_allow_html=True,
-                )
+            _metric_cards_html = ""
+            for ico, title, fn, val, sub, fc in _sum_cards:
+                if fn:
+                    _metric_cards_html += (
+                        f'<div style="flex:3;min-width:150px;background:{_cd};border:1px solid {_bdr};'
+                        f'border-radius:12px;padding:0.9rem 1rem;">'
+                        f'<div style="font-size:1.1rem;margin-bottom:4px;">{ico}</div>'
+                        f'<div style="font-size:0.65rem;color:{_sb};font-weight:600;text-transform:uppercase;'
+                        f'letter-spacing:0.4px;margin-bottom:6px;">{title}</div>'
+                        f'<div style="font-size:0.88rem;font-weight:700;color:{fc};margin-bottom:2px;">{fn}</div>'
+                        + (f'<div style="font-size:1.2rem;font-weight:800;color:{fc};">{val}</div>' if val else "")
+                        + f'<div style="font-size:0.65rem;color:{_sb};margin-top:2px;">{sub}</div>'
+                        f'</div>'
+                    )
+            _info_card_html = (
+                f'<div style="flex:2;min-width:130px;background:{_al};border:1px solid {_bdr};'
+                f'border-radius:12px;padding:0.9rem 1rem;">'
+                f'<div style="font-size:0.68rem;font-weight:700;color:{_a};margin-bottom:8px;">ℹ️ How to read this?</div>'
+                f'<div style="font-size:0.68rem;color:{_sb};line-height:1.6;">'
+                f'Returns are annualised for periods &gt; 1 year.<br><br>'
+                f'Past performance is not indicative of future results.<br><br>'
+                f'<span style="color:{_a};font-weight:600;">Scroll down for deeper analysis ↓</span>'
+                f'</div></div>'
+            )
+            st.markdown(
+                f'<div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;">'
+                f'{_metric_cards_html}{_info_card_html}</div>',
+                unsafe_allow_html=True,
+            )
             st.markdown("<br>", unsafe_allow_html=True)
 
             # ── Section 2: Risk & Efficiency ────────────────────────────────
