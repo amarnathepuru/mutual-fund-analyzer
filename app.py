@@ -5667,12 +5667,16 @@ def page_stock_explorer():
     st.markdown("## Stock Explorer")
     st.markdown(
         f"<p style='color:{t['body']};margin-top:-0.5rem;margin-bottom:1.5rem;'>"
-        "Select any stock to see which funds hold it, their exposure levels, and historical allocation trends. "
-        "For informational and analytical purposes only — not investment advice.</p>",
+        "Select any stock to see which funds hold it, how much they allocate, and whether managers "
+        "are buying more or trimming. For informational purposes only — not investment advice.</p>",
         unsafe_allow_html=True,
     )
 
-    all_stocks = sorted(holdings["stock_name"].unique().tolist())
+    _a   = t["a"];   _al  = t["al"];  _bg  = t["bg"]
+    _bdr = t["bdr"]; _bd  = t["body"]; _hd = t["head"]
+    _cd  = t["card"]; _sb = t["sub"]
+
+    all_stocks  = sorted(holdings["stock_name"].unique().tolist())
     preselected = st.session_state.pop("preselected_stock", "")
     default_idx = all_stocks.index(preselected) if preselected in all_stocks else 0
 
@@ -5682,187 +5686,305 @@ def page_stock_explorer():
 
     stock_df = holdings[holdings["stock_name"] == selected_stock].sort_values(
         "allocation_percent", ascending=False
-    )
+    ).reset_index(drop=True)
+
     n_holding   = len(stock_df)
     avg_alloc   = stock_df["allocation_percent"].mean()
     max_alloc   = stock_df["allocation_percent"].max()
     max_fund    = stock_df.loc[stock_df["allocation_percent"].idxmax(), "fund_name"]
     sector      = stock_df["sector"].mode().iloc[0] if not stock_df.empty else "—"
     total_funds = holdings["fund_name"].nunique()
+    avg_3m      = stock_df["change_3m_percent"].mean()
 
-    # Metric row
+    # ── 4 metric cards ──────────────────────────────────────────────────────────
     c1, c2, c3, c4 = st.columns(4)
     for col, val, label, sub in [
         (c1, str(n_holding),        "Funds Holding",      f"Out of {total_funds} funds"),
-        (c2, f"{avg_alloc:.2f}%",   "Avg Allocation",     "Average across holding funds"),
-        (c3, f"{max_alloc:.2f}%",   "Highest Allocation", max_fund[:28]),
+        (c2, f"{avg_alloc:.2f}%",   "Avg Allocation",     "Across holding funds"),
+        (c3, f"{max_alloc:.2f}%",   "Highest Conviction", display_name(max_fund, 24)),
         (c4, sector.title(),        "Sector",             "Primary classification"),
     ]:
         with col:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-value" style="font-size:1.65rem;">{val}</div>
-                <div class="metric-label">{label}</div>
-                <div class="metric-sub">{sub}</div>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="metric-card">'
+                f'<div class="metric-value" style="font-size:1.65rem;">{val}</div>'
+                f'<div class="metric-label">{label}</div>'
+                f'<div class="metric-sub">{sub}</div>'
+                f'</div>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Allocation bar chart
-    fig = px.bar(
-        stock_df,
-        x="allocation_percent", y="fund_name", orientation="h",
-        color="allocation_percent",
-        color_continuous_scale=[[0, "rgba(124,58,237,0.2)"], [1, "#A78BFA"]],
-        labels={"allocation_percent": "Allocation %", "fund_name": ""},
-        title=f"{selected_stock} — Allocation Across Funds",
-        text="allocation_percent",
-    )
-    fig.update_traces(texttemplate="%{text:.2f}%", textposition="outside",
-                      textfont=dict(color="#CBD5E1", size=11))
-    fig.update_layout(
-        **_dark_layout(
-            height=max(300, n_holding * 44),
-            margin=dict(l=10, r=70, t=45, b=20),
-            showlegend=False,
-            coloraxis_showscale=False,
-            title_font=dict(color="#E2E8F0", size=14, family="Inter, sans-serif"),
-            yaxis=dict(categoryorder="total ascending", tickfont=_CHART_TICK, showgrid=False),
-            xaxis=_dark_xaxis(showgrid=True, gridcolor=_CHART_GRID),
+    # ── Two-column main layout ───────────────────────────────────────────────────
+    col_left, col_right = st.columns([2, 3], gap="large")
+
+    # ── LEFT: ranked fund card strip ─────────────────────────────────────────────
+    with col_left:
+        st.markdown(
+            f'<div class="section-title">Fund Rankings</div>'
+            f'<div class="section-sub">Sorted by allocation — highest conviction first</div>',
+            unsafe_allow_html=True,
         )
-    )
-    st.plotly_chart(fig, use_container_width=True)
 
-    # Fund breakdown table
-    st.markdown('<div class="section-title">Fund-level Breakdown</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="section-sub">Allocation % and 3M / 6M / 1Y allocation changes per fund</div>',
-        unsafe_allow_html=True,
-    )
-
-    display_df = stock_df[[
-        "fund_name", "allocation_percent",
-        "sector", "change_3m_percent", "change_6m_percent", "change_1y_percent",
-    ]].copy()
-
-    # Shorten fund names so the table fits without horizontal scroll
-    display_df["fund_name"] = display_df["fund_name"].apply(display_name)
-
-    def _trend_arrow(row):
-        try:
-            v3 = float(row["change_3m_percent"])
-            v6 = float(row["change_6m_percent"])
-            v1 = float(row["change_1y_percent"])
-            if v3 >= v6 >= v1:
-                return "↑"
-            elif v3 <= v6 <= v1:
-                return "↓"
+        def _trend_chip(row):
+            try:
+                v3 = float(row["change_3m_percent"])
+                v6 = float(row["change_6m_percent"])
+            except Exception:
+                return ("—", "#94A3B8", "No history")
+            if v3 > 0.3:
+                return ("↑ Buying", "#059669", "Managers adding")
+            elif v3 < -0.3:
+                return ("↓ Trimming", "#DC2626", "Managers reducing")
             else:
-                return "→"
-        except Exception:
-            return "—"
+                return ("→ Holding", "#6366F1", "Allocation steady")
 
-    display_df.insert(1, "Trend", display_df.apply(_trend_arrow, axis=1))
-    display_df.columns = ["Fund", "Trend", "Alloc %", "Sector", "3M Δ%", "6M Δ%", "1Y Δ%"]
+        max_bar = stock_df["allocation_percent"].max()
+        cards_html = ""
+        for i, row in stock_df.iterrows():
+            fn        = display_name(row["fund_name"], 30)
+            alloc     = row["allocation_percent"]
+            bar_w     = int(alloc / max_bar * 100) if max_bar > 0 else 0
+            chip_txt, chip_col, chip_tip = _trend_chip(row)
+            cat       = str(row.get("category", "")).replace("nan", "")
+            rank_col  = _a if i == 0 else (_sb if i >= 5 else _hd)
 
-    # Split rows that have change data vs those that don't
-    has_changes  = display_df[["3M Δ%", "6M Δ%", "1Y Δ%"]].notna().any(axis=1)
-    df_with_data = display_df[has_changes].reset_index(drop=True)
-    df_no_data   = display_df[~has_changes].reset_index(drop=True)
+            cards_html += (
+                f'<div style="background:{_cd};border:1px solid {_bdr};border-radius:10px;'
+                f'padding:10px 12px;margin-bottom:6px;">'
+                # rank + fund name + chip
+                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+                f'<span style="font-size:0.7rem;font-weight:700;color:{rank_col};'
+                f'min-width:20px;">#{i+1}</span>'
+                f'<span style="font-size:0.78rem;font-weight:600;color:{_hd};flex:1;'
+                f'line-height:1.3;">{fn}</span>'
+                f'<span style="font-size:0.62rem;font-weight:600;color:{chip_col};'
+                f'background:{chip_col}18;border-radius:20px;padding:2px 7px;white-space:nowrap;">'
+                f'{chip_txt}</span>'
+                f'</div>'
+                # allocation bar
+                f'<div style="display:flex;align-items:center;gap:8px;">'
+                f'<div style="flex:1;height:5px;border-radius:3px;background:{_bdr};">'
+                f'<div style="width:{bar_w}%;height:100%;border-radius:3px;background:{_a};"></div>'
+                f'</div>'
+                f'<span style="font-size:0.72rem;font-weight:700;color:{_a};min-width:38px;'
+                f'text-align:right;">{alloc:.2f}%</span>'
+                f'</div>'
+                + (f'<div style="font-size:0.6rem;color:{_sb};margin-top:4px;">{cat}</div>' if cat else '')
+                + f'</div>'
+            )
 
-    max_alloc_val = float(display_df["Alloc %"].max()) * 1.25
+        st.markdown(
+            f'<div style="max-height:520px;overflow-y:auto;padding-right:4px;">{cards_html}</div>',
+            unsafe_allow_html=True,
+        )
 
-    col_cfg = {
-        "Fund":    st.column_config.TextColumn("Fund",         width="medium"),
-        "Trend":   st.column_config.TextColumn("Trend",        width=55,
-                       help="↑ allocation growing · ↓ declining · → stable · — no history"),
-        "Alloc %": st.column_config.ProgressColumn(
-                       "Alloc %", format="%.2f%%",
-                       min_value=0, max_value=max_alloc_val, width="medium"),
-        "Sector":  st.column_config.TextColumn("Sector",       width="small"),
-        "3M Δ%":   st.column_config.NumberColumn("3M Δ%",      format="%+.2f%%", width="small"),
-        "6M Δ%":   st.column_config.NumberColumn("6M Δ%",      format="%+.2f%%", width="small"),
-        "1Y Δ%":   st.column_config.NumberColumn("1Y Δ%",      format="%+.2f%%", width="small"),
-    }
+    # ── RIGHT: two stacked charts ────────────────────────────────────────────────
+    with col_right:
 
-    if not df_with_data.empty:
+        # Chart 1 — Category breakdown
+        st.markdown(
+            f'<div class="section-title">Which Categories Hold It Most?</div>'
+            f'<div class="section-sub">Average allocation per fund category</div>',
+            unsafe_allow_html=True,
+        )
+        master_tmp = load_master()
+        cat_map = master_tmp.set_index("fund_name")["category"].to_dict() if not master_tmp.empty else {}
+        stock_df["category"] = stock_df["fund_name"].map(cat_map).fillna("Other")
+
+        cat_df = (
+            stock_df.groupby("category")
+            .agg(avg_alloc=("allocation_percent", "mean"), fund_count=("fund_name", "count"))
+            .reset_index()
+            .sort_values("avg_alloc", ascending=True)
+        )
+
+        _CAT_COLORS = {
+            "Large Cap": "#6366F1", "Mid Cap": "#F59E0B", "Small Cap": "#10B981",
+            "Large & Mid Cap": "#06B6D4", "Multi Cap": "#8B5CF6",
+            "Flexi Cap": "#F472B6", "ELSS": "#34D399", "Other": "#94A3B8",
+        }
+        bar_colors = [_CAT_COLORS.get(c, "#94A3B8") for c in cat_df["category"]]
+
+        fig_cat = go.Figure(go.Bar(
+            x=cat_df["avg_alloc"], y=cat_df["category"], orientation="h",
+            marker_color=bar_colors, marker_line_width=0,
+            text=[f'{v:.2f}%  ({int(n)} fund{"s" if n > 1 else ""})' for v, n in
+                  zip(cat_df["avg_alloc"], cat_df["fund_count"])],
+            textposition="outside",
+            textfont=dict(size=11, color=_bd),
+        ))
+        fig_cat.update_layout(**_dark_layout(
+            height=max(200, len(cat_df) * 42 + 40),
+            margin=dict(l=10, r=120, t=10, b=10),
+            xaxis=_dark_xaxis(showgrid=True, gridcolor=_CHART_GRID),
+            yaxis=dict(tickfont=dict(size=11, color=_bd), showgrid=False),
+        ))
+        st.plotly_chart(fig_cat, use_container_width=True)
+
+        # Chart 2 — Conviction map
+        st.markdown(
+            f'<div class="section-title">Conviction Map</div>'
+            f'<div class="section-sub">'
+            f'Each dot = one fund. X = how much they hold · Y = whether they\'re buying or selling'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        scatter_df = stock_df.dropna(subset=["change_3m_percent"]).copy()
+        scatter_df["short_name"] = scatter_df["fund_name"].apply(lambda n: display_name(n, 28))
+
+        if not scatter_df.empty:
+            _dot_colors = [
+                "#059669" if v > 0.3 else "#DC2626" if v < -0.3 else "#6366F1"
+                for v in scatter_df["change_3m_percent"]
+            ]
+            fig_sc = go.Figure(go.Scatter(
+                x=scatter_df["allocation_percent"],
+                y=scatter_df["change_3m_percent"],
+                mode="markers+text",
+                marker=dict(size=10, color=_dot_colors, line=dict(width=1, color=_bg)),
+                text=scatter_df["short_name"],
+                textposition="top center",
+                textfont=dict(size=9, color=_bd),
+                hovertemplate=(
+                    "<b>%{text}</b><br>"
+                    "Allocation: %{x:.2f}%<br>"
+                    "3M Change: %{y:+.2f}%<extra></extra>"
+                ),
+            ))
+            fig_sc.add_hline(y=0, line_dash="dot", line_color=_bdr, line_width=1)
+            fig_sc.update_layout(**_dark_layout(
+                height=300,
+                margin=dict(l=10, r=10, t=10, b=40),
+                xaxis=_dark_xaxis(
+                    showgrid=True, gridcolor=_CHART_GRID,
+                    title="Allocation %", title_font=dict(size=11, color=_sb),
+                ),
+                yaxis=_dark_yaxis(
+                    title="3M Change %", title_font=dict(size=11, color=_sb),
+                ),
+                showlegend=False,
+            ))
+            # Quadrant labels
+            x_mid = scatter_df["allocation_percent"].median()
+            fig_sc.add_annotation(
+                x=scatter_df["allocation_percent"].max(), y=scatter_df["change_3m_percent"].max(),
+                text="High conviction · Buying more", showarrow=False,
+                font=dict(size=9, color="#059669"), xanchor="right",
+            )
+            fig_sc.add_annotation(
+                x=scatter_df["allocation_percent"].max(), y=scatter_df["change_3m_percent"].min(),
+                text="High conviction · Trimming", showarrow=False,
+                font=dict(size=9, color="#DC2626"), xanchor="right",
+            )
+            st.plotly_chart(fig_sc, use_container_width=True)
+        else:
+            st.markdown(
+                f'<div style="background:{_cd};border:1px solid {_bdr};border-radius:10px;'
+                f'padding:2rem;text-align:center;color:{_sb};font-size:0.82rem;">'
+                f'No 3-month trend data available for this stock.</div>',
+                unsafe_allow_html=True,
+            )
+
+    # ── Full breakdown — collapsible ─────────────────────────────────────────────
+    st.markdown("<br>", unsafe_allow_html=True)
+    with st.expander(f"📋 Full breakdown — all {n_holding} funds with allocation & trend data"):
+        display_df = stock_df[[
+            "fund_name", "allocation_percent",
+            "category", "change_3m_percent", "change_6m_percent", "change_1y_percent",
+        ]].copy()
+        display_df["fund_name"] = display_df["fund_name"].apply(display_name)
+
+        def _trend_arrow(row):
+            try:
+                v3 = float(row["change_3m_percent"])
+                v6 = float(row["change_6m_percent"])
+                if v3 >= v6:
+                    return "↑"
+                else:
+                    return "↓"
+            except Exception:
+                return "—"
+
+        display_df.insert(1, "Trend", display_df.apply(_trend_arrow, axis=1))
+        display_df.columns = ["Fund", "Trend", "Alloc %", "Category", "3M Δ%", "6M Δ%", "1Y Δ%"]
+        max_alloc_val = float(display_df["Alloc %"].max()) * 1.25
         st.dataframe(
-            df_with_data,
+            display_df,
             use_container_width=True,
             hide_index=True,
-            height=min(560, 36 * len(df_with_data) + 38),
-            column_config=col_cfg,
+            height=min(500, 36 * len(display_df) + 38),
+            column_config={
+                "Fund":     st.column_config.TextColumn("Fund",     width="medium"),
+                "Trend":    st.column_config.TextColumn("Trend",    width=55),
+                "Alloc %":  st.column_config.ProgressColumn(
+                                "Alloc %", format="%.2f%%",
+                                min_value=0, max_value=max_alloc_val, width="medium"),
+                "Category": st.column_config.TextColumn("Category", width="small"),
+                "3M Δ%":    st.column_config.NumberColumn("3M Δ%",  format="%+.2f%%", width="small"),
+                "6M Δ%":    st.column_config.NumberColumn("6M Δ%",  format="%+.2f%%", width="small"),
+                "1Y Δ%":    st.column_config.NumberColumn("1Y Δ%",  format="%+.2f%%", width="small"),
+            },
         )
 
-    if not df_no_data.empty:
-        with st.expander(f"⚠ {len(df_no_data)} fund{'s' if len(df_no_data) > 1 else ''} with no allocation history"):
-            st.caption(
-                "These funds hold the stock but have no 3M/6M/1Y change data — "
-                "likely a recent addition to their portfolio."
-            )
-            st.dataframe(
-                df_no_data[["Fund", "Alloc %", "Sector"]],
-                use_container_width=True,
-                hide_index=True,
-                height=min(300, 36 * len(df_no_data) + 38),
-                column_config={
-                    "Fund":    st.column_config.TextColumn("Fund",   width="medium"),
-                    "Alloc %": st.column_config.ProgressColumn(
-                                   "Alloc %", format="%.2f%%",
-                                   min_value=0, max_value=max_alloc_val, width="medium"),
-                    "Sector":  st.column_config.TextColumn("Sector", width="small"),
-                },
-            )
-
-    # Insights
+    # ── Insights ─────────────────────────────────────────────────────────────────
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown('<div class="section-title">Insights</div>', unsafe_allow_html=True)
 
     coverage = n_holding / total_funds * 100
     if coverage >= 80:
-        st.markdown(f"""<div class="insight-card insight-alert">
-            <div class="insight-icon">⚠️</div>
-            <div class="insight-text"><strong>High Concentration Risk</strong> — {selected_stock} appears in
-            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage). Investors holding multiple funds
-            across categories likely have significant overlapping exposure to this stock.</div></div>""",
+        st.markdown(
+            f'<div class="insight-card insight-alert"><div class="insight-icon">⚠️</div>'
+            f'<div class="insight-text"><strong>Very widely held</strong> — {selected_stock} appears '
+            f'in {n_holding} out of {total_funds} funds ({coverage:.0f}%). If you hold multiple funds, '
+            f'you almost certainly have a large hidden position in this stock across all of them.</div></div>',
             unsafe_allow_html=True)
     elif coverage >= 50:
-        st.markdown(f"""<div class="insight-card insight-warning">
-            <div class="insight-icon">📊</div>
-            <div class="insight-text"><strong>Moderate Coverage</strong> — {selected_stock} is held by
-            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage), a moderately common
-            holding across the registry.</div></div>""", unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="insight-card insight-warning"><div class="insight-icon">📊</div>'
+            f'<div class="insight-text"><strong>Commonly held</strong> — {selected_stock} shows up in '
+            f'{n_holding} of {total_funds} funds ({coverage:.0f}%). Worth checking how much total '
+            f'exposure you have across your own funds.</div></div>',
+            unsafe_allow_html=True)
     else:
-        st.markdown(f"""<div class="insight-card insight-info">
-            <div class="insight-icon">🔍</div>
-            <div class="insight-text"><strong>Selective Holding</strong> — {selected_stock} appears in only
-            {n_holding}/{total_funds} funds ({coverage:.0f}% coverage), indicating a selective conviction
-            pick rather than a consensus position.</div></div>""", unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="insight-card insight-info"><div class="insight-icon">🔍</div>'
+            f'<div class="insight-text"><strong>Selective pick</strong> — Only {n_holding} of '
+            f'{total_funds} funds hold {selected_stock} ({coverage:.0f}%). Funds that do hold it '
+            f'are making a more deliberate, high-conviction bet.</div></div>',
+            unsafe_allow_html=True)
 
     alloc_spread = stock_df["allocation_percent"].max() - stock_df["allocation_percent"].min()
     if alloc_spread > 3:
-        st.markdown(f"""<div class="insight-card insight-info">
-            <div class="insight-icon">📐</div>
-            <div class="insight-text"><strong>Wide Allocation Spread</strong> — Allocation ranges from
-            {stock_df["allocation_percent"].min():.2f}% to {stock_df["allocation_percent"].max():.2f}%
-            (spread: {alloc_spread:.2f}%), reflecting significantly different conviction levels among
-            fund managers.</div></div>""", unsafe_allow_html=True)
-
-    avg_3m = stock_df["change_3m_percent"].mean()
-    if not pd.isna(avg_3m):
-        direction = "increasing" if avg_3m > 0.1 else "decreasing" if avg_3m < -0.1 else "stable"
-        icon      = "📈" if avg_3m > 0.1 else "📉" if avg_3m < -0.1 else "➡️"
-        ctype     = "insight-success" if avg_3m > 0.1 else "insight-warning" if avg_3m < -0.1 else "insight-info"
-        st.markdown(f"""<div class="insight-card {ctype}">
-            <div class="insight-icon">{icon}</div>
-            <div class="insight-text"><strong>3-Month Trend</strong> — Average allocation to
-            {selected_stock} has been {direction} over the last 3 months
-            (avg change: {avg_3m:+.2f}%) across holding funds.</div></div>""",
+        st.markdown(
+            f'<div class="insight-card insight-info"><div class="insight-icon">📐</div>'
+            f'<div class="insight-text"><strong>Very different conviction levels</strong> — Allocation '
+            f'ranges from {stock_df["allocation_percent"].min():.2f}% to '
+            f'{stock_df["allocation_percent"].max():.2f}% ({alloc_spread:.2f}% spread). Some fund '
+            f'managers see this as a top bet; others hold just a token position.</div></div>',
             unsafe_allow_html=True)
 
-    st.markdown("""<div class="disclaimer">
-        Stock exposure data is for informational and analytical purposes only — not investment advice.
-        Data sourced from ETMoney.</div>""", unsafe_allow_html=True)
+    if not pd.isna(avg_3m):
+        if avg_3m > 0.1:
+            st.markdown(
+                f'<div class="insight-card insight-success"><div class="insight-icon">📈</div>'
+                f'<div class="insight-text"><strong>Managers are buying more</strong> — On average, '
+                f'funds have increased their allocation to {selected_stock} by '
+                f'<strong>{avg_3m:+.2f}%</strong> over the past 3 months — a signal of rising '
+                f'confidence among fund managers.</div></div>',
+                unsafe_allow_html=True)
+        elif avg_3m < -0.1:
+            st.markdown(
+                f'<div class="insight-card insight-warning"><div class="insight-icon">📉</div>'
+                f'<div class="insight-text"><strong>Managers are trimming</strong> — On average, '
+                f'funds have reduced their allocation to {selected_stock} by '
+                f'<strong>{avg_3m:+.2f}%</strong> over the past 3 months — a sign that fund managers '
+                f'are becoming more cautious on this stock.</div></div>',
+                unsafe_allow_html=True)
+
+    st.markdown(
+        '<div class="disclaimer">Stock exposure data is for informational and analytical purposes '
+        'only — not investment advice. Data sourced from ETMoney.</div>',
+        unsafe_allow_html=True)
 
 
 # ── PAGE: OVERLAP DRILLDOWN ───────────────────────────────────────────────────
