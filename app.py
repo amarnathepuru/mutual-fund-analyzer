@@ -5824,75 +5824,100 @@ def page_stock_explorer():
         ))
         st.plotly_chart(fig_cat, use_container_width=True)
 
-        # Chart 2 — Category allocation trend over time
+        # Chart 2 — Small multiples: one mini sparkline per category
         st.markdown(
             f'<div class="section-title" style="margin-top:1rem;">How Has Each Category\'s Holding Changed?</div>'
-            f'<div class="section-sub">Average allocation per category reconstructed across 4 time points</div>',
+            f'<div class="section-sub">Average % of fund portfolio in this stock — across 4 time points</div>',
             unsafe_allow_html=True,
         )
 
         _time_labels = ["1Y ago", "6M ago", "3M ago", "Now"]
-        trend_rows = []
-        for _, row in stock_df.iterrows():
-            cat = str(row.get("category", "Other")).replace("nan", "Other")
-            cur = row["allocation_percent"]
-            try:
-                d3 = cur - float(row["change_3m_percent"])
-            except Exception:
-                d3 = None
-            try:
-                d6 = cur - float(row["change_6m_percent"])
-            except Exception:
-                d6 = None
-            try:
-                d1y = cur - float(row["change_1y_percent"])
-            except Exception:
-                d1y = None
-            trend_rows.append({"category": cat, "1Y ago": d1y, "6M ago": d6, "3M ago": d3, "Now": cur})
-
-        trend_df = pd.DataFrame(trend_rows)
-        cat_trend = trend_df.groupby("category")[_time_labels].mean().reset_index()
-        # Only keep categories with at least some non-null history
-        cat_trend = cat_trend.dropna(subset=["1Y ago", "6M ago", "3M ago"], how="all")
-
+        _period_map  = {"1Y ago": "1 year", "6M ago": "6 months", "3M ago": "3 months"}
         _CAT_COLORS_LINE = {
             "Large Cap": "#6366F1", "Mid Cap": "#F59E0B", "Small Cap": "#10B981",
             "Large & Mid Cap": "#06B6D4", "Multi Cap": "#8B5CF6",
             "Flexi Cap": "#F472B6", "ELSS": "#34D399", "Other": "#94A3B8",
         }
 
-        fig_trend = go.Figure()
-        for _, crow in cat_trend.iterrows():
-            cat  = crow["category"]
-            col  = _CAT_COLORS_LINE.get(cat, "#94A3B8")
-            vals = [crow[t] for t in _time_labels]
-            # Only plot time points that have data
-            x_pts = [t for t, v in zip(_time_labels, vals) if pd.notna(v)]
-            y_pts = [v for v in vals if pd.notna(v)]
-            if len(x_pts) < 2:
-                continue
-            fig_trend.add_trace(go.Scatter(
-                x=x_pts, y=y_pts, mode="lines+markers",
-                name=cat,
-                line=dict(color=col, width=2.5),
-                marker=dict(size=7, color=col, line=dict(width=1.5, color=_bg)),
-                hovertemplate=f"<b>{cat}</b><br>%{{x}}: %{{y:.2f}}%<extra></extra>",
-            ))
+        trend_rows = []
+        for _, row in stock_df.iterrows():
+            cat = str(row.get("category", "Other")).replace("nan", "Other")
+            cur = row["allocation_percent"]
+            try:    d3  = cur - float(row["change_3m_percent"])
+            except: d3  = None
+            try:    d6  = cur - float(row["change_6m_percent"])
+            except: d6  = None
+            try:    d1y = cur - float(row["change_1y_percent"])
+            except: d1y = None
+            trend_rows.append({"category": cat, "1Y ago": d1y, "6M ago": d6, "3M ago": d3, "Now": cur})
 
-        fig_trend.update_layout(**_dark_layout(
-            height=280,
-            margin=dict(l=10, r=10, t=10, b=10),
-            xaxis=_dark_xaxis(showgrid=False),
-            yaxis=_dark_yaxis(
-                title="Avg allocation %", title_font=dict(size=10, color=_sb),
-                gridcolor=_CHART_GRID,
-            ),
-            legend=dict(
-                orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0,
-                font=dict(size=10, color=_bd), bgcolor="rgba(0,0,0,0)",
-            ),
-        ))
-        st.plotly_chart(fig_trend, use_container_width=True)
+        trend_df  = pd.DataFrame(trend_rows)
+        cat_trend = trend_df.groupby("category")[_time_labels].mean().reset_index()
+        cat_trend = cat_trend.dropna(subset=["1Y ago", "6M ago", "3M ago"], how="all")
+        cats_list = cat_trend.to_dict("records")
+
+        _COLS_PER_ROW = 3
+        for _rs in range(0, len(cats_list), _COLS_PER_ROW):
+            _row_cats = cats_list[_rs : _rs + _COLS_PER_ROW]
+            _scols    = st.columns(_COLS_PER_ROW)
+            for _ci, _crow in enumerate(_row_cats):
+                with _scols[_ci]:
+                    _cat   = _crow["category"]
+                    _col_c = _CAT_COLORS_LINE.get(_cat, "#94A3B8")
+                    _xpts  = [t for t in _time_labels if pd.notna(_crow.get(t))]
+                    _ypts  = [_crow[t] for t in _time_labels if pd.notna(_crow.get(t))]
+                    if len(_xpts) < 2:
+                        continue
+                    _change      = _ypts[-1] - _ypts[0]
+                    _ch_col      = "#059669" if _change >= 0 else "#DC2626"
+                    _period_lbl  = _period_map.get(_xpts[0], "the period")
+                    _change_str  = f"{'+' if _change >= 0 else ''}{_change:.2f}% over {_period_lbl}"
+
+                    _fig_m = go.Figure()
+                    _fig_m.add_trace(go.Scatter(
+                        x=_xpts, y=_ypts,
+                        mode="lines+markers",
+                        line=dict(color=_col_c, width=2.5),
+                        marker=dict(size=6, color=_col_c,
+                                    line=dict(width=1.5, color=_cd)),
+                        fill="tozeroy",
+                        fillcolor=_col_c + "28",
+                        hovertemplate="%{x}: <b>%{y:.2f}%</b><extra></extra>",
+                    ))
+                    _fig_m.update_layout(
+                        paper_bgcolor=_cd,
+                        plot_bgcolor="rgba(0,0,0,0)",
+                        font=dict(family="Inter, sans-serif"),
+                        height=165,
+                        margin=dict(l=8, r=8, t=54, b=8),
+                        showlegend=False,
+                        xaxis=dict(showticklabels=False, showgrid=False,
+                                   showline=False, zeroline=False),
+                        yaxis=dict(showticklabels=False, showgrid=False,
+                                   showline=False, zeroline=False),
+                        annotations=[
+                            dict(
+                                text=f"<b>{_cat}</b>",
+                                x=0, y=1, xref="paper", yref="paper",
+                                xanchor="left", yanchor="bottom",
+                                showarrow=False,
+                                font=dict(size=12, color=_hd,
+                                          family="Inter, sans-serif"),
+                                yshift=28,
+                            ),
+                            dict(
+                                text=_change_str,
+                                x=0, y=1, xref="paper", yref="paper",
+                                xanchor="left", yanchor="bottom",
+                                showarrow=False,
+                                font=dict(size=10, color=_ch_col,
+                                          family="Inter, sans-serif"),
+                                yshift=8,
+                            ),
+                        ],
+                    )
+                    st.plotly_chart(_fig_m, use_container_width=True,
+                                    config={"displayModeBar": False})
 
 
     # ── Full breakdown — collapsible ─────────────────────────────────────────────
