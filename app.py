@@ -6008,54 +6008,126 @@ def page_stock_explorer():
     st.markdown('<div class="section-title">Insights</div>', unsafe_allow_html=True)
 
     coverage = n_holding / total_funds * 100
+
+    # 1. Coverage / market consensus
     if coverage >= 80:
         st.markdown(
             f'<div class="insight-card insight-alert"><div class="insight-icon">⚠️</div>'
-            f'<div class="insight-text"><strong>Very widely held</strong> — {selected_stock} appears '
-            f'in {n_holding} out of {total_funds} funds ({coverage:.0f}%). If you hold multiple funds, '
-            f'you almost certainly have a large hidden position in this stock across all of them.</div></div>',
+            f'<div class="insight-text"><strong>Near-universal holding — {n_holding}/{total_funds} funds ({coverage:.0f}%)</strong> — '
+            f'{selected_stock} is owned by almost every fund in this dataset. If you hold multiple funds, '
+            f'your actual combined exposure to this stock is likely much larger than any single fund\'s number shows. '
+            f'Open <strong>Who holds it</strong> above to see each fund\'s position size.</div></div>',
             unsafe_allow_html=True)
     elif coverage >= 50:
         st.markdown(
             f'<div class="insight-card insight-warning"><div class="insight-icon">📊</div>'
-            f'<div class="insight-text"><strong>Commonly held</strong> — {selected_stock} shows up in '
-            f'{n_holding} of {total_funds} funds ({coverage:.0f}%). Worth checking how much total '
-            f'exposure you have across your own funds.</div></div>',
+            f'<div class="insight-text"><strong>Held by most funds — {n_holding}/{total_funds} ({coverage:.0f}%)</strong> — '
+            f'{selected_stock} is a popular pick in this segment. Investors holding 2+ funds very likely '
+            f'own it through multiple routes, amplifying their real exposure. '
+            f'Check <strong>Who holds it</strong> above to assess combined weight.</div></div>',
+            unsafe_allow_html=True)
+    elif coverage >= 25:
+        st.markdown(
+            f'<div class="insight-card insight-info"><div class="insight-icon">🔍</div>'
+            f'<div class="insight-text"><strong>Selectively held — {n_holding}/{total_funds} funds ({coverage:.0f}%)</strong> — '
+            f'{selected_stock} is not a broad-market consensus pick. The funds that own it are making '
+            f'a more deliberate, focused bet. See <strong>Which categories hold it</strong> to identify '
+            f'which fund types favour this name.</div></div>',
             unsafe_allow_html=True)
     else:
         st.markdown(
             f'<div class="insight-card insight-info"><div class="insight-icon">🔍</div>'
-            f'<div class="insight-text"><strong>Selective pick</strong> — Only {n_holding} of '
-            f'{total_funds} funds hold {selected_stock} ({coverage:.0f}%). Funds that do hold it '
-            f'are making a more deliberate, high-conviction bet.</div></div>',
+            f'<div class="insight-text"><strong>High-conviction minority pick — {n_holding}/{total_funds} funds ({coverage:.0f}%)</strong> — '
+            f'Very few funds hold {selected_stock}. Those that do are making a strong, deliberate bet '
+            f'that most others skip. See <strong>Which categories hold it</strong> to identify which '
+            f'fund types favour this name.</div></div>',
             unsafe_allow_html=True)
 
+    # 2. Top holder standout
+    if n_holding > 1 and _top_alloc > avg_alloc * 1.8:
+        st.markdown(
+            f'<div class="insight-card insight-info"><div class="insight-icon">🎯</div>'
+            f'<div class="insight-text"><strong>{_top_fn} has an outsized position</strong> — at '
+            f'<strong>{_top_alloc:.2f}%</strong>, it holds nearly double the average of '
+            f'<strong>{avg_alloc:.2f}%</strong> across all funds holding this stock. '
+            f'This fund has significantly higher conviction in {selected_stock} than its peers.</div></div>',
+            unsafe_allow_html=True)
+
+    # 3. Allocation spread (conviction disagreement)
     alloc_spread = stock_df["allocation_percent"].max() - stock_df["allocation_percent"].min()
-    if alloc_spread > 3:
+    if alloc_spread > 3 and n_holding > 1:
+        _bot_row   = stock_df.iloc[-1]
+        _bot_fn    = display_name(_bot_row["fund_name"], 28)
+        _bot_alloc = _bot_row["allocation_percent"]
         st.markdown(
             f'<div class="insight-card insight-info"><div class="insight-icon">📐</div>'
-            f'<div class="insight-text"><strong>Very different conviction levels</strong> — Allocation '
-            f'ranges from {stock_df["allocation_percent"].min():.2f}% to '
-            f'{stock_df["allocation_percent"].max():.2f}% ({alloc_spread:.2f}% spread). Some fund '
-            f'managers see this as a top bet; others hold just a token position.</div></div>',
+            f'<div class="insight-text"><strong>Fund managers disagree sharply on how much to hold</strong> — '
+            f'<strong>{_top_fn}</strong> allocates <strong>{_top_alloc:.2f}%</strong> while '
+            f'<strong>{_bot_fn}</strong> holds just <strong>{_bot_alloc:.2f}%</strong> '
+            f'({alloc_spread:.2f}% spread). Some see {selected_stock} as a core holding; '
+            f'others treat it as a small, token position.</div></div>',
             unsafe_allow_html=True)
 
+    # 4. Category concentration
+    if top_cat_row is not None and not cat_df_se.empty and n_holding > 2:
+        _top_cat_name  = top_cat_row["category"]
+        _top_cat_count = int(top_cat_row["fund_count"])
+        _top_cat_pct   = _top_cat_count / n_holding * 100
+        n_cats = len(cat_df_se)
+        if _top_cat_pct >= 60:
+            st.markdown(
+                f'<div class="insight-card insight-info"><div class="insight-icon">🏷️</div>'
+                f'<div class="insight-text"><strong>Dominant in {_top_cat_name} funds</strong> — '
+                f'{_top_cat_count} of {n_holding} funds holding {selected_stock} are {_top_cat_name} funds '
+                f'({_top_cat_pct:.0f}%). It\'s a particularly strong pick within this category. '
+                f'See <strong>Which categories</strong> above for the full breakdown.</div></div>',
+                unsafe_allow_html=True)
+        elif n_cats >= 4:
+            _first_cat = cat_df_se["category"].iloc[0]
+            _last_cat  = cat_df_se["category"].iloc[-1]
+            st.markdown(
+                f'<div class="insight-card insight-success"><div class="insight-icon">🌐</div>'
+                f'<div class="insight-text"><strong>Broad consensus across {n_cats} fund categories</strong> — '
+                f'{selected_stock} is held across fund types from {_first_cat} to {_last_cat}. '
+                f'Agreement across different fund styles is a stronger signal than concentration in one category alone.</div></div>',
+                unsafe_allow_html=True)
+
+    # 5. Momentum with 6M context
+    avg_6m = stock_df["change_6m_percent"].mean() if "change_6m_percent" in stock_df.columns else float("nan")
     if not pd.isna(avg_3m):
         if avg_3m > 0.1:
+            if not pd.isna(avg_6m) and avg_6m > 0.1:
+                _trend_txt = (
+                    f'<strong>Sustained buying — managers have increased their stake for at least 6 months</strong> '
+                    f'(6M avg: <strong>{avg_6m:+.2f}%</strong>, 3M avg: <strong>{avg_3m:+.2f}%</strong>). '
+                    f'A consistent directional move across independent fund managers.'
+                )
+            else:
+                _trend_txt = (
+                    f'<strong>Recent accumulation in {selected_stock}</strong> — funds added an average '
+                    f'<strong>{avg_3m:+.2f}%</strong> over 3 months. '
+                    f'Short-term buying signal without a confirmed 6-month pattern yet.'
+                )
             st.markdown(
                 f'<div class="insight-card insight-success"><div class="insight-icon">📈</div>'
-                f'<div class="insight-text"><strong>Managers are buying more</strong> — On average, '
-                f'funds have increased their allocation to {selected_stock} by '
-                f'<strong>{avg_3m:+.2f}%</strong> over the past 3 months — a signal of rising '
-                f'confidence among fund managers.</div></div>',
+                f'<div class="insight-text">{_trend_txt}</div></div>',
                 unsafe_allow_html=True)
         elif avg_3m < -0.1:
+            if not pd.isna(avg_6m) and avg_6m < -0.1:
+                _trend_txt = (
+                    f'<strong>Sustained trimming — managers have been cutting their stake for at least 6 months</strong> '
+                    f'(6M avg: <strong>{avg_6m:+.2f}%</strong>, 3M avg: <strong>{avg_3m:+.2f}%</strong>). '
+                    f'A consistent signal of reduced conviction across independent fund managers.'
+                )
+            else:
+                _trend_txt = (
+                    f'<strong>Recent trimming in {selected_stock}</strong> — funds cut their stake by an average '
+                    f'<strong>{avg_3m:+.2f}%</strong> over 3 months. '
+                    f'Worth monitoring whether this extends into a longer 6-month pattern.'
+                )
             st.markdown(
                 f'<div class="insight-card insight-warning"><div class="insight-icon">📉</div>'
-                f'<div class="insight-text"><strong>Managers are trimming</strong> — On average, '
-                f'funds have reduced their allocation to {selected_stock} by '
-                f'<strong>{avg_3m:+.2f}%</strong> over the past 3 months — a sign that fund managers '
-                f'are becoming more cautious on this stock.</div></div>',
+                f'<div class="insight-text">{_trend_txt}</div></div>',
                 unsafe_allow_html=True)
 
     st.markdown(
