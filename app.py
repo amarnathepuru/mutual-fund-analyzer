@@ -6139,10 +6139,13 @@ def page_stock_explorer():
 # ── PAGE: OVERLAP DRILLDOWN ───────────────────────────────────────────────────
 
 def page_overlap_drilldown():
+    import json as _json
+    import streamlit.components.v1 as _components
+
     t_name, t = _fl_get_theme()
     _fl_inject_css(t, t_name)
-    _fl_render_navbar(t, t_name, "analyse_funds")
-    _fl_render_breadcrumb([("Home", "home"), ("Analyse Funds", "analyse_funds"), ("Overlap Matrix", None)])
+    _fl_render_navbar(t, t_name, "overlap_drilldown")
+    _fl_render_breadcrumb([("Home", "home"), ("Analyse Funds", "analyse_funds"), ("Fund Cluster Map", None)])
 
     holdings   = load_holdings()
     similarity = load_similarity()
