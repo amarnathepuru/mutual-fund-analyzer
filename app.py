@@ -2087,6 +2087,12 @@ def page_compare():
         st.warning("Please select at least 2 funds to compare.")
         return
 
+    if st.session_state.get("overlap_matrix_return"):
+        if st.button("← Back to Overlap matrix", type="secondary", key="compare_back_overlap"):
+            st.session_state.overlap_matrix_return = False
+            st.session_state.page = "overlap_drilldown"
+            st.rerun()
+
     holdings   = load_holdings()
     similarity = load_similarity()
     master     = load_master()
@@ -6136,218 +6142,1015 @@ def page_stock_explorer():
         unsafe_allow_html=True)
 
 
-# ── PAGE: OVERLAP DRILLDOWN ───────────────────────────────────────────────────
+# ── PAGE: OVERLAP MATRIX ────────────────────────────────────────────────────────
+
+
+def _overlap_theme_dict(t, t_name):
+    return {**t, "is_dark": t_name == "dark_premium"}
+
+
+def _overlap_init_session():
+    if "overlap_matrix_selected_funds" not in st.session_state:
+        legacy = st.session_state.pop("overlap_matrix_selected_fund", "")
+        st.session_state.overlap_matrix_selected_funds = [legacy] if legacy else []
+    if "overlap_matrix_return_period" not in st.session_state:
+        st.session_state.overlap_matrix_return_period = "1Y"
+    if "overlap_matrix_min_return" not in st.session_state:
+        st.session_state.overlap_matrix_min_return = 0
+
+
+def _overlap_pick_fund_index(selection, graph):
+    if not selection or not getattr(selection, "points", None):
+        return None
+    pt = selection.points[0]
+    idx = pt.get("point_index", pt.get("pointNumber"))
+    if idx is None or idx < 0 or idx >= len(graph.funds):
+        return None
+    return int(idx)
+
+
+def _overlap_get_ab(allowed: list[str]) -> tuple[str | None, str | None]:
+    sel = [f for f in st.session_state.overlap_matrix_selected_funds if f in allowed]
+    fund_a = sel[0] if len(sel) > 0 else None
+    fund_b = sel[1] if len(sel) > 1 else None
+    return fund_a, fund_b
+
+
+def _overlap_pick_fund(fund: str, allowed: list[str]):
+    """Fund A first, Fund B second; toggle A/B on re-click; new fund replaces B when both set."""
+    if fund not in allowed:
+        return
+    fund_a, fund_b = _overlap_get_ab(allowed)
+    if fund == fund_a:
+        st.session_state.overlap_matrix_selected_funds = []
+    elif fund == fund_b:
+        st.session_state.overlap_matrix_selected_funds = [fund_a] if fund_a else []
+    elif not fund_a:
+        st.session_state.overlap_matrix_selected_funds = [fund]
+    elif not fund_b:
+        st.session_state.overlap_matrix_selected_funds = [fund_a, fund]
+    else:
+        st.session_state.overlap_matrix_selected_funds = [fund_a, fund]
+
+
+def _overlap_go_compare(fund_a: str, fund_b: str):
+    st.session_state.selected_funds = [fund_a, fund_b]
+    st.session_state.overlap_matrix_return = True
+    st.session_state.page = "compare"
+    st.rerun()
+
+
+@st.cache_data(ttl=3600)
+def _overlap_filtered_graph(category: str, funds_key: tuple[str, ...]):
+    from analytics.overlap_graph import build_category_graph, filter_pairs
+
+    if len(funds_key) < 2:
+        return None
+    similarity = load_similarity()
+    funds = list(funds_key)
+    return build_category_graph(category, funds, filter_pairs(similarity, funds))
+
+
+def _overlap_hex_rgba(hex_color: str, alpha: float) -> str:
+    h = hex_color.lstrip("#")
+    if len(h) != 6:
+        return f"rgba(37,99,235,{alpha})"
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"rgba({r},{g},{b},{alpha})"
+
+
+def _overlap_inject_page_css(t: dict, t_name: str):
+    a = t["a"]
+    al = t["al"]
+    bdr = t["bdr"]
+    cd = t["card"]
+    bd = t["body"]
+    hd = t["head"]
+    sb = t["sub"]
+    checked_fg = "#FFFFFF"
+
+    st.markdown(
+        f"""<style>
+/* ── All selectboxes on this page ─────────────────────────────────── */
+[data-testid="stSelectbox"] > div > div,
+[data-testid="stSelectbox"] [data-baseweb="select"] {{
+  background:{cd} !important; border:1.5px solid {bdr} !important;
+  color:{hd} !important; min-height:2rem !important;
+}}
+[data-testid="stSelectbox"] [data-baseweb="select"] span,
+[data-testid="stSelectbox"] [data-baseweb="select"] [data-testid="stText"] {{
+  color:{hd} !important; font-size:0.85rem !important; font-weight:500 !important;
+  opacity:1 !important;
+}}
+[data-testid="stSelectbox"] svg {{ fill:{hd} !important; opacity:0.7 !important; }}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSelectbox"] > div > div {{
+  min-height:2rem !important; padding-top:0 !important; padding-bottom:0 !important;
+}}
+
+/* Toolbar card + theme primary for Return / Min return */
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] {{
+  --primary-color: {a};
+  background:{cd} !important; border:1px solid {bdr} !important;
+  border-radius:12px !important; padding:0.55rem 1rem !important;
+  margin-bottom:0.85rem !important; align-items:center !important;
+  flex-wrap:nowrap !important;
+}}
+/* Align every filter segment vertically */
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {{
+  display:flex !important; align-items:center !important;
+  justify-content:flex-start !important; align-self:center !important;
+}}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stVerticalBlock"] {{
+  justify-content:center !important; gap:0 !important;
+  padding:0 !important; min-height:2rem !important;
+}}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSlider"] {{
+  margin:0 !important; padding:0 !important;
+}}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSelectbox"] {{
+  margin:0 !important;
+}}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSegmentedControl"] {{
+  margin:0 !important; padding:0 !important;
+}}
+
+/* Return period segmented control (toolbar) */
+[data-testid="stColumn"]:has(.ov-period-wrap) [data-testid="stSegmentedControl"] {{
+  background:{cd} !important; border:1px solid {bdr} !important;
+  border-radius:999px !important; padding:2px !important; min-height:2rem !important;
+}}
+[data-testid="stColumn"]:has(.ov-period-wrap) [data-testid="stSegmentedControl"] button {{
+  font-size:0.8rem !important; font-weight:500 !important; color:{hd} !important;
+  background:transparent !important; border:none !important;
+  border-radius:999px !important; padding:4px 14px !important; min-height:1.65rem !important;
+}}
+[data-testid="stColumn"]:has(.ov-period-wrap) [data-testid="stSegmentedControl"] button[aria-checked="true"],
+[data-testid="stColumn"]:has(.ov-period-wrap) [data-testid="stSegmentedControl"] button[aria-pressed="true"] {{
+  background:{a} !important; color:{checked_fg} !important; font-weight:600 !important;
+}}
+
+/* ── Min return slider (toolbar only) ───────────────────────────────── */
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSlider"] [data-baseweb="slider"] {{
+  background:transparent !important;
+}}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSlider"] [data-baseweb="slider"] > div {{
+  background:{bdr} !important;
+}}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSlider"] [data-baseweb="slider"] > div > div {{
+  background:{a} !important;
+}}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSlider"] [role="slider"] {{
+  background:{a} !important; border-color:{a} !important;
+  box-shadow:none !important;
+}}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSlider"] [data-testid="stThumbValue"] {{
+  background:{a} !important; color:{checked_fg} !important;
+  border-color:{a} !important; font-size:0.75rem !important;
+}}
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSlider"] [data-testid="stTickBarMin"],
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSlider"] [data-testid="stTickBarMax"] {{
+  color:{bd} !important;
+}}
+
+.ov-flbl {{
+  font-size:0.8rem; font-weight:600; color:{bd};
+  white-space:nowrap; line-height:1; margin:0; padding:0 0.4rem 0 0;
+  display:flex; align-items:center; height:2rem;
+}}
+.ov-min-val {{
+  font-size:0.8rem; font-weight:700; color:{a};
+  white-space:nowrap; line-height:1; text-align:left;
+  display:flex; align-items:center; height:2rem; margin:0; padding:0;
+}}
+/* Connections selectbox — show its label styled like ov-flbl */
+[data-testid="stColumn"]:has(.ov-period-wrap)
+  [data-testid="stSelectbox"] label {{
+  font-size:0.8rem !important; font-weight:600 !important; color:{bd} !important;
+  margin-bottom:2px !important;
+}}
+/* Unified control typography in toolbar */
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSelectbox"] [data-baseweb="select"],
+[data-testid="stMarkdownContainer"]:has(.ov-tb-sentinel)
+  + [data-testid="stHorizontalBlock"] [data-testid="stSelectbox"] [data-baseweb="select"] span {{
+  font-size:0.8rem !important;
+}}
+
+/* ── Side panel — style the column container via sentinel ─────────── */
+[data-testid="stMarkdownContainer"]:has(.ov-side-sentinel)
+  ~ [data-testid="stVerticalBlock"],
+[data-testid="stMarkdownContainer"]:has(.ov-side-sentinel)
+  + * {{
+  /* no-op: actual styling applied to the column via the rule below */
+}}
+/* Target the stColumn that holds the sentinel + sidebar content */
+[data-testid="stColumn"]:has(.ov-side-sentinel) > [data-testid="stVerticalBlock"] {{
+  background:{cd}; border:1px solid {bdr};
+  border-radius:12px; padding:0.9rem 1rem !important;
+}}
+/* Hide the sentinel element itself (zero height, no padding) */
+[data-testid="stMarkdownContainer"]:has(.ov-side-sentinel) {{
+  display:none !important;
+}}
+.ov-side-hdr {{
+  font-size:0.85rem; font-weight:700; color:{hd};
+  padding-bottom:0.45rem; border-bottom:1px solid {bdr}; margin-bottom:0.7rem;
+}}
+
+/* ── Selection pills ─────────────────────────────────────────────── */
+.ov-pills-row {{
+  display:flex; align-items:stretch; gap:0.45rem; margin-bottom:0.55rem;
+}}
+.ov-pill {{
+  flex:1; border-radius:8px; padding:0.42rem 0.75rem;
+  font-size:0.8rem; font-weight:600; color:{hd};
+  border:1.5px solid transparent; line-height:1.4;
+  min-height:2.2rem; display:flex; align-items:center;
+}}
+.ov-pill-a {{ background:#EEEDFE; border-color:#AFA9EC; color:#3730A3; }}
+.ov-pill-b {{ background:#E1F5EE; border-color:#9FE1CB; color:#065F46; }}
+.ov-empty-slot {{
+  flex:1; border:1.5px dashed {bdr}; border-radius:8px;
+  padding:0.42rem 0.75rem; font-size:0.78rem; color:{sb};
+  min-height:2.2rem; display:flex; align-items:center;
+}}
+.ov-pill-x button {{
+  padding:0 !important; width:24px !important; height:24px !important;
+  min-width:24px !important; border-radius:50% !important;
+  font-size:0.85rem !important; font-weight:700 !important;
+  background:transparent !important; color:{bd} !important;
+  border:1px solid {bdr} !important; line-height:1 !important;
+  flex-shrink:0;
+}}
+.ov-pill-x button:hover {{
+  background:{al} !important; color:{a} !important; border-color:{a} !important;
+}}
+
+/* ── Overlap card ─────────────────────────────────────────────────── */
+.ov-overlap-card {{
+  background:{al}; border:1px solid {bdr}; border-radius:10px;
+  padding:0.8rem 1rem; margin:0.5rem 0 0.7rem;
+}}
+.ov-overlap-score {{
+  font-size:1.5rem; font-weight:800; color:{hd}; line-height:1.15; margin-bottom:0.12rem;
+}}
+.ov-overlap-common {{
+  font-size:0.78rem; color:{bd}; margin-bottom:0.5rem;
+}}
+.ov-verdict-badge {{
+  display:inline-block; font-size:0.72rem; font-weight:700;
+  padding:0.2rem 0.6rem; border-radius:6px; margin-bottom:0.4rem;
+}}
+.ov-verdict-desc {{
+  font-size:0.76rem; color:{bd}; line-height:1.5; margin:0 0 0.5rem;
+}}
+
+/* ── Fund list dropdown ──────────────────────────────────────────── */
+.ov-list-sub {{
+  font-size:0.68rem; font-weight:700; color:{bd};
+  text-transform:uppercase; letter-spacing:0.5px; margin:0.7rem 0 0.3rem;
+}}
+[data-testid="stColumn"]:has(.ov-side-sentinel) [data-testid="stSelectbox"] {{
+  margin-bottom:0.3rem;
+}}
+/* Ensure dropdown text is fully readable */
+[data-testid="stColumn"]:has(.ov-side-sentinel) [data-testid="stSelectbox"] [data-baseweb="select"] span {{
+  color:{hd} !important; font-size:0.85rem !important; font-weight:500 !important;
+}}
+
+/* ── Hint bar ────────────────────────────────────────────────────── */
+.ov-hint {{
+  text-align:center; font-size:0.76rem; color:{sb};
+  margin:0.3rem 0 0.6rem; font-style:italic; line-height:1.4;
+}}
+</style>""",
+        unsafe_allow_html=True,
+    )
+
+
+
+def _overlap_graph_insight(graph, min_edge_pct: float, conn_bucket: str, theme: dict) -> str:
+    """Generate a plain-English insight card based on current graph state."""
+    from analytics.overlap_graph import fund_label, get_edges
+
+    n = len(graph.funds)
+    if n < 2:
+        return ""
+
+    # Build adjacency for connected-component detection
+    edges = get_edges(graph.matrix, min_edge_pct, top_k_per_fund=None)
+    adj: dict[int, set[int]] = {i: set() for i in range(n)}
+    for i, j, _ in edges:
+        adj[i].add(j)
+        adj[j].add(i)
+
+    # BFS connected components
+    visited: set[int] = set()
+    components: list[list[int]] = []
+    for start in range(n):
+        if start in visited:
+            continue
+        comp: list[int] = []
+        queue = [start]
+        while queue:
+            node = queue.pop()
+            if node in visited:
+                continue
+            visited.add(node)
+            comp.append(node)
+            queue.extend(adj[node] - visited)
+        components.append(comp)
+
+    clusters     = [c for c in components if len(c) > 1]
+    isolated     = [c[0] for c in components if len(c) == 1]
+    n_connected  = n - len(isolated)
+    n_isolated   = len(isolated)
+    n_clusters   = len(clusters)
+    bucket_label = conn_bucket.split("(")[0].strip()  # e.g. "🔴 Very High"
+
+    _a   = theme["a"]
+    _al  = theme["al"]
+    _bdr = theme["bdr"]
+    _hd  = theme["head"]
+    _bd  = theme["body"]
+    _sb  = theme["sub"]
+
+    # ── Build sentences ──────────────────────────────────────────────────────
+    if not edges:
+        # No connections at this threshold
+        verdict_icon  = "✅"
+        verdict_color = "#059669"
+        verdict_bg    = "#ECFDF5"
+        headline = f"All {n} funds look distinct at this overlap level"
+        body = (
+            f"None of the {n} funds share more than {min_edge_pct:.0f}% of their portfolio "
+            f"with any other fund at the <strong>{bucket_label}</strong> threshold. "
+            f"You could pick any combination from this list without worrying about duplication."
+        )
+        tip = "Try lowering the Connections filter to see more subtle overlaps."
+    elif n_clusters == 1 and n_connected == n:
+        # All funds connected into one big cluster
+        verdict_icon  = "⚠️"
+        verdict_color = "#DC2626"
+        verdict_bg    = "#FEF2F2"
+        headline = f"Most funds in this category overlap significantly"
+        body = (
+            f"All {n} funds are connected at the <strong>{bucket_label}</strong> level — "
+            f"meaning every fund shares a large chunk of its portfolio with at least one other. "
+            f"Owning multiple funds from this group may give you less diversification than you expect."
+        )
+        tip = "Pick funds from opposite ends of the graph to maximise diversification."
+    else:
+        # Mixed — some clusters, some isolated
+        cluster_names: list[str] = []
+        for comp in sorted(clusters, key=len, reverse=True)[:2]:
+            names = " · ".join(fund_label(graph.funds[i], max_len=14) for i in comp)
+            cluster_names.append(f"<strong>{names}</strong>")
+
+        if n_isolated == 0:
+            verdict_icon  = "🟡"
+            verdict_color = "#D97706"
+            verdict_bg    = "#FFFBEB"
+        else:
+            verdict_icon  = "ℹ️"
+            verdict_color = _a
+            verdict_bg    = _al
+
+        headline = (
+            f"{n_connected} of {n} funds have {bucket_label.lower()} overlap with at least one other"
+        )
+
+        cluster_desc = " and ".join(cluster_names)
+        body_parts = [
+            f"{cluster_desc} "
+            + (f"hold very similar portfolios" if "Very High" in conn_bucket else "overlap significantly")
+            + f" — owning two or more from {'these groups' if n_clusters > 1 else 'this group'} adds little diversification."
+        ]
+        if n_isolated > 0:
+            isolated_names = ", ".join(
+                f"<strong>{fund_label(graph.funds[i], max_len=14)}</strong>"
+                for i in isolated[:3]
+            )
+            more = f" and {n_isolated - 3} others" if n_isolated > 3 else ""
+            body_parts.append(
+                f"{isolated_names}{more} {'are' if n_isolated > 1 else 'is'} free-standing "
+                f"— {'they' if n_isolated > 1 else 'it'} can be paired with any other fund without significant duplication."
+            )
+        body = " ".join(body_parts)
+        tip = "Click any bubble to see its specific overlaps with every other fund."
+
+    return (
+        f'<div style="background:{verdict_bg};border:1px solid {_bdr};border-radius:10px;'
+        f'padding:0.75rem 1rem;margin:0.5rem 0 0.4rem;">'
+        f'<div style="font-size:0.88rem;font-weight:700;color:{verdict_color};margin-bottom:0.3rem;">'
+        f'{verdict_icon}&nbsp; {headline}</div>'
+        f'<div style="font-size:0.78rem;color:{_bd};line-height:1.6;">{body}</div>'
+        f'<div style="font-size:0.72rem;color:{_sb};margin-top:0.4rem;">💡 {tip}</div>'
+        f'</div>'
+    )
+
+
+def _overlap_graph_hint(fund_a: str | None, fund_b: str | None) -> str:
+    from analytics.overlap_graph import fund_label
+
+    if fund_a and fund_b:
+        return (
+            f"Comparing {fund_label(fund_a)} and {fund_label(fund_b)} "
+            f"— see overlap details in the panel →"
+        )
+    if fund_a:
+        return (
+            f"Showing {fund_label(fund_a)}'s overlap — click another fund "
+            f"or pick from the list to compare"
+        )
+    return "Click a fund on the graph or choose from the list · select two to compare"
+
+
+def _overlap_render_fund_sidebar(
+    graph,
+    funds: list[str],
+    master,
+    period: str,
+    theme: dict,
+    similarity,
+    holdings,
+):
+    from analytics.overlap_filters import fund_return_pct, sort_funds_by_return
+    from analytics.overlap_graph import fund_label, pair_score
+    from analytics.overlap_quick_compare import (
+        overlap_pair_summary,
+        pair_common_count,
+        top_common_holdings_table,
+    )
+
+    t = theme
+    fund_a, fund_b = _overlap_get_ab(funds)
+
+    hdr = (
+        f"Funds — vs {fund_label(fund_a, max_len=20)}"
+        if fund_a
+        else f"Funds ({len(funds)} matching)"
+    )
+    st.markdown(f'<div class="ov-side-hdr">{hdr}</div>', unsafe_allow_html=True)
+
+    # ── Selection pills (A + B in a flex row) ──────────────────────────
+    pill_a_html = (
+        f'<div class="ov-pill ov-pill-a">{fund_label(fund_a, max_len=22)}</div>'
+        if fund_a else
+        '<div class="ov-empty-slot">Fund A</div>'
+    )
+    pill_b_html = (
+        f'<div class="ov-pill ov-pill-b">{fund_label(fund_b, max_len=22)}</div>'
+        if fund_b else
+        '<div class="ov-empty-slot">Fund B</div>'
+    )
+    st.markdown(
+        f'<div class="ov-pills-row">{pill_a_html}{pill_b_html}</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Clear buttons below pills
+    if fund_a or fund_b:
+        bc1, bc2 = st.columns(2)
+        with bc1:
+            if fund_a:
+                st.markdown('<div class="ov-pill-x">', unsafe_allow_html=True)
+                if st.button(f"✕ Clear A", key="overlap_clear_a", use_container_width=True):
+                    st.session_state.overlap_matrix_selected_funds = []
+                    st.rerun()
+                st.markdown("</div>", unsafe_allow_html=True)
+        with bc2:
+            if fund_b:
+                st.markdown('<div class="ov-pill-x">', unsafe_allow_html=True)
+                if st.button(f"✕ Clear B", key="overlap_clear_b", use_container_width=True):
+                    st.session_state.overlap_matrix_selected_funds = [fund_a]
+                    st.rerun()
+                st.markdown("</div>", unsafe_allow_html=True)
+
+    if fund_a and fund_b:
+        score = pair_score(graph.lookup, fund_a, fund_b)
+        common_n = pair_common_count(similarity, fund_a, fund_b)
+        summary = overlap_pair_summary(score, common_n)
+        st.markdown(
+            f'<div class="ov-overlap-card">'
+            f'<div class="ov-overlap-score">{score:.0f}% overlap</div>'
+            f'<div class="ov-overlap-common">{summary["common_text"]}</div>'
+            f'<div class="ov-verdict-badge" style="background:{summary["badge_bg"]};'
+            f'color:{summary["badge_color"]};">{summary["label"]}</div>'
+            f'<div class="ov-verdict-desc">{summary["description"]}</div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        if st.button(
+            "Compare in detail →",
+            type="primary",
+            use_container_width=True,
+            key="overlap_compare_detail",
+        ):
+            _overlap_go_compare(fund_a, fund_b)
+
+    sub_label = (
+        f"By overlap with {fund_label(fund_a, max_len=16)}" if fund_a else "By return"
+    )
+    st.markdown(f'<div class="ov-list-sub">{sub_label}</div>', unsafe_allow_html=True)
+
+    def _return_str(fund: str) -> str:
+        ret = fund_return_pct(master, fund, period)
+        return f"{ret:+.1f}%" if ret is not None else "—"
+
+    def _option_label(fund: str, ov: float | None) -> str:
+        name = fund_label(fund, max_len=26)
+        ret = _return_str(fund)
+        if ov is not None:
+            return f"{name}  ·  {ret}  ·  {ov:.0f}% ov."
+        return f"{name}  ·  {ret}"
+
+    if fund_a:
+        ordered = sorted(
+            funds,
+            key=lambda f: pair_score(graph.lookup, fund_a, f),
+            reverse=True,
+        )
+        labels = [
+            _option_label(
+                f,
+                None if f == fund_a else pair_score(graph.lookup, fund_a, f),
+            )
+            for f in ordered
+        ]
+    else:
+        ordered = sort_funds_by_return(funds, master, period)
+        labels = [_option_label(f, None) for f in ordered]
+
+    if st.session_state.get("overlap_dropdown_last") not in funds:
+        st.session_state.pop("overlap_dropdown_last", None)
+
+    label_to_fund = dict(zip(labels, ordered))
+    fund_to_label = {v: k for k, v in label_to_fund.items()}
+    highlight = fund_b or fund_a
+    default_idx = ordered.index(highlight) if highlight in ordered else 0
+
+    # Determine the index to show without touching session_state (avoids Streamlit warning).
+    last_fund = st.session_state.get("overlap_dropdown_last")
+    if last_fund and last_fund in ordered:
+        show_idx = ordered.index(last_fund)
+    else:
+        show_idx = default_idx
+
+    pick_label = st.selectbox(
+        "Choose fund",
+        labels,
+        index=show_idx,
+        label_visibility="collapsed",
+    )
+    picked_fund = label_to_fund.get(pick_label, ordered[default_idx])
+    last_picked = st.session_state.get("overlap_dropdown_last")
+    if last_picked is not None and picked_fund != last_picked:
+        _overlap_pick_fund(picked_fund, funds)
+        st.session_state.overlap_dropdown_last = picked_fund
+        st.rerun()
+    st.session_state.overlap_dropdown_last = picked_fund
+
+    # ── Quick Facts comparison (only when both selected) ───────────────
+    if fund_a and fund_b:
+        _overlap_render_quick_facts(fund_a, fund_b, master, holdings, period, theme)
+
+
+def _overlap_render_quick_facts(fund_a, fund_b, master, holdings, period, theme):
+    from analytics.overlap_filters import fund_return_pct
+    from analytics.overlap_graph import fund_label
+
+    COLOR_A = "#534AB7"
+    COLOR_B = "#0F6E56"
+    _bdr = theme["bdr"]
+    _hd  = theme["head"]
+    _sb  = theme["sub"]
+    _bd  = theme["body"]
+    _al  = theme["al"]
+    _cd  = theme["card"]
+
+    def _mval(col, fund):
+        row = master.loc[master["fund_name"] == fund, col]
+        return float(row.iloc[0]) if not row.empty and row.iloc[0] == row.iloc[0] else None
+
+    # ── Gather metrics ──────────────────────────────────────────────────
+    ret_a  = fund_return_pct(master, fund_a, period)
+    ret_b  = fund_return_pct(master, fund_b, period)
+    aum_a  = _mval("aum_cr",       fund_a)
+    aum_b  = _mval("aum_cr",       fund_b)
+    er_a   = _mval("expense_ratio", fund_a)
+    er_b   = _mval("expense_ratio", fund_b)
+
+    # Top shared sector (highest combined % in both funds)
+    top_sector = top_sector_a = top_sector_b = None
+    if not holdings.empty and "sector" in holdings.columns:
+        ha = holdings.loc[holdings["fund_name"] == fund_a, ["sector", "allocation_percent"]]
+        hb = holdings.loc[holdings["fund_name"] == fund_b, ["sector", "allocation_percent"]]
+        if not ha.empty and not hb.empty:
+            sa = ha.groupby("sector")["allocation_percent"].sum()
+            sb = hb.groupby("sector")["allocation_percent"].sum()
+            combined = (sa.add(sb, fill_value=0)).sort_values(ascending=False)
+            if not combined.empty:
+                top_sector   = combined.index[0]
+                top_sector_a = float(sa.get(top_sector, 0))
+                top_sector_b = float(sb.get(top_sector, 0))
+
+    def _fmt_ret(v):
+        if v is None: return "—"
+        color = "#059669" if v >= 0 else "#DC2626"
+        return f'<span style="color:{color};font-weight:700;">{v:+.1f}%</span>'
+
+    def _fmt_aum(v):
+        if v is None: return "—"
+        if v >= 10000: return f"₹{v/1000:.0f}K cr"
+        if v >= 1000:  return f"₹{v/1000:.1f}K cr"
+        return f"₹{v:.0f} cr"
+
+    def _fmt_er(v):
+        return f"{v:.2f}%" if v is not None else "—"
+
+    def _delta_badge(va, vb, *, higher_is_better=True):
+        if va is None or vb is None: return ""
+        diff = vb - va
+        if abs(diff) < 0.01: return '<span style="font-size:0.68rem;color:#94A3B8;">Same</span>'
+        better = (diff > 0) == higher_is_better
+        icon  = "▲" if diff > 0 else "▼"
+        color = "#059669" if better else "#DC2626"
+        who   = fund_label(fund_b if diff > 0 else fund_a, max_len=10)
+        return f'<span style="font-size:0.68rem;color:{color};">{icon} {who}</span>'
+
+    # ── Build rows ──────────────────────────────────────────────────────
+    def _row(label, val_a, val_b, delta_html="", last=False):
+        bb = "none" if last else f"1px solid {_bdr}"
+        return (
+            f'<tr style="border-bottom:{bb};">'
+            f'<td style="padding:7px 8px;font-size:0.72rem;color:{_sb};white-space:nowrap;">{label}</td>'
+            f'<td style="padding:7px 8px;font-size:0.78rem;text-align:right;">{val_a}</td>'
+            f'<td style="padding:7px 8px;font-size:0.78rem;text-align:right;">{val_b}</td>'
+            f'<td style="padding:7px 4px;text-align:right;">{delta_html}</td>'
+            f'</tr>'
+        )
+
+    fa_s = fund_label(fund_a, max_len=11)
+    fb_s = fund_label(fund_b, max_len=11)
+
+    rows = (
+        _row(f"{period} Return", _fmt_ret(ret_a), _fmt_ret(ret_b),
+             _delta_badge(ret_a, ret_b, higher_is_better=True))
+        + _row("AUM", _fmt_aum(aum_a), _fmt_aum(aum_b))
+        + _row("Exp. Ratio", _fmt_er(er_a), _fmt_er(er_b),
+               _delta_badge(er_a, er_b, higher_is_better=False), last=True)
+    )
+
+    col_head = (
+        f'<th style="padding:6px 8px;font-size:0.68rem;font-weight:700;'
+        f'text-transform:uppercase;letter-spacing:0.4px;text-align:right;'
+        f'white-space:nowrap;"></th>'
+    )
+    col_a_head = (
+        f'<th style="padding:6px 8px;font-size:0.68rem;font-weight:700;'
+        f'color:{COLOR_A};text-align:right;white-space:nowrap;">{fa_s}</th>'
+    )
+    col_b_head = (
+        f'<th style="padding:6px 8px;font-size:0.68rem;font-weight:700;'
+        f'color:{COLOR_B};text-align:right;white-space:nowrap;">{fb_s}</th>'
+    )
+
+    sector_html = ""
+    if top_sector:
+        sa_str = f"{top_sector_a:.1f}%" if top_sector_a else "—"
+        sb_str = f"{top_sector_b:.1f}%" if top_sector_b else "—"
+        sector_html = (
+            f'<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid {_bdr};">'
+            f'<div style="font-size:0.68rem;font-weight:700;color:{_sb};'
+            f'text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">'
+            f'Biggest shared sector</div>'
+            f'<div style="font-size:0.8rem;font-weight:600;color:{_hd};">{top_sector}</div>'
+            f'<div style="display:flex;gap:12px;margin-top:3px;">'
+            f'<span style="font-size:0.75rem;color:{COLOR_A};">{fa_s}: {sa_str}</span>'
+            f'<span style="font-size:0.75rem;color:{COLOR_B};">{fb_s}: {sb_str}</span>'
+            f'</div></div>'
+        )
+
+    st.markdown(
+        f'<div style="margin-top:0.7rem;padding:0.65rem 0.75rem;background:{_al};'
+        f'border:1px solid {_bdr};border-radius:10px;">'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{_sb};'
+        f'text-transform:uppercase;letter-spacing:0.4px;margin-bottom:0.3rem;">'
+        f'Quick facts</div>'
+        f'<table style="width:100%;border-collapse:collapse;">'
+        f'<thead><tr>{col_head}{col_a_head}{col_b_head}'
+        f'<th style="width:60px;"></th></tr></thead>'
+        f'<tbody>{rows}</tbody></table>'
+        + sector_html
+        + f'</div>',
+        unsafe_allow_html=True,
+    )
+
 
 def page_overlap_drilldown():
-    import json as _json
-    import streamlit.components.v1 as _components
+    from analytics.overlap_filters import (
+        CATEGORY_ORDER,
+        MIN_RETURN_SLIDER_MAX,
+        RETURN_PERIODS,
+        filter_funds,
+        sort_funds_by_return,
+    )
+    from analytics.overlap_journey_viz import (
+        BUCKET_LABEL_TO_MIN,
+        DEFAULT_BUCKET_LABEL,
+        JOURNEY_MIN_EDGE,
+        OVERLAP_BUCKETS,
+        JourneyVizParams,
+        fig_overlap_journey,
+        journey_legend_html,
+    )
+    from analytics.overlap_quick_compare import (
+        display_table,
+        overlap_pair_summary,
+        pair_common_count,
+        top_common_holdings_table,
+    )
 
     t_name, t = _fl_get_theme()
     _fl_inject_css(t, t_name)
     _fl_render_navbar(t, t_name, "overlap_drilldown")
-    _fl_render_breadcrumb([("Home", "home"), ("Analyse Funds", "analyse_funds"), ("Fund Cluster Map", None)])
-
-    holdings   = load_holdings()
+    theme = _overlap_theme_dict(t, t_name)
+    _overlap_inject_page_css(t, t_name)
+    _fl_render_breadcrumb([("Home", "home"), ("Analyse Funds", "analyse_funds"), ("Overlap matrix", None)])
     similarity = load_similarity()
-
+    master = load_master()
     if similarity.empty:
         st.warning("Similarity data not available.")
         return
 
-    def _short(name):
-        return name.replace(" Large Cap Fund", "").replace(" Large Cap", "").strip()
+    _overlap_init_session()
 
-    st.markdown("## Fund Overlap Analysis")
-    st.markdown(
-        f"<p style='color:{t['body']};margin-top:-0.5rem;margin-bottom:1.5rem;'>"
-        "Explore which fund pairs share the most holdings — a key indicator of portfolio redundancy. "
-        "For informational and analytical purposes only — not investment advice.</p>",
-        unsafe_allow_html=True,
+    # Filter toolbar — 7 columns: lbl | cat | lbl | ret-pills | lbl | slider+val | connections
+    st.markdown('<div class="ov-tb-sentinel"></div>', unsafe_allow_html=True)
+    c_lbl_cat, c_cat, c_lbl_ret, c_ret, c_lbl_min, c_slider, c_conn = st.columns(
+        [0.7, 2.2, 0.58, 1.5, 0.85, 2.6, 2.55],
+        gap="small",
+        vertical_alignment="center",
     )
-
-    top_row    = similarity.nlargest(1, "normalized_score").iloc[0]
-    max_pair_a = top_row["fund_a"]
-    max_pair_b = top_row["fund_b"]
-    max_score  = top_row["normalized_score"]
-    max_common = int(top_row["common_stocks"])
-    high_count = int((similarity["normalized_score"] >= 60).sum())
-
-    # ── Summary metrics ──
-    c1, c2, c3, c4 = st.columns(4)
-    for col, val, label, sub in [
-        (c1, f"{max_score:.0f}%",   "Highest Overlap",    "Max pairwise similarity score"),
-        (c2, str(max_common),       "Common Stocks",      "In the top-overlap pair"),
-        (c3, str(high_count),       "High-Overlap Pairs", "Pairs with ≥60% overlap"),
-        (c4, str(len(similarity)),  "Pairs Analyzed",     "All fund-pair combinations"),
-    ]:
-        with col:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-value" style="font-size:2rem;">{val}</div>
-                <div class="metric-label">{label}</div>
-                <div class="metric-sub">{sub}</div>
-            </div>""", unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # ── Top 15 bar chart (full width) ──
-    st.markdown('<div class="section-title">Top 15 Fund Pair Overlaps</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="section-sub">Higher score = more shared holdings = higher redundancy risk</div>',
-        unsafe_allow_html=True,
-    )
-    top15 = similarity.nlargest(15, "normalized_score").copy()
-    top15["pair"] = top15.apply(
-        lambda r: f"{_short(r['fund_a'])} ↔ {_short(r['fund_b'])}", axis=1
-    )
-    fig = px.bar(
-        top15.iloc[::-1],
-        x="normalized_score", y="pair", orientation="h",
-        color="normalized_score",
-        color_continuous_scale=[[0, "rgba(124,58,237,0.15)"], [0.5, "#7C3AED"], [1, "#A78BFA"]],
-        labels={"normalized_score": "Overlap %", "pair": ""},
-        text="normalized_score",
-    )
-    fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside",
-                      textfont=dict(color="#CBD5E1", size=11))
-    fig.update_layout(
-        **_dark_layout(
-            height=460,
-            margin=dict(l=10, r=70, t=10, b=20),
-            showlegend=False,
-            coloraxis_showscale=False,
-            xaxis=_dark_xaxis(showgrid=True, gridcolor=_CHART_GRID, range=[0, max_score + 12]),
-            yaxis=_dark_yaxis(showgrid=False),
+    with c_lbl_cat:
+        st.markdown('<div class="ov-flbl">Category</div>', unsafe_allow_html=True)
+    with c_cat:
+        prev_cat = st.session_state.get("overlap_matrix_category", "Large Cap")
+        category = st.selectbox(
+            "Category",
+            CATEGORY_ORDER,
+            key="overlap_matrix_category",
+            label_visibility="collapsed",
         )
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        if category != prev_cat:
+            st.session_state.overlap_matrix_selected_funds = []
+            st.session_state.pop("overlap_dropdown_last", None)
+    with c_lbl_ret:
+        st.markdown('<div class="ov-flbl">Return</div>', unsafe_allow_html=True)
+    with c_ret:
+        st.markdown('<div class="ov-period-wrap"></div>', unsafe_allow_html=True)
+        period = st.segmented_control(
+            "Return period",
+            RETURN_PERIODS,
+            key="overlap_matrix_return_period",
+            label_visibility="collapsed",
+            width="content",
+        )
+    with c_lbl_min:
+        st.markdown('<div class="ov-flbl">Min return</div>', unsafe_allow_html=True)
+    with c_slider:
+        # Slider + inline value in a sub-column layout
+        sl_col, val_col = st.columns([3, 1], vertical_alignment="center")
+        with sl_col:
+            min_ret = st.slider(
+                "Min return",
+                min_value=0,
+                max_value=MIN_RETURN_SLIDER_MAX,
+                step=1,
+                key="overlap_matrix_min_return",
+                format="%d%%",
+                label_visibility="collapsed",
+                help="0 = Any (no minimum).",
+            )
+        with val_col:
+            min_txt = "Any" if min_ret == 0 else f"≥{min_ret}%"
+            st.markdown(f'<div class="ov-min-val">{min_txt}</div>', unsafe_allow_html=True)
+    with c_conn:
+        st.markdown('<div class="ov-period-wrap"></div>', unsafe_allow_html=True)
+        conn_bucket = st.selectbox(
+            "Connections",
+            [b[0] for b in OVERLAP_BUCKETS],
+            index=next(
+                i for i, b in enumerate(OVERLAP_BUCKETS)
+                if b[0] == DEFAULT_BUCKET_LABEL
+            ),
+            key="overlap_matrix_conn_bucket",
+            label_visibility="visible",
+            help="Filter which overlap connections are shown as lines in the graph.",
+        )
+    min_edge_pct = BUCKET_LABEL_TO_MIN.get(conn_bucket, JOURNEY_MIN_EDGE)
+    min_return_floor = None if min_ret == 0 else float(min_ret)
 
-    # ── All Pairs table (full width, selectable) ──
-    st.markdown('<div class="section-title">All Fund Pairs</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="section-sub">Select a row to update the Common Holdings section below</div>',
-        unsafe_allow_html=True,
-    )
+    filtered = filter_funds(master, category, period, min_return_floor)
+    filtered = sort_funds_by_return(filtered, master, period)
 
-    sorted_sim = similarity.sort_values("normalized_score", ascending=False).reset_index(drop=True)
+    if len(filtered) < 2:
+        st.info(
+            f"Need at least 2 funds in {category} matching your filters. "
+            f"Try lowering the minimum return or choosing another category."
+        )
+        return
 
-    def _risk(score):
-        if score >= 65: return "High"
-        if score >= 45: return "Medium"
-        return "Low"
+    graph = _overlap_filtered_graph(category, tuple(filtered))
+    if graph is None:
+        st.info("Could not build overlap graph for the selected funds.")
+        return
 
-    disp = pd.DataFrame({
-        "Fund A":        sorted_sim["fund_a"].apply(_short),
-        "Fund B":        sorted_sim["fund_b"].apply(_short),
-        "Overlap %":     sorted_sim["normalized_score"],
-        "Common Stocks": sorted_sim["common_stocks"],
-        "Risk Level":    sorted_sim["normalized_score"].apply(_risk),
-    })
+    funds = graph.funds
+    fund_a, fund_b = _overlap_get_ab(funds)
+    holdings = load_holdings()
 
-    sel_result = st.dataframe(
-        disp,
-        use_container_width=True,
-        hide_index=True,
-        height=min(400, 36 * len(disp) + 38),
-        on_select="rerun",
-        selection_mode="single-row",
-        column_config={
-            "Fund A":        st.column_config.TextColumn("Fund A",        width="large"),
-            "Fund B":        st.column_config.TextColumn("Fund B",        width="large"),
-            "Overlap %":     st.column_config.ProgressColumn(
-                                 "Overlap %", format="%.1f%%",
-                                 min_value=0, max_value=100, width="medium"),
-            "Common Stocks": st.column_config.NumberColumn(
-                                 "Common Stocks", format="%d stocks",    width="small"),
-            "Risk Level":    st.column_config.TextColumn("Risk",          width="small"),
-        },
-    )
+    col_graph, col_side = st.columns([15, 7])
 
-    # Resolve selected pair (default = top pair)
-    sel_rows = sel_result.selection.rows
-    if sel_rows:
-        row       = sorted_sim.iloc[sel_rows[0]]
-        sel_a     = row["fund_a"]
-        sel_b     = row["fund_b"]
-        sel_score = float(row["normalized_score"])
-        sel_n     = int(row["common_stocks"])
-    else:
-        sel_a, sel_b, sel_score, sel_n = max_pair_a, max_pair_b, max_score, max_common
-
-    short_a = _short(sel_a)
-    short_b = _short(sel_b)
-
-    # ── Common Holdings (dynamic) ──
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown(
-        f'<div class="section-title">Common Holdings: {short_a} ↔ {short_b}</div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f'<div class="section-sub">{sel_n} shared positions · {sel_score:.1f}% overlap score</div>',
-        unsafe_allow_html=True,
-    )
-
-    if not holdings.empty:
-        h_a = holdings[holdings["fund_name"] == sel_a][
-            ["stock_name", "allocation_percent", "sector"]
-        ].rename(columns={"allocation_percent": "alloc_a"})
-        h_b = holdings[holdings["fund_name"] == sel_b][
-            ["stock_name", "allocation_percent"]
-        ].rename(columns={"allocation_percent": "alloc_b"})
-        common_df = pd.merge(h_a, h_b, on="stock_name").sort_values("alloc_a", ascending=False)
-        common_df.columns = ["Stock", f"{short_a} %", "Sector", f"{short_b} %"]
-        max_alloc_scale = max(
-            common_df[f"{short_a} %"].max(), common_df[f"{short_b} %"].max()
-        ) * 1.25
-        st.dataframe(
-            common_df,
+    with col_graph:
+        st.markdown(journey_legend_html(theme), unsafe_allow_html=True)
+        fig = fig_overlap_journey(
+            graph,
+            theme,
+            master,
+            JourneyVizParams(fund_a=fund_a, fund_b=fund_b, return_period=period, min_edge_pct=min_edge_pct),
+        )
+        chart_event = st.plotly_chart(
+            fig,
             use_container_width=True,
-            hide_index=True,
-            height=min(520, 36 * len(common_df) + 38),
-            column_config={
-                "Stock": st.column_config.TextColumn("Stock", width="medium"),
-                f"{short_a} %": st.column_config.ProgressColumn(
-                    short_a, format="%.2f%%",
-                    min_value=0, max_value=max_alloc_scale, width="medium",
-                ),
-                "Sector": st.column_config.TextColumn("Sector", width="small"),
-                f"{short_b} %": st.column_config.ProgressColumn(
-                    short_b, format="%.2f%%",
-                    min_value=0, max_value=max_alloc_scale, width="medium",
-                ),
-            },
+            on_select="rerun",
+            key=f"overlap_journey_{category}_{period}_{min_ret}_{len(funds)}",
         )
+        # Process graph-click selection
+        idx = _overlap_pick_fund_index(
+            chart_event.selection if chart_event else None,
+            graph,
+        )
+        if idx is not None:
+            _overlap_pick_fund(graph.funds[idx], funds)
+            st.session_state.pop("overlap_dropdown_last", None)
+            st.rerun()
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button(
-        f"Open Full Comparison: {short_a} vs {short_b} →",
-        type="primary", use_container_width=True,
-    ):
-        st.session_state.selected_funds = [sel_a, sel_b]
-        st.session_state.page = "compare"
-        st.rerun()
+        insight_html = _overlap_graph_insight(graph, min_edge_pct, conn_bucket, theme)
+        if insight_html:
+            st.markdown(insight_html, unsafe_allow_html=True)
 
-    # ── Insights ──
-    st.markdown("<br>", unsafe_allow_html=True)
-    if high_count > 0:
-        st.markdown(f"""<div class="insight-card insight-warning">
-            <div class="insight-icon">⚠️</div>
-            <div class="insight-text"><strong>{high_count} High-Overlap Pair(s)</strong> —
-            {high_count} fund combination(s) share ≥60% of their portfolios. Holding these funds
-            together may provide less diversification than expected.</div></div>""",
-            unsafe_allow_html=True)
+        hint = _overlap_graph_hint(fund_a, fund_b)
+        st.markdown(f'<div class="ov-hint">{hint}</div>', unsafe_allow_html=True)
 
-    median_overlap = similarity["normalized_score"].median()
-    st.markdown(f"""<div class="insight-card insight-info">
-        <div class="insight-icon">📊</div>
-        <div class="insight-text"><strong>Median Overlap: {median_overlap:.1f}%</strong> —
-        The typical fund pair shares {median_overlap:.1f}% of their portfolio, reflecting
-        the structural concentration of equity funds around a core set of index-dominant
-        stocks.</div></div>""", unsafe_allow_html=True)
+    with col_side:
+        st.markdown('<div class="ov-side-sentinel"></div>', unsafe_allow_html=True)
+        _overlap_render_fund_sidebar(graph, funds, master, period, theme, similarity, holdings)
 
-    st.markdown("""<div class="disclaimer">
-        Overlap analysis is for informational and analytical purposes only — not investment advice.</div>""", unsafe_allow_html=True)
+    # ── Full-width shared holdings expander (only when both funds selected) ──
+    if fund_a and fund_b:
+        from analytics.overlap_quick_compare import (
+            exclusive_holdings_table,
+            holdings_union_table,
+            top_common_holdings_table,
+        )
+        from analytics.overlap_graph import fund_label as _fl
+
+        fa_lbl  = _fl(fund_a, max_len=28)
+        fb_lbl  = _fl(fund_b, max_len=28)
+        fa_short = _fl(fund_a, max_len=14)
+        fb_short = _fl(fund_b, max_len=14)
+
+        # Pre-compute counts for the expander title
+        common_df = top_common_holdings_table(holdings, fund_a, fund_b, top_n=200)
+        n_shared  = len(common_df)
+
+        with st.expander(
+            f"📋  Holdings breakdown  ·  {n_shared} stocks in common  ·  {fa_lbl} vs {fb_lbl}",
+            expanded=False,
+        ):
+            COLOR_A = "#534AB7"
+            COLOR_B = "#0F6E56"
+            _a   = theme["a"]
+            _al  = theme["al"]
+            _cd  = theme["card"]
+            _bdr = theme["bdr"]
+            _hd  = theme["head"]
+            _sb  = theme["sub"]
+
+            VIEW_COMMON  = f"Common ({n_shared})"
+            VIEW_ALL     = "All stocks"
+            VIEW_EXCL_A  = f"Only in {fa_short}"
+            VIEW_EXCL_B  = f"Only in {fb_short}"
+            view_options = [VIEW_COMMON, VIEW_ALL, VIEW_EXCL_A, VIEW_EXCL_B]
+
+            view = st.segmented_control(
+                "Stock view",
+                view_options,
+                default=VIEW_COMMON,
+                key="overlap_holdings_view",
+                label_visibility="collapsed",
+            )
+            if not view:
+                view = VIEW_COMMON
+
+            # Build the appropriate dataframe
+            if view == VIEW_COMMON:
+                df_view = common_df
+                bar_cols   = [(cols := list(df_view.columns))[1], cols[2]] if len(df_view.columns) > 2 else []
+                bar_colors = [COLOR_A, COLOR_B]
+            elif view == VIEW_ALL:
+                df_view = holdings_union_table(holdings, fund_a, fund_b)
+                bar_cols   = [(cols := list(df_view.columns))[1], cols[2]] if not df_view.empty and len(df_view.columns) > 2 else []
+                bar_colors = [COLOR_A, COLOR_B]
+            elif view == VIEW_EXCL_A:
+                df_view    = exclusive_holdings_table(holdings, fund_a, fund_b)
+                bar_cols   = [(cols := list(df_view.columns))[1]] if not df_view.empty and len(df_view.columns) > 1 else []
+                bar_colors = [COLOR_A]
+            else:  # Exclusive B
+                df_view    = exclusive_holdings_table(holdings, fund_b, fund_a)
+                bar_cols   = [(cols := list(df_view.columns))[1]] if not df_view.empty and len(df_view.columns) > 1 else []
+                bar_colors = [COLOR_B]
+
+            if df_view.empty:
+                st.caption("No holdings data available for this selection.")
+            else:
+                all_cols   = list(df_view.columns)
+                data_cols  = all_cols[1:]
+                max_vals   = {c: float(df_view[c].max()) or 1.0 for c in data_cols if c in df_view.columns}
+                col_colors = {c: bar_colors[i] if i < len(bar_colors) else _a for i, c in enumerate(data_cols)}
+
+                def _th_fw(lbl, align="left"):
+                    return (
+                        f'<th style="padding:10px 14px;text-align:{align};font-size:0.7rem;'
+                        f'font-weight:700;color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">{lbl}</th>'
+                    )
+
+                def _bar_fw(val, max_val, color):
+                    if val is None or (hasattr(val, '__class__') and val != val):  # NaN check
+                        return f'<span style="color:{_sb};font-size:0.78rem;">—</span>'
+                    try:
+                        v = float(val)
+                    except (TypeError, ValueError):
+                        return f'<span style="color:{_sb};font-size:0.78rem;">—</span>'
+                    w = int(v / max_val * 100) if max_val > 0 else 0
+                    return (
+                        f'<div style="display:flex;align-items:center;gap:8px;">'
+                        f'<div style="flex:1;height:6px;border-radius:3px;background:{_bdr};">'
+                        f'<div style="width:{w}%;height:100%;border-radius:3px;background:{color};"></div>'
+                        f'</div>'
+                        f'<span style="font-size:0.82rem;font-weight:700;color:{color};white-space:nowrap;">'
+                        f'{v:.2f}%</span></div>'
+                    )
+
+                header_html = _th_fw("Stock") + "".join(_th_fw(c) for c in data_cols)
+                rows_html   = ""
+                for i, row in df_view.reset_index(drop=True).iterrows():
+                    row_bg = _al if i % 2 == 0 else _cd
+                    stock  = str(row[all_cols[0]])
+                    cells  = "".join(
+                        f'<td style="padding:10px 14px;min-width:200px;">'
+                        f'{_bar_fw(row[c], max_vals.get(c, 1), col_colors[c])}</td>'
+                        for c in data_cols
+                    )
+                    rows_html += (
+                        f'<tr style="background:{row_bg};border-bottom:1px solid {_bdr};">'
+                        f'<td style="padding:10px 14px;min-width:220px;font-size:0.82rem;'
+                        f'font-weight:600;color:{_hd};line-height:1.3;">{stock}</td>'
+                        f'{cells}</tr>'
+                    )
+
+                n_rows = len(df_view)
+                st.caption(f"{n_rows} stock{'s' if n_rows != 1 else ''}")
+                st.markdown(
+                    f'<div style="border-radius:12px;border:1px solid {_bdr};overflow:hidden;">'
+                    f'<table style="width:100%;border-collapse:collapse;">'
+                    f'<thead><tr style="background:{_al};border-bottom:2px solid {_bdr};">'
+                    f'{header_html}'
+                    f'</tr></thead><tbody>{rows_html}</tbody></table></div>',
+                    unsafe_allow_html=True,
+                )
+
+    st.markdown(
+        '<div class="fl-disc">Overlap analysis is for informational purposes only — not investment advice.</div>',
+        unsafe_allow_html=True,
+    )
+
 
 
 def main():
