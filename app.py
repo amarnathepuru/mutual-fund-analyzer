@@ -3684,7 +3684,7 @@ def page_compare():
             f'<div style="font-size:0.62rem;color:{_sb};margin-top:6px;text-align:right;">'
             f'Top 30 stocks · Eff. Weight = avg allocation × (funds holding ÷ total funds selected)</div>'
         )
-        with st.expander("🗂️ Effective Portfolio — blended stock exposure across all funds", expanded=True):
+        with st.expander("🗂️ Effective Portfolio — blended stock exposure across all funds", expanded=False):
             st.markdown(
                 f'<div class="section-sub">Equal-weighted blend of all selected funds — '
                 f'your actual combined stock exposure if you invest equally in each fund</div>',
@@ -4218,7 +4218,7 @@ def page_compare():
             return (f'<span style="background:{_bdr};color:{_sb};border-radius:4px;'
                     f'padding:2px 6px;font-size:0.7rem;font-weight:700;">→ Mixed</span>')
 
-        with st.expander("📈 Holdings Timeline — allocation trends across shared stocks", expanded=True):
+        with st.expander("📈 Holdings Timeline — allocation trends across shared stocks", expanded=False):
             ht_view = st.radio(
                 "View",
                 options=["Average across funds", "Per fund"],
