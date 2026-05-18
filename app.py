@@ -5712,326 +5712,245 @@ def page_stock_explorer():
                 f'<div class="metric-sub">{sub}</div>'
                 f'</div>', unsafe_allow_html=True)
 
+    # ── Pre-compute all data ─────────────────────────────────────────────────────
+    master_tmp = load_master()
+    cat_map_se = master_tmp.set_index("fund_name")["category"].to_dict() if not master_tmp.empty else {}
+    stock_df["category"] = stock_df["fund_name"].map(cat_map_se).fillna("Other")
+
+    _CAT_COLORS_SE = {
+        "Large Cap": "#6366F1", "Mid Cap": "#F59E0B", "Small Cap": "#10B981",
+        "Large & Mid Cap": "#06B6D4", "Multi Cap": "#8B5CF6",
+        "Flexi Cap": "#F472B6", "ELSS": "#34D399", "Other": "#94A3B8",
+    }
+    cat_df_se = (
+        stock_df.groupby("category")
+        .agg(avg_alloc=("allocation_percent", "mean"), fund_count=("fund_name", "count"))
+        .reset_index().sort_values("avg_alloc", ascending=False)
+    )
+    top_cat_row  = cat_df_se.iloc[0] if not cat_df_se.empty else None
+    cat_df_chart = cat_df_se.sort_values("avg_alloc", ascending=True)
+
+    _time_labels = ["1Y ago", "6M ago", "3M ago", "Now"]
+    _period_map  = {"1Y ago": "1 year", "6M ago": "6 months", "3M ago": "3 months"}
+    trend_rows   = []
+    for _, _tr in stock_df.iterrows():
+        _tc = str(_tr.get("category", "Other")).replace("nan", "Other")
+        _cu = _tr["allocation_percent"]
+        try:    _d3  = _cu - float(_tr["change_3m_percent"])
+        except: _d3  = None
+        try:    _d6  = _cu - float(_tr["change_6m_percent"])
+        except: _d6  = None
+        try:    _d1y = _cu - float(_tr["change_1y_percent"])
+        except: _d1y = None
+        trend_rows.append({"category": _tc, "1Y ago": _d1y, "6M ago": _d6, "3M ago": _d3, "Now": _cu})
+    _trend_df  = pd.DataFrame(trend_rows)
+    _cat_trend = _trend_df.groupby("category")[_time_labels].mean().reset_index()
+    _cat_trend = _cat_trend.dropna(subset=["1Y ago", "6M ago", "3M ago"], how="all")
+    _cats_list = _cat_trend.to_dict("records")
+
+    _top_fn      = display_name(stock_df.iloc[0]["fund_name"], 28)
+    _top_alloc   = stock_df.iloc[0]["allocation_percent"]
+    _top_cat_lbl = (f"Highest: {top_cat_row['category']} at {top_cat_row['avg_alloc']:.2f}%"
+                    if top_cat_row is not None else "")
+
+    def _trend_chip_se(row):
+        try:
+            v3 = float(row["change_3m_percent"])
+            return ("↑ Buying", "#059669") if v3 > 0.3 else \
+                   ("↓ Trimming", "#DC2626") if v3 < -0.3 else ("→ Holding", "#6366F1")
+        except Exception:
+            return ("—", "#94A3B8")
+
+    def _hex_rgba(hex_col, alpha):
+        h = hex_col.lstrip("#")
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return f"rgba({r},{g},{b},{alpha})"
+
+    def _delta_cell(val):
+        try:
+            v = float(val)
+            if v > 0:   return f'<span style="color:#059669;font-weight:600;">+{v:.2f}%</span>'
+            elif v < 0: return f'<span style="color:#DC2626;font-weight:600;">{v:.2f}%</span>'
+            else:       return f'<span style="color:#94A3B8;">0.00%</span>'
+        except Exception:
+            return f'<span style="color:#94A3B8;">—</span>'
+
+    def _trend_badge_tbl(row):
+        try:
+            v3 = float(row["change_3m_percent"])
+            if v3 > 0.3:    return '<span style="color:#059669;font-size:0.7rem;font-weight:700;">↑ Buying</span>'
+            elif v3 < -0.3: return '<span style="color:#DC2626;font-size:0.7rem;font-weight:700;">↓ Trimming</span>'
+            else:            return '<span style="color:#6366F1;font-size:0.7rem;font-weight:700;">→ Holding</span>'
+        except Exception:
+            return '<span style="color:#94A3B8;font-size:0.7rem;">—</span>'
+
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # ── Two-column main layout ───────────────────────────────────────────────────
-    col_left, col_right = st.columns([2, 3], gap="large")
-
-    # ── LEFT: ranked fund card strip ─────────────────────────────────────────────
-    with col_left:
-        st.markdown(
-            f'<div class="section-title">Who Holds It & How Much?</div>'
-            f'<div class="section-sub">Funds sorted by allocation — highest at the top</div>',
-            unsafe_allow_html=True,
-        )
-
-        def _trend_chip(row):
-            try:
-                v3 = float(row["change_3m_percent"])
-                v6 = float(row["change_6m_percent"])
-            except Exception:
-                return ("—", "#94A3B8", "No history")
-            if v3 > 0.3:
-                return ("↑ Buying", "#059669", "Managers adding")
-            elif v3 < -0.3:
-                return ("↓ Trimming", "#DC2626", "Managers reducing")
-            else:
-                return ("→ Holding", "#6366F1", "Allocation steady")
-
-        max_bar = stock_df["allocation_percent"].max()
-        cards_html = ""
+    # ── Expander 1: Who holds it ──────────────────────────────────────────────────
+    with st.expander(
+        f"🏦  Who holds it & how much?   ·   {n_holding} funds   ·   Top: {_top_alloc:.2f}% — {_top_fn}",
+        expanded=True,
+    ):
+        _max_bar   = stock_df["allocation_percent"].max()
+        _cards_html = ""
         for i, row in stock_df.iterrows():
-            fn        = display_name(row["fund_name"], 30)
+            fn        = display_name(row["fund_name"], 36)
             alloc     = row["allocation_percent"]
-            bar_w     = int(alloc / max_bar * 100) if max_bar > 0 else 0
-            chip_txt, chip_col, chip_tip = _trend_chip(row)
+            bar_w     = int(alloc / _max_bar * 100) if _max_bar > 0 else 0
+            chip_txt, chip_col = _trend_chip_se(row)
             cat       = str(row.get("category", "")).replace("nan", "")
             rank_col  = _a if i == 0 else (_sb if i >= 5 else _hd)
-
-            cards_html += (
-                f'<div style="background:{_cd};border:1px solid {_bdr};border-radius:10px;'
-                f'padding:10px 12px;margin-bottom:6px;">'
-                # rank + fund name + chip
-                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
-                f'<span style="font-size:0.7rem;font-weight:700;color:{rank_col};'
-                f'min-width:20px;">#{i+1}</span>'
-                f'<span style="font-size:0.78rem;font-weight:600;color:{_hd};flex:1;'
-                f'line-height:1.3;">{fn}</span>'
-                f'<span style="font-size:0.62rem;font-weight:600;color:{chip_col};'
-                f'background:{chip_col}18;border-radius:20px;padding:2px 7px;white-space:nowrap;">'
-                f'{chip_txt}</span>'
-                f'</div>'
-                # allocation bar
+            _cards_html += (
+                f'<div style="display:flex;align-items:center;gap:12px;padding:10px 0;'
+                f'border-bottom:1px solid {_bdr};">'
+                f'<span style="font-size:0.7rem;font-weight:700;color:{rank_col};min-width:24px;'
+                f'text-align:right;">#{i+1}</span>'
+                f'<div style="flex:1;min-width:0;">'
+                f'<div style="font-size:0.8rem;font-weight:600;color:{_hd};line-height:1.3;">{fn}</div>'
+                f'<div style="font-size:0.62rem;color:{_sb};margin-bottom:4px;">{cat}</div>'
                 f'<div style="display:flex;align-items:center;gap:8px;">'
-                f'<div style="flex:1;height:5px;border-radius:3px;background:{_bdr};">'
-                f'<div style="width:{bar_w}%;height:100%;border-radius:3px;background:{_a};"></div>'
+                f'<div style="flex:1;height:4px;border-radius:2px;background:{_bdr};">'
+                f'<div style="width:{bar_w}%;height:100%;border-radius:2px;background:{_a};"></div>'
                 f'</div>'
-                f'<span style="font-size:0.72rem;font-weight:700;color:{_a};min-width:38px;'
+                f'<span style="font-size:0.75rem;font-weight:700;color:{_a};min-width:40px;'
                 f'text-align:right;">{alloc:.2f}%</span>'
+                f'</div></div>'
+                f'<span style="font-size:0.62rem;font-weight:600;color:{chip_col};'
+                f'background:{chip_col}18;border-radius:20px;padding:3px 9px;'
+                f'white-space:nowrap;flex-shrink:0;">{chip_txt}</span>'
                 f'</div>'
-                + (f'<div style="font-size:0.6rem;color:{_sb};margin-top:4px;">{cat}</div>' if cat else '')
-                + f'</div>'
             )
-
         st.markdown(
-            f'<div style="max-height:520px;overflow-y:auto;padding-right:4px;">{cards_html}</div>',
+            f'<div style="max-height:480px;overflow-y:auto;">{_cards_html}</div>',
             unsafe_allow_html=True,
         )
 
-    # ── RIGHT: two stacked charts ────────────────────────────────────────────────
-    with col_right:
-
-        # Chart 1 — Category breakdown
+    # ── Expander 2: Category breakdown ───────────────────────────────────────────
+    with st.expander(f"📊  Which categories hold it most?   ·   {_top_cat_lbl}", expanded=True):
         st.markdown(
-            f'<div class="section-title">Which Categories Hold It Most?</div>'
-            f'<div class="section-sub">On average, what % of a fund\'s total portfolio is allocated to this stock — grouped by category</div>',
+            f'<div class="section-sub">Avg % of a fund\'s portfolio in this stock — grouped by category</div>',
             unsafe_allow_html=True,
         )
-        master_tmp = load_master()
-        cat_map = master_tmp.set_index("fund_name")["category"].to_dict() if not master_tmp.empty else {}
-        stock_df["category"] = stock_df["fund_name"].map(cat_map).fillna("Other")
-
-        cat_df = (
-            stock_df.groupby("category")
-            .agg(avg_alloc=("allocation_percent", "mean"), fund_count=("fund_name", "count"))
-            .reset_index()
-            .sort_values("avg_alloc", ascending=True)
-        )
-
-        _CAT_COLORS = {
-            "Large Cap": "#6366F1", "Mid Cap": "#F59E0B", "Small Cap": "#10B981",
-            "Large & Mid Cap": "#06B6D4", "Multi Cap": "#8B5CF6",
-            "Flexi Cap": "#F472B6", "ELSS": "#34D399", "Other": "#94A3B8",
-        }
-        bar_colors = [_CAT_COLORS.get(c, "#94A3B8") for c in cat_df["category"]]
-
+        _bar_colors = [_CAT_COLORS_SE.get(c, "#94A3B8") for c in cat_df_chart["category"]]
         fig_cat = go.Figure(go.Bar(
-            x=cat_df["avg_alloc"], y=cat_df["category"], orientation="h",
-            marker_color=bar_colors, marker_line_width=0,
-            text=[f'avg {v:.2f}% of portfolio  ·  {int(n)} fund{"s" if n > 1 else ""}' for v, n in
-                  zip(cat_df["avg_alloc"], cat_df["fund_count"])],
-            textposition="outside",
-            textfont=dict(size=11, color=_bd),
-            cliponaxis=False,
+            x=cat_df_chart["avg_alloc"], y=cat_df_chart["category"], orientation="h",
+            marker_color=_bar_colors, marker_line_width=0,
+            text=[f'avg {v:.2f}%  ·  {int(n)} fund{"s" if n > 1 else ""}' for v, n in
+                  zip(cat_df_chart["avg_alloc"], cat_df_chart["fund_count"])],
+            textposition="outside", textfont=dict(size=11, color=_bd), cliponaxis=False,
         ))
         fig_cat.update_layout(**_dark_layout(
-            height=max(200, len(cat_df) * 42 + 40),
-            margin=dict(l=10, r=180, t=10, b=10),
+            height=max(200, len(cat_df_chart) * 44 + 40),
+            margin=dict(l=10, r=170, t=10, b=10),
             xaxis=_dark_xaxis(showgrid=True, gridcolor=_CHART_GRID,
-                              title="Avg % of fund portfolio allocated to this stock",
+                              title="Avg % of fund portfolio",
                               title_font=dict(size=10, color=_sb)),
             yaxis=dict(tickfont=dict(size=11, color=_bd), showgrid=False),
         ))
-        st.plotly_chart(fig_cat, use_container_width=True)
+        st.plotly_chart(fig_cat, use_container_width=True, config={"displayModeBar": False})
 
-        # Chart 2 — Small multiples: one mini sparkline per category
+    # ── Expander 3: Category sparklines ──────────────────────────────────────────
+    with st.expander("📈  How has each category's holding changed?", expanded=False):
         st.markdown(
-            f'<div class="section-title" style="margin-top:1rem;">How Has Each Category\'s Holding Changed?</div>'
-            f'<div class="section-sub">Average % of fund portfolio in this stock — across 4 time points</div>',
+            f'<div class="section-sub">Average allocation per category — 1Y ago → 6M ago → 3M ago → Now</div>',
             unsafe_allow_html=True,
         )
+        if not _cats_list:
+            st.info("Not enough historical data to show trends for this stock.")
+        else:
+            for _rs in range(0, len(_cats_list), 3):
+                _row_cats = _cats_list[_rs: _rs + 3]
+                _scols    = st.columns(3)
+                for _ci, _crow in enumerate(_row_cats):
+                    with _scols[_ci]:
+                        _cat   = _crow["category"]
+                        _col_c = _CAT_COLORS_SE.get(_cat, "#94A3B8")
+                        _xpts  = [t for t in _time_labels if pd.notna(_crow.get(t))]
+                        _ypts  = [_crow[t] for t in _time_labels if pd.notna(_crow.get(t))]
+                        if len(_xpts) < 2:
+                            continue
+                        _change     = _ypts[-1] - _ypts[0]
+                        _ch_col     = "#059669" if _change >= 0 else "#DC2626"
+                        _period_lbl = _period_map.get(_xpts[0], "the period")
+                        _change_str = f"{'+' if _change >= 0 else ''}{_change:.2f}% over {_period_lbl}"
+                        _fig_m = go.Figure()
+                        _fig_m.add_trace(go.Scatter(
+                            x=_xpts, y=_ypts, mode="lines+markers",
+                            line=dict(color=_col_c, width=2.5),
+                            marker=dict(size=7, color=_col_c, line=dict(width=1.5, color="#ffffff")),
+                            fill="tozeroy", fillcolor=_hex_rgba(_col_c, 0.15),
+                            hovertemplate="%{x}: <b>%{y:.2f}%</b><extra></extra>",
+                        ))
+                        _fig_m.update_layout(
+                            paper_bgcolor=_cd, plot_bgcolor="rgba(0,0,0,0)",
+                            font=dict(family="Inter, sans-serif"),
+                            height=160, margin=dict(l=10, r=10, t=56, b=10),
+                            showlegend=False,
+                            xaxis=dict(showticklabels=False, showgrid=False,
+                                       showline=False, zeroline=False, fixedrange=True),
+                            yaxis=dict(showticklabels=False, showgrid=False,
+                                       showline=False, zeroline=False, fixedrange=True),
+                            annotations=[
+                                dict(text=f"<b>{_cat}</b>", x=0.04, y=1,
+                                     xref="paper", yref="paper", xanchor="left",
+                                     yanchor="bottom", showarrow=False, yshift=30,
+                                     font=dict(size=12, color=_hd, family="Inter, sans-serif")),
+                                dict(text=_change_str, x=0.04, y=1,
+                                     xref="paper", yref="paper", xanchor="left",
+                                     yanchor="bottom", showarrow=False, yshift=10,
+                                     font=dict(size=10, color=_ch_col, family="Inter, sans-serif")),
+                            ],
+                            shapes=[dict(type="rect", xref="paper", yref="paper",
+                                         x0=0, y0=0, x1=1, y1=1,
+                                         line=dict(color=_bdr, width=1), layer="below")],
+                        )
+                        st.plotly_chart(_fig_m, use_container_width=True,
+                                        config={"displayModeBar": False, "staticPlot": True})
 
-        _time_labels = ["1Y ago", "6M ago", "3M ago", "Now"]
-        _period_map  = {"1Y ago": "1 year", "6M ago": "6 months", "3M ago": "3 months"}
-        _CAT_COLORS_LINE = {
-            "Large Cap": "#6366F1", "Mid Cap": "#F59E0B", "Small Cap": "#10B981",
-            "Large & Mid Cap": "#06B6D4", "Multi Cap": "#8B5CF6",
-            "Flexi Cap": "#F472B6", "ELSS": "#34D399", "Other": "#94A3B8",
-        }
-
-        trend_rows = []
-        for _, row in stock_df.iterrows():
-            cat = str(row.get("category", "Other")).replace("nan", "Other")
-            cur = row["allocation_percent"]
-            try:    d3  = cur - float(row["change_3m_percent"])
-            except: d3  = None
-            try:    d6  = cur - float(row["change_6m_percent"])
-            except: d6  = None
-            try:    d1y = cur - float(row["change_1y_percent"])
-            except: d1y = None
-            trend_rows.append({"category": cat, "1Y ago": d1y, "6M ago": d6, "3M ago": d3, "Now": cur})
-
-        trend_df  = pd.DataFrame(trend_rows)
-        cat_trend = trend_df.groupby("category")[_time_labels].mean().reset_index()
-        cat_trend = cat_trend.dropna(subset=["1Y ago", "6M ago", "3M ago"], how="all")
-        cats_list = cat_trend.to_dict("records")
-
-        def _hex_to_rgba(hex_col, alpha):
-            h = hex_col.lstrip("#")
-            r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-            return f"rgba({r},{g},{b},{alpha})"
-
-        _COLS_PER_ROW = 3
-        for _rs in range(0, len(cats_list), _COLS_PER_ROW):
-            _row_cats = cats_list[_rs : _rs + _COLS_PER_ROW]
-            _scols    = st.columns(_COLS_PER_ROW)
-            for _ci, _crow in enumerate(_row_cats):
-                with _scols[_ci]:
-                    _cat   = _crow["category"]
-                    _col_c = _CAT_COLORS_LINE.get(_cat, "#94A3B8")
-                    _xpts  = [t for t in _time_labels if pd.notna(_crow.get(t))]
-                    _ypts  = [_crow[t] for t in _time_labels if pd.notna(_crow.get(t))]
-                    if len(_xpts) < 2:
-                        continue
-                    _change     = _ypts[-1] - _ypts[0]
-                    _ch_col     = "#059669" if _change >= 0 else "#DC2626"
-                    _period_lbl = _period_map.get(_xpts[0], "the period")
-                    _change_str = f"{'+' if _change >= 0 else ''}{_change:.2f}% over {_period_lbl}"
-                    _fill_rgba  = _hex_to_rgba(_col_c, 0.15)
-
-                    _fig_m = go.Figure()
-                    _fig_m.add_trace(go.Scatter(
-                        x=_xpts, y=_ypts,
-                        mode="lines+markers",
-                        line=dict(color=_col_c, width=2.5),
-                        marker=dict(size=7, color=_col_c,
-                                    line=dict(width=1.5, color="#ffffff")),
-                        fill="tozeroy",
-                        fillcolor=_fill_rgba,
-                        hovertemplate="%{x}: <b>%{y:.2f}%</b><extra></extra>",
-                    ))
-                    _fig_m.update_layout(
-                        paper_bgcolor=_cd,
-                        plot_bgcolor="rgba(0,0,0,0)",
-                        font=dict(family="Inter, sans-serif"),
-                        height=160,
-                        margin=dict(l=10, r=10, t=56, b=10),
-                        showlegend=False,
-                        xaxis=dict(showticklabels=False, showgrid=False,
-                                   showline=False, zeroline=False,
-                                   fixedrange=True),
-                        yaxis=dict(showticklabels=False, showgrid=False,
-                                   showline=False, zeroline=False,
-                                   fixedrange=True),
-                        annotations=[
-                            dict(
-                                text=f"<b>{_cat}</b>",
-                                x=0.04, y=1, xref="paper", yref="paper",
-                                xanchor="left", yanchor="bottom",
-                                showarrow=False,
-                                font=dict(size=12, color=_hd,
-                                          family="Inter, sans-serif"),
-                                yshift=30,
-                            ),
-                            dict(
-                                text=_change_str,
-                                x=0.04, y=1, xref="paper", yref="paper",
-                                xanchor="left", yanchor="bottom",
-                                showarrow=False,
-                                font=dict(size=10, color=_ch_col,
-                                          family="Inter, sans-serif"),
-                                yshift=10,
-                            ),
-                        ],
-                        shapes=[dict(
-                            type="rect",
-                            xref="paper", yref="paper",
-                            x0=0, y0=0, x1=1, y1=1,
-                            line=dict(color=_bdr, width=1),
-                            layer="below",
-                        )],
-                    )
-                    st.plotly_chart(_fig_m, use_container_width=True,
-                                    config={"displayModeBar": False,
-                                            "staticPlot": True})
-
-
-    # ── Full breakdown — collapsible ─────────────────────────────────────────────
-    st.markdown("<br>", unsafe_allow_html=True)
-    with st.expander(f"📋 Full breakdown — all {n_holding} funds with allocation & trend data"):
-        _CAT_COLORS_TBL = {
-            "Large Cap": "#6366F1", "Mid Cap": "#F59E0B", "Small Cap": "#10B981",
-            "Large & Mid Cap": "#06B6D4", "Multi Cap": "#8B5CF6",
-            "Flexi Cap": "#F472B6", "ELSS": "#34D399", "Other": "#94A3B8",
-        }
-
-        def _delta_cell(val):
-            try:
-                v = float(val)
-                if v > 0:
-                    return f'<span style="color:#059669;font-weight:600;">+{v:.2f}%</span>'
-                elif v < 0:
-                    return f'<span style="color:#DC2626;font-weight:600;">{v:.2f}%</span>'
-                else:
-                    return f'<span style="color:#94A3B8;">0.00%</span>'
-            except Exception:
-                return f'<span style="color:#94A3B8;">—</span>'
-
-        def _trend_badge(row):
-            try:
-                v3 = float(row["change_3m_percent"])
-                if v3 > 0.3:
-                    return '<span style="color:#059669;font-size:0.7rem;font-weight:700;">↑ Buying</span>'
-                elif v3 < -0.3:
-                    return '<span style="color:#DC2626;font-size:0.7rem;font-weight:700;">↓ Trimming</span>'
-                else:
-                    return '<span style="color:#6366F1;font-size:0.7rem;font-weight:700;">→ Holding</span>'
-            except Exception:
-                return '<span style="color:#94A3B8;font-size:0.7rem;">— No data</span>'
-
+    # ── Expander 4: Full breakdown table ─────────────────────────────────────────
+    with st.expander(f"📋  Full breakdown  ·  all {n_holding} funds", expanded=False):
         _max_alloc = stock_df["allocation_percent"].max()
-
-        rows_html = ""
+        _rows_html = ""
         for i, row in stock_df.iterrows():
-            fn       = display_name(row["fund_name"], 36)
-            alloc    = row["allocation_percent"]
-            bar_w    = int(alloc / _max_alloc * 100) if _max_alloc > 0 else 0
-            cat      = str(row.get("category", "Other")).replace("nan", "Other")
-            cat_col  = _CAT_COLORS_TBL.get(cat, "#94A3B8")
-            row_bg   = _al if i % 2 == 0 else _cd
-
-            rows_html += (
+            fn      = display_name(row["fund_name"], 36)
+            alloc   = row["allocation_percent"]
+            bar_w   = int(alloc / _max_alloc * 100) if _max_alloc > 0 else 0
+            cat     = str(row.get("category", "Other")).replace("nan", "Other")
+            cat_col = _CAT_COLORS_SE.get(cat, "#94A3B8")
+            row_bg  = _al if i % 2 == 0 else _cd
+            _rows_html += (
                 f'<tr style="background:{row_bg};border-bottom:1px solid {_bdr};">'
-                # Fund name + category pill
                 f'<td style="padding:10px 14px;min-width:200px;">'
                 f'<div style="font-size:0.78rem;font-weight:600;color:{_hd};line-height:1.3;">{fn}</div>'
-                f'<span style="font-size:0.6rem;font-weight:600;color:{cat_col};'
-                f'background:{cat_col}20;border-radius:20px;padding:2px 7px;'
-                f'display:inline-block;margin-top:3px;">{cat}</span>'
+                f'<span style="font-size:0.6rem;font-weight:600;color:{cat_col};background:{cat_col}20;'
+                f'border-radius:20px;padding:2px 7px;display:inline-block;margin-top:3px;">{cat}</span>'
                 f'</td>'
-                # Allocation bar + value
                 f'<td style="padding:10px 14px;min-width:140px;">'
                 f'<div style="display:flex;align-items:center;gap:8px;">'
                 f'<div style="flex:1;height:6px;border-radius:3px;background:{_bdr};">'
                 f'<div style="width:{bar_w}%;height:100%;border-radius:3px;background:{_a};"></div>'
                 f'</div>'
                 f'<span style="font-size:0.78rem;font-weight:700;color:{_a};white-space:nowrap;">'
-                f'{alloc:.2f}%</span>'
-                f'</div>'
-                f'</td>'
-                # Trend badge
-                f'<td style="padding:10px 14px;white-space:nowrap;">{_trend_badge(row)}</td>'
-                # Delta columns
+                f'{alloc:.2f}%</span></div></td>'
+                f'<td style="padding:10px 14px;white-space:nowrap;">{_trend_badge_tbl(row)}</td>'
                 f'<td style="padding:10px 14px;text-align:right;">{_delta_cell(row.get("change_3m_percent"))}</td>'
                 f'<td style="padding:10px 14px;text-align:right;">{_delta_cell(row.get("change_6m_percent"))}</td>'
                 f'<td style="padding:10px 14px;text-align:right;">{_delta_cell(row.get("change_1y_percent"))}</td>'
                 f'</tr>'
             )
-
-        tbl_html = (
+        _th = lambda lbl, align="left": (
+            f'<th style="padding:10px 14px;text-align:{align};font-size:0.7rem;font-weight:700;'
+            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">{lbl}</th>'
+        )
+        st.markdown(
             f'<div style="overflow-x:auto;border-radius:12px;border:1px solid {_bdr};">'
             f'<table style="width:100%;border-collapse:collapse;">'
-            f'<thead>'
-            f'<tr style="background:{_al};border-bottom:2px solid {_bdr};">'
-            f'<th style="padding:10px 14px;text-align:left;font-size:0.7rem;font-weight:700;'
-            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">Fund</th>'
-            f'<th style="padding:10px 14px;text-align:left;font-size:0.7rem;font-weight:700;'
-            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">Allocation</th>'
-            f'<th style="padding:10px 14px;text-align:left;font-size:0.7rem;font-weight:700;'
-            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">3M Trend</th>'
-            f'<th style="padding:10px 14px;text-align:right;font-size:0.7rem;font-weight:700;'
-            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">3M Δ</th>'
-            f'<th style="padding:10px 14px;text-align:right;font-size:0.7rem;font-weight:700;'
-            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">6M Δ</th>'
-            f'<th style="padding:10px 14px;text-align:right;font-size:0.7rem;font-weight:700;'
-            f'color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">1Y Δ</th>'
-            f'</tr>'
-            f'</thead>'
-            f'<tbody>{rows_html}</tbody>'
-            f'</table>'
-            f'</div>'
+            f'<thead><tr style="background:{_al};border-bottom:2px solid {_bdr};">'
+            f'{_th("Fund")}{_th("Allocation")}{_th("3M Trend")}'
+            f'{_th("3M Δ","right")}{_th("6M Δ","right")}{_th("1Y Δ","right")}'
+            f'</tr></thead><tbody>{_rows_html}</tbody></table></div>',
+            unsafe_allow_html=True,
         )
-        st.markdown(tbl_html, unsafe_allow_html=True)
 
     # ── Insights ─────────────────────────────────────────────────────────────────
     st.markdown("<br>", unsafe_allow_html=True)
