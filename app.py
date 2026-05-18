@@ -5856,6 +5856,11 @@ def page_stock_explorer():
         cat_trend = cat_trend.dropna(subset=["1Y ago", "6M ago", "3M ago"], how="all")
         cats_list = cat_trend.to_dict("records")
 
+        def _hex_to_rgba(hex_col, alpha):
+            h = hex_col.lstrip("#")
+            r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+            return f"rgba({r},{g},{b},{alpha})"
+
         _COLS_PER_ROW = 3
         for _rs in range(0, len(cats_list), _COLS_PER_ROW):
             _row_cats = cats_list[_rs : _rs + _COLS_PER_ROW]
@@ -5868,56 +5873,67 @@ def page_stock_explorer():
                     _ypts  = [_crow[t] for t in _time_labels if pd.notna(_crow.get(t))]
                     if len(_xpts) < 2:
                         continue
-                    _change      = _ypts[-1] - _ypts[0]
-                    _ch_col      = "#059669" if _change >= 0 else "#DC2626"
-                    _period_lbl  = _period_map.get(_xpts[0], "the period")
-                    _change_str  = f"{'+' if _change >= 0 else ''}{_change:.2f}% over {_period_lbl}"
+                    _change     = _ypts[-1] - _ypts[0]
+                    _ch_col     = "#059669" if _change >= 0 else "#DC2626"
+                    _period_lbl = _period_map.get(_xpts[0], "the period")
+                    _change_str = f"{'+' if _change >= 0 else ''}{_change:.2f}% over {_period_lbl}"
+                    _fill_rgba  = _hex_to_rgba(_col_c, 0.15)
 
                     _fig_m = go.Figure()
                     _fig_m.add_trace(go.Scatter(
                         x=_xpts, y=_ypts,
                         mode="lines+markers",
                         line=dict(color=_col_c, width=2.5),
-                        marker=dict(size=6, color=_col_c,
-                                    line=dict(width=1.5, color=_cd)),
+                        marker=dict(size=7, color=_col_c,
+                                    line=dict(width=1.5, color="#ffffff")),
                         fill="tozeroy",
-                        fillcolor=_col_c + "28",
+                        fillcolor=_fill_rgba,
                         hovertemplate="%{x}: <b>%{y:.2f}%</b><extra></extra>",
                     ))
                     _fig_m.update_layout(
                         paper_bgcolor=_cd,
                         plot_bgcolor="rgba(0,0,0,0)",
                         font=dict(family="Inter, sans-serif"),
-                        height=165,
-                        margin=dict(l=8, r=8, t=54, b=8),
+                        height=160,
+                        margin=dict(l=10, r=10, t=56, b=10),
                         showlegend=False,
                         xaxis=dict(showticklabels=False, showgrid=False,
-                                   showline=False, zeroline=False),
+                                   showline=False, zeroline=False,
+                                   fixedrange=True),
                         yaxis=dict(showticklabels=False, showgrid=False,
-                                   showline=False, zeroline=False),
+                                   showline=False, zeroline=False,
+                                   fixedrange=True),
                         annotations=[
                             dict(
                                 text=f"<b>{_cat}</b>",
-                                x=0, y=1, xref="paper", yref="paper",
+                                x=0.04, y=1, xref="paper", yref="paper",
                                 xanchor="left", yanchor="bottom",
                                 showarrow=False,
                                 font=dict(size=12, color=_hd,
                                           family="Inter, sans-serif"),
-                                yshift=28,
+                                yshift=30,
                             ),
                             dict(
                                 text=_change_str,
-                                x=0, y=1, xref="paper", yref="paper",
+                                x=0.04, y=1, xref="paper", yref="paper",
                                 xanchor="left", yanchor="bottom",
                                 showarrow=False,
                                 font=dict(size=10, color=_ch_col,
                                           family="Inter, sans-serif"),
-                                yshift=8,
+                                yshift=10,
                             ),
                         ],
+                        shapes=[dict(
+                            type="rect",
+                            xref="paper", yref="paper",
+                            x0=0, y0=0, x1=1, y1=1,
+                            line=dict(color=_bdr, width=1),
+                            layer="below",
+                        )],
                     )
                     st.plotly_chart(_fig_m, use_container_width=True,
-                                    config={"displayModeBar": False})
+                                    config={"displayModeBar": False,
+                                            "staticPlot": True})
 
 
     # ── Full breakdown — collapsible ─────────────────────────────────────────────
