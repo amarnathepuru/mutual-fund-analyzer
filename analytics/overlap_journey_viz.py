@@ -28,20 +28,24 @@ COLOR_EDGE_MODERATE  = "#6366F1"   # 30–45% Moderate — indigo
 # Keep backward-compat aliases
 COLOR_EDGE_MID = COLOR_EDGE_HIGH
 
-# Overlap buckets (label, threshold, edge-colour, badge-bg, description)
-# Mirror Fund Comparison page exactly
-OVERLAP_BUCKETS: list[tuple[str, float, str, str, str]] = [
-    ("🔴 Very High (>60%)",  60.0, COLOR_EDGE_VERY_HIGH, "#FEE2E2", "Nearly identical — consider replacing one fund."),
-    ("🟡 High (45–60%)",     45.0, COLOR_EDGE_HIGH,      "#FEF3C7", "Significant overlap — paying two managers for similar results."),
-    ("🔵 Moderate (30–45%)", 30.0, COLOR_EDGE_MODERATE,  "#EEF2FF", "Noticeable overlap — worth monitoring."),
-    ("🟢 Good (15–30%)",     15.0, "#059669",             "#ECFDF5", "Healthy diversification — generally fine."),
-    ("✅ All connections",    0.0,  "#94A3B8",             "#F8FAFC", "Show every pair with any overlap."),
+# Overlap buckets: (label, min_pct, max_pct, edge-colour, badge-bg, description)
+# Each bucket shows ONLY connections whose overlap falls within [min_pct, max_pct).
+# "All connections" uses max=100 to show everything with score-based colours.
+OVERLAP_BUCKETS: list[tuple[str, float, float, str, str, str]] = [
+    ("🔴 Very High (60%+)",   60.0, 100.0, COLOR_EDGE_VERY_HIGH, "#FEE2E2", "Nearly identical — consider replacing one fund."),
+    ("🟡 High (45–59%)",      45.0,  60.0, COLOR_EDGE_HIGH,      "#FEF3C7", "Significant overlap — paying two managers for similar results."),
+    ("🔵 Moderate (30–44%)",  30.0,  45.0, COLOR_EDGE_MODERATE,  "#EEF2FF", "Noticeable overlap — worth monitoring."),
+    ("🟢 Good (15–29%)",      15.0,  30.0, "#059669",             "#ECFDF5", "Healthy diversification — generally fine."),
+    ("🟢 Excellent (<15%)",    0.0,  15.0, "#34D399",             "#ECFDF5", "Very different portfolios — ideal combination."),
+    ("✅ All connections",     0.0,  100.0, "#94A3B8",             "#F8FAFC", "Show every pair with any overlap."),
 ]
 
-# Map from display label → min threshold value
+# Maps from display label → (min, max) thresholds
+BUCKET_LABEL_TO_RANGE: dict[str, tuple[float, float]] = {b[0]: (b[1], b[2]) for b in OVERLAP_BUCKETS}
+# Keep legacy min-only map for backward compat
 BUCKET_LABEL_TO_MIN: dict[str, float] = {b[0]: b[1] for b in OVERLAP_BUCKETS}
 # Default selection label
-DEFAULT_BUCKET_LABEL = "🟡 High (45–60%)"
+DEFAULT_BUCKET_LABEL = "🟡 High (45–59%)"
 
 # Node fill palette – constant, readable on any background
 NODE_FILL_DEFAULT  = "#6C63FF"   # soft indigo
@@ -59,6 +63,7 @@ class JourneyVizParams:
     fund_b: str | None = None
     return_period: str = "1Y"
     min_edge_pct: float = JOURNEY_MIN_EDGE
+    max_edge_pct: float = 100.0          # upper bound — 100 means no upper limit
     selected_funds: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self) -> None:
@@ -91,16 +96,22 @@ def _hex_rgba(hex_color: str, alpha: float) -> str:
     return f"rgba({r},{g},{b},{alpha})"
 
 
-def _edge_style(score: float, min_edge: float = JOURNEY_MIN_EDGE) -> tuple[str, float] | None:
-    if score < min_edge:
+def _edge_style(
+    score: float,
+    min_edge: float = JOURNEY_MIN_EDGE,
+    max_edge: float = 100.0,
+) -> tuple[str, float] | None:
+    """Return (colour, width) if score falls within [min_edge, max_edge), else None."""
+    if score < min_edge or score >= max_edge:
         return None
+    # Colour by actual overlap level regardless of which bucket filter is active
     if score >= 60.0:
         return COLOR_EDGE_VERY_HIGH, WIDTH_EDGE_HIGH
     if score >= 45.0:
         return COLOR_EDGE_HIGH, WIDTH_EDGE_MID
     if score >= 30.0:
         return COLOR_EDGE_MODERATE, WIDTH_EDGE_LOW
-    return "#94A3B8", WIDTH_EDGE_LOW  # any remaining (15–30%)
+    return "#059669", WIDTH_EDGE_LOW  # Good (15–30%)
 
 
 def _node_label(graph: CategoryGraph, idx: int, master, period: str) -> str:
@@ -178,6 +189,7 @@ def _add_edge_traces(
     pos,
     fund_a: str | None,
     min_edge_pct: float = JOURNEY_MIN_EDGE,
+    max_edge_pct: float = 100.0,
 ) -> None:
     fund_a_idx = graph.funds.index(fund_a) if fund_a and fund_a in graph.funds else None
     batches: dict[tuple, tuple] = {}
@@ -186,7 +198,7 @@ def _add_edge_traces(
         for i, j, score in get_edges(graph.matrix, min_edge_pct, top_k_per_fund=None):
             if i == fund_a_idx or j == fund_a_idx:
                 continue
-            style = _edge_style(score, min_edge_pct)
+            style = _edge_style(score, min_edge_pct, max_edge_pct)
             if style is None:
                 continue
             color, width = style
@@ -200,7 +212,7 @@ def _add_edge_traces(
             if j == fund_a_idx:
                 continue
             score = float(graph.matrix[fund_a_idx, j])
-            style = _edge_style(score, min_edge_pct)
+            style = _edge_style(score, min_edge_pct, max_edge_pct)
             if style is None:
                 continue
             color, width = style
@@ -211,7 +223,7 @@ def _add_edge_traces(
             hovers.extend([f"{graph.labels[fund_a_idx]} ↔ {graph.labels[j]}: {score:.0f}%"] * 2 + [""])
     else:
         for i, j, score in get_edges(graph.matrix, min_edge_pct, top_k_per_fund=None):
-            style = _edge_style(score, min_edge_pct)
+            style = _edge_style(score, min_edge_pct, max_edge_pct)
             if style is None:
                 continue
             color, width = style
@@ -275,8 +287,9 @@ def fig_overlap_journey(
     fund_a_idx = graph.funds.index(fund_a) if fund_a and fund_a in graph.funds else None
 
     min_edge = params.min_edge_pct
+    max_edge = params.max_edge_pct
     fig = go.Figure()
-    _add_edge_traces(fig, graph, pos, fund_a, min_edge)
+    _add_edge_traces(fig, graph, pos, fund_a, min_edge, max_edge)
 
     sizes               = _node_sizes(graph, master, params.return_period)
     fills, text_colors  = _node_colors(graph, fund_a, fund_b, fund_a_idx)
@@ -358,17 +371,22 @@ def journey_legend_html(theme: dict) -> str:
 
     lines_section = (
         f'<div style="font-size:0.72rem;font-weight:700;color:{sub};text-transform:uppercase;'
-        f'letter-spacing:0.4px;margin-bottom:0.4rem;">Connecting lines (same buckets as Fund Comparison)</div>'
-        f'<div style="margin-bottom:0.75rem;display:flex;flex-wrap:wrap;align-items:center;">'
-        + _swatch(COLOR_EDGE_VERY_HIGH, "🔴 Very High (&gt;60%) &mdash; nearly identical, consider replacing one")
-        + _swatch(COLOR_EDGE_HIGH,      "🟡 High (45&ndash;60%) &mdash; significant overlap")
-        + _swatch(COLOR_EDGE_MODERATE,  "🔵 Moderate (30&ndash;45%) &mdash; worth monitoring")
-        + _swatch("#059669",            "🟢 Good (15&ndash;30%) &mdash; healthy diversification")
+        f'letter-spacing:0.4px;margin-bottom:0.4rem;">Line colours (overlap level)</div>'
+        f'<div style="margin-bottom:0.5rem;display:flex;flex-wrap:wrap;align-items:center;">'
+        + _swatch(COLOR_EDGE_VERY_HIGH, "🔴 Very High 60%+ &mdash; nearly identical")
+        + _swatch(COLOR_EDGE_HIGH,      "🟡 High 45&ndash;59% &mdash; significant overlap")
+        + _swatch(COLOR_EDGE_MODERATE,  "🔵 Moderate 30&ndash;44% &mdash; worth monitoring")
+        + _swatch("#059669",            "🟢 Good 15&ndash;29% &mdash; healthy diversification")
+        + _swatch("#34D399",            "🟢 Excellent &lt;15% &mdash; very different, ideal combination")
         + no_line
         + f'</div>'
-        f'<div style="font-size:0.72rem;color:{sub};margin-bottom:0.75rem;">'
-        f'💡 Use the <strong style="color:{head};">Connections</strong> filter in the toolbar '
-        f'to focus on only the overlap level you care about.'
+        f'<div style="font-size:0.72rem;color:{sub};background:{bdr}20;border-radius:6px;'
+        f'padding:6px 8px;margin-bottom:0.75rem;line-height:1.5;">'
+        f'<strong style="color:{head};">Draw lines when overlap ≥</strong> filter sets the <em>minimum</em> threshold. '
+        f'Selecting <strong>High &amp; above (≥45%)</strong> draws amber lines (High) <em>and</em> red lines (Very High). '
+        f'Choose <strong>Very High only</strong> to see exclusively the &gt;60% connections.<br>'
+        f'&nbsp;<br>This filter only affects the lines drawn — '
+        f'<strong style="color:{head};">you can compare any two funds regardless</strong> by clicking a bubble or using the list.'
         f'</div>'
     )
 

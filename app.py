@@ -880,20 +880,21 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
 # ── NAV HEADER ────────────────────────────────────────────────────────────────
 
 def nav_header(back_page=None, back_label="Back"):
+    _t = st.session_state.get("fl_theme", "warm_light")
     back_pill = ""
     if back_page and back_page != "home":
-        href = f"?nav={back_page}"
+        href = f"?nav={back_page}&theme={_t}"
         # Preserve selected_categories in URL so the explorer isn't empty after a reload
         if back_page == "explorer":
             cats = st.session_state.get("selected_categories", [])
             if cats:
                 cats_enc = "|".join(urllib.parse.quote_plus(c) for c in cats)
-                href = f"?nav={back_page}&cats={cats_enc}"
+                href = f"?nav={back_page}&cats={cats_enc}&theme={_t}"
         back_pill = f'<a href="{href}" target="_self" class="nav-pill">← {back_label}</a>'
 
     st.markdown(
         f'<div class="nav-pill-row">'
-        f'<a href="?nav=home" target="_self" class="nav-pill">🏠 Home</a>'
+        f'<a href="?nav=home&theme={_t}" target="_self" class="nav-pill">🏠 Home</a>'
         f'{back_pill}'
         f'</div>'
         f'<div style="height:1px;background:rgba(255,255,255,0.08);margin:0 0 1.25rem;"></div>',
@@ -945,7 +946,7 @@ def render_sidebar():
             )
             st.markdown(
                 f'<div class="nav-tooltip-wrap">'
-                f'<a href="?nav={target}" target="_self" style="all:unset;display:block;cursor:pointer;">'
+                f'<a href="?nav={target}&theme={st.session_state.get("fl_theme","warm_light")}" target="_self" style="all:unset;display:block;cursor:pointer;">'
                 f'<div style="background:{card_bg};border:1.5px solid {card_border};border-radius:12px;'
                 f'padding:.75rem .85rem;margin-bottom:.5rem;box-shadow:{shadow};transition:all .15s;">'
                 f'<div style="display:flex;align-items:center;gap:.7rem;">'
@@ -1278,7 +1279,6 @@ def _fl_render_navbar(t, t_name, active_page):
         active_cls = " active" if key == active_page else ""
         links_html += f'<a href="?nav={key}&theme={t_name}" target="_self" class="fl-nav-link{active_cls}">{label}</a>'
 
-    # Pure HTML <details> theme picker — no Streamlit widget, full CSS control
     _current_page = st.session_state.get("page", active_page)
     _theme_rows = ""
     for tk, (tc, tname) in _FL_THEME_META.items():
@@ -1419,15 +1419,15 @@ def page_analyse_funds():
     max_sim  = int(similarity["normalized_score"].max()) if not similarity.empty else 0
 
     _cards = [
-        ("?nav=category",          "rgba(83,74,183,0.15)",  "🔍",
+        (f"?nav=category&theme={t_name}",          "rgba(83,74,183,0.15)",  "🔍",
          "Compare funds",
          "Pick up to 5 funds and see their overlap, sector exposure, and common holdings side by side.",
          f"{n_funds} funds · {n_cats} categories"),
-        ("?nav=stock_explorer",    "rgba(16,185,129,0.15)", "🏦",
+        (f"?nav=stock_explorer&theme={t_name}",    "rgba(16,185,129,0.15)", "🏦",
          "Inspect a stock",
          "Pick any stock and see every fund holding it, at what weight, and how conviction is shifting.",
          f"{n_unique} unique stocks tracked"),
-        ("?nav=overlap_drilldown", "rgba(249,115,22,0.15)", "🔗",
+        (f"?nav=overlap_drilldown&theme={t_name}", "rgba(249,115,22,0.15)", "🔗",
          "Overlap matrix",
          "Full pairwise overlap across every fund in a category — spot which pairs are nearly identical.",
          f"Highest overlap found: {max_sim}%"),
@@ -2699,16 +2699,16 @@ def page_compare():
                             f'<span style="font-size:0.72rem;font-weight:700;color:{"#34D399" if _is_dark else "#059669"};min-width:82px;flex-shrink:0;">🟢 Excellent<br><span style="font-weight:400;color:{_sb};font-size:0.65rem;">&lt;15%</span></span>'
                             f'<span style="font-size:0.72rem;color:{_bd};line-height:1.5;">Very different portfolios — ideal combination.</span></div>'
                             f'<div style="display:flex;align-items:baseline;gap:8px;">'
-                            f'<span style="font-size:0.72rem;font-weight:700;color:{"#34D399" if _is_dark else "#059669"};min-width:82px;flex-shrink:0;">🟢 Good<br><span style="font-weight:400;color:{_sb};font-size:0.65rem;">15–30%</span></span>'
+                            f'<span style="font-size:0.72rem;font-weight:700;color:{"#34D399" if _is_dark else "#059669"};min-width:82px;flex-shrink:0;">🟢 Good<br><span style="font-weight:400;color:{_sb};font-size:0.65rem;">15–29%</span></span>'
                             f'<span style="font-size:0.72rem;color:{_bd};line-height:1.5;">Healthy diversification — generally fine.</span></div>'
                             f'<div style="display:flex;align-items:baseline;gap:8px;">'
-                            f'<span style="font-size:0.72rem;font-weight:700;color:{_a};min-width:82px;flex-shrink:0;">🔵 Moderate<br><span style="font-weight:400;color:{_sb};font-size:0.65rem;">30–45%</span></span>'
+                            f'<span style="font-size:0.72rem;font-weight:700;color:{_a};min-width:82px;flex-shrink:0;">🔵 Moderate<br><span style="font-weight:400;color:{_sb};font-size:0.65rem;">30–44%</span></span>'
                             f'<span style="font-size:0.72rem;color:{_bd};line-height:1.5;">Noticeable overlap — worth monitoring.</span></div>'
                             f'<div style="display:flex;align-items:baseline;gap:8px;">'
-                            f'<span style="font-size:0.72rem;font-weight:700;color:{"#FDE68A" if _is_dark else "#D97706"};min-width:82px;flex-shrink:0;">🟡 High<br><span style="font-weight:400;color:{_sb};font-size:0.65rem;">45–60%</span></span>'
+                            f'<span style="font-size:0.72rem;font-weight:700;color:{"#FDE68A" if _is_dark else "#D97706"};min-width:82px;flex-shrink:0;">🟡 High<br><span style="font-weight:400;color:{_sb};font-size:0.65rem;">45–59%</span></span>'
                             f'<span style="font-size:0.72rem;color:{_bd};line-height:1.5;">Significant overlap — paying two managers for similar results.</span></div>'
                             f'<div style="display:flex;align-items:baseline;gap:8px;">'
-                            f'<span style="font-size:0.72rem;font-weight:700;color:{"#FCA5A5" if _is_dark else "#DC2626"};min-width:82px;flex-shrink:0;">🔴 Very High<br><span style="font-weight:400;color:{_sb};font-size:0.65rem;">&gt;60%</span></span>'
+                            f'<span style="font-size:0.72rem;font-weight:700;color:{"#FCA5A5" if _is_dark else "#DC2626"};min-width:82px;flex-shrink:0;">🔴 Very High<br><span style="font-weight:400;color:{_sb};font-size:0.65rem;">60%+</span></span>'
                             f'<span style="font-size:0.72rem;color:{_bd};line-height:1.5;">Nearly identical — consider replacing one fund.</span></div>'
                             )
                             + f'</div>'
@@ -6200,7 +6200,7 @@ def _overlap_go_compare(fund_a: str, fund_b: str):
     st.rerun()
 
 
-@st.cache_data(ttl=3600)
+@st.cache_resource(ttl=3600)
 def _overlap_filtered_graph(category: str, funds_key: tuple[str, ...]):
     from analytics.overlap_graph import build_category_graph, filter_pairs
 
@@ -6443,16 +6443,19 @@ def _overlap_inject_page_css(t: dict, t_name: str):
 
 
 
-def _overlap_graph_insight(graph, min_edge_pct: float, conn_bucket: str, theme: dict) -> str:
+def _overlap_graph_insight(graph, min_edge_pct: float, max_edge_pct: float, conn_bucket: str, theme: dict) -> str:
     """Generate a plain-English insight card based on current graph state."""
     from analytics.overlap_graph import fund_label, get_edges
+    from analytics.overlap_journey_viz import _edge_style
 
     n = len(graph.funds)
     if n < 2:
         return ""
 
-    # Build adjacency for connected-component detection
-    edges = get_edges(graph.matrix, min_edge_pct, top_k_per_fund=None)
+    # Build adjacency using only the edges that will actually be drawn
+    all_edges = get_edges(graph.matrix, min_edge_pct, top_k_per_fund=None)
+    edges = [(i, j, s) for i, j, s in all_edges
+             if _edge_style(s, min_edge_pct, max_edge_pct) is not None]
     adj: dict[int, set[int]] = {i: set() for i in range(n)}
     for i, j, _ in edges:
         adj[i].add(j)
@@ -6489,24 +6492,30 @@ def _overlap_graph_insight(graph, min_edge_pct: float, conn_bucket: str, theme: 
     _bd  = theme["body"]
     _sb  = theme["sub"]
 
+    def _rgba(hex_c: str, alpha: float) -> str:
+        h = hex_c.lstrip("#")
+        r, g, b = int(h[0:2],16), int(h[2:4],16), int(h[4:6],16)
+        return f"rgba({r},{g},{b},{alpha})"
+
     # ── Build sentences ──────────────────────────────────────────────────────
     if not edges:
-        # No connections at this threshold
         verdict_icon  = "✅"
-        verdict_color = "#059669"
-        verdict_bg    = "#ECFDF5"
-        headline = f"All {n} funds look distinct at this overlap level"
+        verdict_color = "#34D399"
+        verdict_bg    = _rgba("#059669", 0.12)
+        headline = f"No lines drawn — no two funds exceed {min_edge_pct:.0f}% overlap"
         body = (
-            f"None of the {n} funds share more than {min_edge_pct:.0f}% of their portfolio "
-            f"with any other fund at the <strong>{bucket_label}</strong> threshold. "
-            f"You could pick any combination from this list without worrying about duplication."
+            f"The <strong>Draw lines</strong> filter is set to <strong>{bucket_label}</strong>, "
+            f"so lines only appear between funds with that level of overlap. "
+            f"None of the {n} funds cross that threshold with any other fund — "
+            f"which means this set is well-diversified at this level. "
+            f"<strong>You can still compare any two funds</strong> — click a bubble or pick from the list on the right."
         )
-        tip = "Try lowering the Connections filter to see more subtle overlaps."
+        tip = "Lower the 'Draw lines' filter (e.g. to Moderate or Good) to see which funds have milder overlaps."
     elif n_clusters == 1 and n_connected == n:
         # All funds connected into one big cluster
         verdict_icon  = "⚠️"
-        verdict_color = "#DC2626"
-        verdict_bg    = "#FEF2F2"
+        verdict_color = "#F87171"
+        verdict_bg    = _rgba("#DC2626", 0.12)
         headline = f"Most funds in this category overlap significantly"
         body = (
             f"All {n} funds are connected at the <strong>{bucket_label}</strong> level — "
@@ -6523,12 +6532,12 @@ def _overlap_graph_insight(graph, min_edge_pct: float, conn_bucket: str, theme: 
 
         if n_isolated == 0:
             verdict_icon  = "🟡"
-            verdict_color = "#D97706"
-            verdict_bg    = "#FFFBEB"
+            verdict_color = "#FCD34D"
+            verdict_bg    = _rgba("#D97706", 0.12)
         else:
             verdict_icon  = "ℹ️"
             verdict_color = _a
-            verdict_bg    = _al
+            verdict_bg    = _rgba(_a, 0.08)
 
         headline = (
             f"{n_connected} of {n} funds have {bucket_label.lower()} overlap with at least one other"
@@ -6554,11 +6563,11 @@ def _overlap_graph_insight(graph, min_edge_pct: float, conn_bucket: str, theme: 
         tip = "Click any bubble to see its specific overlaps with every other fund."
 
     return (
-        f'<div style="background:{verdict_bg};border:1px solid {_bdr};border-radius:10px;'
+        f'<div style="background:{verdict_bg};border:1px solid {verdict_color}40;border-radius:10px;'
         f'padding:0.75rem 1rem;margin:0.5rem 0 0.4rem;">'
         f'<div style="font-size:0.88rem;font-weight:700;color:{verdict_color};margin-bottom:0.3rem;">'
         f'{verdict_icon}&nbsp; {headline}</div>'
-        f'<div style="font-size:0.78rem;color:{_bd};line-height:1.6;">{body}</div>'
+        f'<div style="font-size:0.78rem;color:{_hd};line-height:1.6;">{body}</div>'
         f'<div style="font-size:0.72rem;color:{_sb};margin-top:0.4rem;">💡 {tip}</div>'
         f'</div>'
     )
@@ -6769,10 +6778,12 @@ def _overlap_render_quick_facts(fund_a, fund_b, master, holdings, period, theme)
                 top_sector_a = float(sa.get(top_sector, 0))
                 top_sector_b = float(sb.get(top_sector, 0))
 
+    fa_s = fund_label(fund_a, max_len=13)
+    fb_s = fund_label(fund_b, max_len=13)
+
     def _fmt_ret(v):
-        if v is None: return "—"
-        color = "#059669" if v >= 0 else "#DC2626"
-        return f'<span style="color:{color};font-weight:700;">{v:+.1f}%</span>'
+        if v is None: return "—", False
+        return f"{v:+.1f}%", v >= 0
 
     def _fmt_aum(v):
         if v is None: return "—"
@@ -6783,78 +6794,107 @@ def _overlap_render_quick_facts(fund_a, fund_b, master, holdings, period, theme)
     def _fmt_er(v):
         return f"{v:.2f}%" if v is not None else "—"
 
-    def _delta_badge(va, vb, *, higher_is_better=True):
-        if va is None or vb is None: return ""
-        diff = vb - va
-        if abs(diff) < 0.01: return '<span style="font-size:0.68rem;color:#94A3B8;">Same</span>'
-        better = (diff > 0) == higher_is_better
-        icon  = "▲" if diff > 0 else "▼"
-        color = "#059669" if better else "#DC2626"
-        who   = fund_label(fund_b if diff > 0 else fund_a, max_len=10)
-        return f'<span style="font-size:0.68rem;color:{color};">{icon} {who}</span>'
+    WIN_BG = "rgba(16,185,129,0.13)"  # semi-transparent green — works on light and dark themes
+    TICK_COLOR = "#34D399"
 
-    # ── Build rows ──────────────────────────────────────────────────────
-    def _row(label, val_a, val_b, delta_html="", last=False):
-        bb = "none" if last else f"1px solid {_bdr}"
+    def _cell(val_str, is_winner, color):
+        bg = f"background:{WIN_BG};" if is_winner else ""
+        tick = f' <span style="color:{TICK_COLOR};font-size:0.7rem;">✓</span>' if is_winner else ""
         return (
-            f'<tr style="border-bottom:{bb};">'
-            f'<td style="padding:7px 8px;font-size:0.72rem;color:{_sb};white-space:nowrap;">{label}</td>'
-            f'<td style="padding:7px 8px;font-size:0.78rem;text-align:right;">{val_a}</td>'
-            f'<td style="padding:7px 8px;font-size:0.78rem;text-align:right;">{val_b}</td>'
-            f'<td style="padding:7px 4px;text-align:right;">{delta_html}</td>'
-            f'</tr>'
+            f'<td style="padding:9px 10px;text-align:right;border-radius:6px;{bg}">'
+            f'<span style="font-size:0.85rem;font-weight:700;color:{color};">{val_str}</span>'
+            f'{tick}</td>'
         )
 
-    fa_s = fund_label(fund_a, max_len=11)
-    fb_s = fund_label(fund_b, max_len=11)
+    def _winner(va, vb, *, higher_is_better=True):
+        """Returns (a_wins, b_wins) booleans."""
+        if va is None or vb is None: return False, False
+        if abs(vb - va) < 0.01: return False, False
+        b_wins = (vb > va) if higher_is_better else (vb < va)
+        return not b_wins, b_wins
+
+    ret_a_str, _ = _fmt_ret(ret_a)
+    ret_b_str, _ = _fmt_ret(ret_b)
+    ret_a_wins, ret_b_wins = _winner(ret_a, ret_b, higher_is_better=True)
+    er_a_wins,  er_b_wins  = _winner(er_a,  er_b,  higher_is_better=False)
+
+    RET_POS = "#34D399"   # green that reads on both light and dark backgrounds
+    RET_NEG = "#F87171"   # red that reads on both light and dark backgrounds
+    ret_color_a = RET_POS if (ret_a is not None and ret_a >= 0) else RET_NEG
+    ret_color_b = RET_POS if (ret_b is not None and ret_b >= 0) else RET_NEG
+
+    def _lbl(text):
+        return (
+            f'<td style="padding:9px 10px;font-size:0.75rem;font-weight:600;'
+            f'color:{_sb};white-space:nowrap;width:38%;">{text}</td>'
+        )
+
+    def _divider():
+        return f'<tr><td colspan="3" style="padding:0;border-bottom:1px solid {_bdr};"></td></tr>'
 
     rows = (
-        _row(f"{period} Return", _fmt_ret(ret_a), _fmt_ret(ret_b),
-             _delta_badge(ret_a, ret_b, higher_is_better=True))
-        + _row("AUM", _fmt_aum(aum_a), _fmt_aum(aum_b))
-        + _row("Exp. Ratio", _fmt_er(er_a), _fmt_er(er_b),
-               _delta_badge(er_a, er_b, higher_is_better=False), last=True)
+        f'<tr>'
+        + _lbl(f"{period} Return")
+        + _cell(ret_a_str, ret_a_wins, ret_color_a)
+        + _cell(ret_b_str, ret_b_wins, ret_color_b)
+        + f'</tr>'
+        + _divider()
+        + f'<tr>'
+        + _lbl("Fund size (AUM)")
+        + f'<td style="padding:9px 10px;text-align:right;font-size:0.82rem;font-weight:600;color:{_hd};">{_fmt_aum(aum_a)}</td>'
+        + f'<td style="padding:9px 10px;text-align:right;font-size:0.82rem;font-weight:600;color:{_hd};">{_fmt_aum(aum_b)}</td>'
+        + f'</tr>'
+        + _divider()
+        + f'<tr>'
+        + _lbl("Expense ratio")
+        + _cell(_fmt_er(er_a), er_a_wins, _hd)
+        + _cell(_fmt_er(er_b), er_b_wins, _hd)
+        + f'</tr>'
     )
 
-    col_head = (
-        f'<th style="padding:6px 8px;font-size:0.68rem;font-weight:700;'
-        f'text-transform:uppercase;letter-spacing:0.4px;text-align:right;'
-        f'white-space:nowrap;"></th>'
-    )
-    col_a_head = (
-        f'<th style="padding:6px 8px;font-size:0.68rem;font-weight:700;'
-        f'color:{COLOR_A};text-align:right;white-space:nowrap;">{fa_s}</th>'
-    )
-    col_b_head = (
-        f'<th style="padding:6px 8px;font-size:0.68rem;font-weight:700;'
-        f'color:{COLOR_B};text-align:right;white-space:nowrap;">{fb_s}</th>'
-    )
+    # Column headers with coloured dot + name
+    def _col_hdr(name, color):
+        return (
+            f'<th style="padding:7px 10px;text-align:right;font-size:0.75rem;'
+            f'font-weight:700;color:{color};white-space:nowrap;">'
+            f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
+            f'background:{color};margin-right:4px;vertical-align:middle;"></span>'
+            f'{name}</th>'
+        )
 
     sector_html = ""
     if top_sector:
         sa_str = f"{top_sector_a:.1f}%" if top_sector_a else "—"
         sb_str = f"{top_sector_b:.1f}%" if top_sector_b else "—"
         sector_html = (
-            f'<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid {_bdr};">'
+            f'<div style="margin-top:0.6rem;padding-top:0.55rem;border-top:1px solid {_bdr};">'
             f'<div style="font-size:0.68rem;font-weight:700;color:{_sb};'
-            f'text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">'
+            f'text-transform:uppercase;letter-spacing:0.4px;margin-bottom:5px;">'
             f'Biggest shared sector</div>'
-            f'<div style="font-size:0.8rem;font-weight:600;color:{_hd};">{top_sector}</div>'
-            f'<div style="display:flex;gap:12px;margin-top:3px;">'
-            f'<span style="font-size:0.75rem;color:{COLOR_A};">{fa_s}: {sa_str}</span>'
-            f'<span style="font-size:0.75rem;color:{COLOR_B};">{fb_s}: {sb_str}</span>'
+            f'<div style="font-size:0.85rem;font-weight:700;color:{_hd};margin-bottom:4px;">{top_sector}</div>'
+            f'<div style="display:flex;gap:16px;">'
+            f'<span style="font-size:0.78rem;color:{COLOR_A};font-weight:600;">'
+            f'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;'
+            f'background:{COLOR_A};margin-right:3px;vertical-align:middle;"></span>'
+            f'{fa_s}: {sa_str}</span>'
+            f'<span style="font-size:0.78rem;color:{COLOR_B};font-weight:600;">'
+            f'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;'
+            f'background:{COLOR_B};margin-right:3px;vertical-align:middle;"></span>'
+            f'{fb_s}: {sb_str}</span>'
             f'</div></div>'
         )
 
     st.markdown(
-        f'<div style="margin-top:0.7rem;padding:0.65rem 0.75rem;background:{_al};'
+        f'<div style="margin-top:0.7rem;padding:0.7rem 0.8rem;background:{_al};'
         f'border:1px solid {_bdr};border-radius:10px;">'
         f'<div style="font-size:0.68rem;font-weight:700;color:{_sb};'
-        f'text-transform:uppercase;letter-spacing:0.4px;margin-bottom:0.3rem;">'
-        f'Quick facts</div>'
+        f'text-transform:uppercase;letter-spacing:0.4px;margin-bottom:0.4rem;">Quick facts</div>'
         f'<table style="width:100%;border-collapse:collapse;">'
-        f'<thead><tr>{col_head}{col_a_head}{col_b_head}'
-        f'<th style="width:60px;"></th></tr></thead>'
+        f'<thead><tr>'
+        f'<th style="width:38%;"></th>'
+        + _col_hdr(fa_s, COLOR_A)
+        + _col_hdr(fb_s, COLOR_B)
+        + f'</tr></thead>'
         f'<tbody>{rows}</tbody></table>'
         + sector_html
         + f'</div>',
@@ -6872,6 +6912,7 @@ def page_overlap_drilldown():
     )
     from analytics.overlap_journey_viz import (
         BUCKET_LABEL_TO_MIN,
+        BUCKET_LABEL_TO_RANGE,
         DEFAULT_BUCKET_LABEL,
         JOURNEY_MIN_EDGE,
         OVERLAP_BUCKETS,
@@ -6953,7 +6994,7 @@ def page_overlap_drilldown():
     with c_conn:
         st.markdown('<div class="ov-period-wrap"></div>', unsafe_allow_html=True)
         conn_bucket = st.selectbox(
-            "Connections",
+            "Draw lines when overlap ≥",
             [b[0] for b in OVERLAP_BUCKETS],
             index=next(
                 i for i, b in enumerate(OVERLAP_BUCKETS)
@@ -6961,9 +7002,13 @@ def page_overlap_drilldown():
             ),
             key="overlap_matrix_conn_bucket",
             label_visibility="visible",
-            help="Filter which overlap connections are shown as lines in the graph.",
+            help=(
+                "Controls which lines are drawn on the graph. "
+                "You can always compare any two funds — just click a bubble or use the dropdown."
+            ),
         )
-    min_edge_pct = BUCKET_LABEL_TO_MIN.get(conn_bucket, JOURNEY_MIN_EDGE)
+    _bucket_range = BUCKET_LABEL_TO_RANGE.get(conn_bucket, (JOURNEY_MIN_EDGE, 100.0))
+    min_edge_pct, max_edge_pct = _bucket_range
     min_return_floor = None if min_ret == 0 else float(min_ret)
 
     filtered = filter_funds(master, category, period, min_return_floor)
@@ -6993,7 +7038,8 @@ def page_overlap_drilldown():
             graph,
             theme,
             master,
-            JourneyVizParams(fund_a=fund_a, fund_b=fund_b, return_period=period, min_edge_pct=min_edge_pct),
+            JourneyVizParams(fund_a=fund_a, fund_b=fund_b, return_period=period,
+                             min_edge_pct=min_edge_pct, max_edge_pct=max_edge_pct),
         )
         chart_event = st.plotly_chart(
             fig,
@@ -7011,7 +7057,7 @@ def page_overlap_drilldown():
             st.session_state.pop("overlap_dropdown_last", None)
             st.rerun()
 
-        insight_html = _overlap_graph_insight(graph, min_edge_pct, conn_bucket, theme)
+        insight_html = _overlap_graph_insight(graph, min_edge_pct, max_edge_pct, conn_bucket, theme)
         if insight_html:
             st.markdown(insight_html, unsafe_allow_html=True)
 
