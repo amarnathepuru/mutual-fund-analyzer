@@ -1,11 +1,12 @@
 [server]
 port = 8501
-address = "localhost"
-headless = false
-# Avoids watchdog/semaphore crashes on Windows when the dev server runs a long time
+headless = true
 fileWatcherType = "none"
 
 [browser]
 gatherUsageStats = false
 serverAddress = "localhost"
 serverPort = 8501
+
+[client]
+showEmailPrompt = false
