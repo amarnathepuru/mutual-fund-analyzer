@@ -23,6 +23,8 @@ In [share.streamlit.io](https://share.streamlit.io), connect this repo with:
 
 After pushing to `main`, use **Manage app → Reboot app** so the cloud instance picks up the latest code.
 
+**Python version:** set in the Cloud UI (Advanced settings), not in `packages.txt`. Do not put `python-3.11` in `packages.txt` — that file is only for Linux `apt` packages and will break the build.
+
 If the public URL shows an old sidebar (“Analyze Category” / equity picker), that deployment is **not** this app — create a new app or fix the repo/branch/main file above. This codebase is **FundLens** (home → Analyse Portfolio → Portfolio X-Ray).
 
 Data CSVs under `data/` are committed so the cloud app can load holdings without scraping.
