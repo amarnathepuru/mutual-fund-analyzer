@@ -665,6 +665,277 @@ def render_risk_metric_explainer(key_suffix=""):
                 )
 
 
+INSIGHT_CATEGORIES = [
+    (
+        "overlap",
+        "🔗 Do your funds repeat the same stocks?",
+        "Checks whether several funds own the same companies underneath.",
+    ),
+    (
+        "sector",
+        "🏗️ Are you tilted toward one industry?",
+        "Looks at how much of your funds sit in sectors like banks, IT, or pharma.",
+    ),
+    (
+        "unique",
+        "🔬 What does each fund add on its own?",
+        "Stocks only one of your funds holds — the extra variety that fund brings.",
+    ),
+    (
+        "momentum",
+        "📈 What are managers buying or selling lately?",
+        "Recent 3-month changes in how much funds hold certain stocks.",
+    ),
+    (
+        "cost_risk",
+        "💰 Fees and bumpiness",
+        "Yearly fund charges and how much returns tend to swing up and down.",
+    ),
+]
+
+
+def _render_categorized_insights(
+    insights: list,
+    *,
+    hd: str, sb: str, bd: str, al: str, bdr: str,
+    page_key: str = "ins",
+    empty_msg: str = "No clear patterns stood out. Try adding more funds or check the other tabs.",
+) -> None:
+    """Render insights grouped in collapsible sections to keep the page scannable."""
+    cls_map = {
+        "alert": "insight-alert",
+        "warning": "insight-warning",
+        "info": "insight-info",
+        "success": "insight-success",
+    }
+    if not insights:
+        st.info(empty_msg)
+        return
+
+    n_notes = len(insights)
+    n_watch = sum(1 for i in insights if i["type"] in ("alert", "warning"))
+    n_good  = sum(1 for i in insights if i["type"] == "success")
+    st.markdown(
+        f'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;">'
+        f'<span style="font-size:0.72rem;font-weight:600;color:{sb};background:{al};'
+        f'border:1px solid {bdr};border-radius:999px;padding:4px 10px;">'
+        f'{n_notes} note{"s" if n_notes != 1 else ""} total</span>'
+        + (f'<span style="font-size:0.72rem;font-weight:600;color:{sb};background:rgba(245,158,11,0.12);'
+           f'border:1px solid {bdr};border-radius:999px;padding:4px 10px;">'
+           f'{n_watch} worth a closer look</span>' if n_watch else "")
+        + (f'<span style="font-size:0.72rem;font-weight:600;color:{sb};background:rgba(16,185,129,0.12);'
+           f'border:1px solid {bdr};border-radius:999px;padding:4px 10px;">'
+           f'{n_good} positive</span>' if n_good else "")
+        + f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    _open_cat = None
+    for cat_key, _, _ in INSIGHT_CATEGORIES:
+        cat_ins = [i for i in insights if i.get("category") == cat_key]
+        if cat_ins and any(i["type"] in ("alert", "warning") for i in cat_ins):
+            _open_cat = cat_key
+            break
+    if _open_cat is None:
+        for cat_key, _, _ in INSIGHT_CATEGORIES:
+            if any(i.get("category") == cat_key for i in insights):
+                _open_cat = cat_key
+                break
+
+    for cat_key, cat_title, cat_sub in INSIGHT_CATEGORIES:
+        cat_ins = [i for i in insights if i.get("category") == cat_key]
+        if not cat_ins:
+            continue
+        with st.expander(
+            f"{cat_title} — {len(cat_ins)} note{'s' if len(cat_ins) != 1 else ''}",
+            expanded=(cat_key == _open_cat),
+            key=f"{page_key}_ins_{cat_key}",
+        ):
+            st.markdown(
+                f'<div style="font-size:0.78rem;color:{bd};line-height:1.5;margin-bottom:0.75rem;">'
+                f'{cat_sub}</div>',
+                unsafe_allow_html=True,
+            )
+            for ins in cat_ins:
+                st.markdown(
+                    f'<div class="insight-card {cls_map[ins["type"]]}">'
+                    f'<div class="insight-icon">{ins["icon"]}</div>'
+                    f'<div class="insight-text">{ins["text"]}</div></div>',
+                    unsafe_allow_html=True,
+                )
+
+
+def _render_concentration_flags(
+    *,
+    matched_funds: list,
+    sel_sim: pd.DataFrame,
+    sel_h: pd.DataFrame,
+    sel_sector: pd.DataFrame,
+    sel_master: pd.DataFrame,
+    master: pd.DataFrame,
+    weight_map: dict,
+    hd: str,
+    bd: str,
+    al: str,
+    bdr: str,
+) -> bool:
+    """Strict warning checks (overlap ≥65%, stock >5%, sector >40%, etc.). Returns True if any flag fired."""
+    st.markdown(
+        f'<div style="margin:0 0 0.5rem;">'
+        f'<div style="font-size:0.95rem;font-weight:700;color:{hd};">'
+        f'⚡ Priority concentration flags</div>'
+        f'<div style="font-size:0.72rem;color:{bd};margin-top:2px;">'
+        f'Only shows up when your portfolio crosses a strict warning level</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<div style="font-size:0.82rem;color:{bd};line-height:1.65;margin-bottom:0.75rem;'
+        f'padding:0.75rem 1rem;background:{al};border:1px solid {bdr};border-radius:10px;">'
+        f'<strong style="color:{hd};">Concentration</strong> means too much of your money depends on the '
+        f'same stocks, industries, fund types, or high fees. These flags are the first things to check.</div>',
+        unsafe_allow_html=True,
+    )
+
+    flags_found = False
+
+    if not sel_sim.empty:
+        high_ol = sel_sim[sel_sim["normalized_score"] >= 65]
+        for _, row in high_ol.iterrows():
+            flags_found = True
+            _fa = display_name(row["fund_a"])
+            _fb = display_name(row["fund_b"])
+            _ol_pct = row["normalized_score"]
+            _common = int(row["common_stocks"])
+            st.markdown(f"""<div class="insight-card insight-alert">
+                <div class="insight-icon">🔁</div>
+                <div class="insight-text"><strong>Two funds that largely own the same stocks</strong><br>
+                <strong>{_fa}</strong> and <strong>{_fb}</strong> share about <strong>{_ol_pct:.0f}%</strong>
+                of their holdings — roughly <strong>{_common}</strong> companies appear in both.
+                In plain terms: money in both funds often ends up in the same place, so you are not
+                getting much extra safety from holding two. It is a bit like buying two similar baskets.
+                Open the <strong>Fund Overlap</strong> tab to see the shared company names.</div></div>""",
+                unsafe_allow_html=True,
+            )
+
+    sel_h_wt2 = sel_h.copy()
+    sel_h_wt2["weight"]    = sel_h_wt2["fund_name"].map(weight_map).fillna(0)
+    sel_h_wt2["eff_alloc"] = sel_h_wt2["allocation_percent"] * sel_h_wt2["weight"]
+    eff_exp = sel_h_wt2.groupby("stock_name")["eff_alloc"].sum()
+    heavy_stocks = eff_exp[eff_exp > 5].sort_values(ascending=False)
+    if not heavy_stocks.empty:
+        flags_found = True
+        stocks_txt = ", ".join(
+            f"<strong>{s}</strong> ({v:.1f}% of your total holdings)" for s, v in heavy_stocks.items()
+        )
+        st.markdown(f"""<div class="insight-card insight-warning">
+            <div class="insight-icon">📌</div>
+            <div class="insight-text"><strong>Too much riding on a few companies</strong><br>
+            When we combine all your funds, these stocks make up more than 5% each of what you
+            actually own: {stocks_txt}.
+            If one of these companies has a bad quarter, legal trouble, or a big price fall,
+            your whole portfolio can feel it — not just one fund.</div></div>""",
+            unsafe_allow_html=True,
+        )
+
+    if not sel_sector.empty:
+        avg_by_sec = sel_sector.groupby("sector")["allocation_percent"].mean()
+        heavy_secs = avg_by_sec[avg_by_sec > 40].sort_values(ascending=False)
+        for sec, pct in heavy_secs.items():
+            flags_found = True
+            _sec_name = sec.title()
+            if sec.upper() == "FINANCIAL":
+                _sec_bench = (
+                    " Even a typical broad Indian market index only has about 30–35% in financial "
+                    "companies, so your funds are tilted more than usual toward banks and finance."
+                )
+            else:
+                _sec_bench = (
+                    " Many well-spread equity funds keep any one industry below about 25%, "
+                    "so this is a noticeable lean in one direction."
+                )
+            st.markdown(f"""<div class="insight-card insight-warning">
+                <div class="insight-icon">🏗️</div>
+                <div class="insight-text"><strong>Heavy tilt toward one industry ({_sec_name})</strong><br>
+                A <em>sector</em> is a group of similar businesses — for example banks, IT, or pharma.
+                On average, your funds have about <strong>{pct:.1f}%</strong> in <strong>{_sec_name}</strong>.{_sec_bench}
+                If that whole industry struggles (for example rate changes hitting banks, or a tech slowdown),
+                most of your funds can drop together because they all lean the same way.</div></div>""",
+                unsafe_allow_html=True,
+            )
+
+    if not master.empty and "category" in master.columns:
+        cat_map2  = dict(zip(master["fund_name"], master["category"]))
+        fund_cats = list({cat_map2.get(f, "Other") for f in matched_funds})
+        if len(fund_cats) == 1:
+            flags_found = True
+            _only_cat = fund_cats[0]
+            _cap_plain = {
+                "Large Cap": "big, well-known companies (think large Nifty names)",
+                "Mid Cap": "medium-sized companies — often faster growth, but bumpier rides",
+                "Small Cap": "smaller companies — can grow quickly, but usually swing more in bad markets",
+                "Large & Mid Cap": "a mix of large and medium-sized companies",
+                "Multi Cap": "companies of all sizes, chosen by the fund manager",
+                "Flexi Cap": "flexible mix across company sizes",
+                "ELSS": "tax-saving funds (with a 3-year lock-in)",
+            }
+            _cat_desc = _cap_plain.get(_only_cat, "similar types of companies")
+            _all_caps = ["Large Cap", "Mid Cap", "Small Cap"]
+            if _only_cat in _all_caps:
+                _missing = [c for c in _all_caps if c != _only_cat]
+                _missing_str = ", ".join(f"<strong>{c}</strong>" for c in _missing)
+                _missing_tail = (
+                    f" You do not hold separate {_missing_str} funds, "
+                    f"so your portfolio mainly tracks {_only_cat.lower()} stocks."
+                )
+            else:
+                _missing_tail = ""
+            st.markdown(f"""<div class="insight-card insight-info">
+                <div class="insight-icon">📊</div>
+                <div class="insight-text"><strong>All your funds are the same type ({_only_cat})</strong><br>
+                Fund categories describe <em>which size of company</em> they mainly buy:
+                large-cap funds focus on {_cap_plain.get("Large Cap", "big companies")},
+                mid-cap on {_cap_plain.get("Mid Cap", "medium ones")},
+                and small-cap on {_cap_plain.get("Small Cap", "smaller ones")}.
+                Every fund you hold is <strong>{_only_cat}</strong> — {_cat_desc}.{_missing_tail}
+                Different sizes do not always move together in a market crash or rally, so using only one
+                category can mean your whole portfolio rises and falls in a similar way.</div></div>""",
+                unsafe_allow_html=True,
+            )
+
+    if not sel_master.empty and "expense_ratio" in sel_master.columns:
+        er_vals = pd.to_numeric(sel_master["expense_ratio"], errors="coerce").dropna()
+        if len(er_vals) > 1 and er_vals.min() > 0:
+            most_exp = sel_master.loc[er_vals.idxmax()]
+            cheapest = sel_master.loc[er_vals.idxmin()]
+            if er_vals.max() > er_vals.min() * 2:
+                flags_found = True
+                _er_gap_pf   = float(most_exp["expense_ratio"]) - float(cheapest["expense_ratio"])
+                _10yr_pf     = int(100_000 * ((1.12 ** 10) - ((1.12 - _er_gap_pf / 100) ** 10)))
+                _exp_fn = display_name(most_exp["fund_name"])
+                _cheap_fn = display_name(cheapest["fund_name"])
+                _exp_er = float(most_exp["expense_ratio"])
+                _cheap_er = float(cheapest["expense_ratio"])
+                st.markdown(f"""<div class="insight-card insight-info">
+                    <div class="insight-icon">💸</div>
+                    <div class="insight-text"><strong>One fund charges much higher yearly fees</strong><br>
+                    The <em>expense ratio</em> is the annual fee the fund house takes from your money.
+                    <strong>{_exp_fn}</strong> charges <strong>{_exp_er:.2f}% per year</strong>, while
+                    <strong>{_cheap_fn}</strong> charges <strong>{_cheap_er:.2f}%</strong> — more than double.
+                    That extra <strong>{_er_gap_pf:.2f}%</strong> each year adds up: on ₹1 lakh, kept for
+                    10 years (if returns were around 12% before fees), you could pay roughly
+                    <strong>₹{_10yr_pf:,} more</strong> in fees on the pricier fund. Lower fees do not
+                    guarantee better returns, but they leave more of any gains in your pocket.</div></div>""",
+                    unsafe_allow_html=True,
+                )
+
+    if not flags_found:
+        st.success(
+            "✅ No priority concentration flags — overlap, single stocks, sectors, cap types, "
+            "and fees did not cross our strict warning levels."
+        )
+    return flags_found
+
+
 def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_df=None):
     insights = []
     sel_sim = similarity_df[
@@ -672,7 +943,7 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
     ]
     sel_h = holdings_df[holdings_df["fund_name"].isin(fund_list)]
 
-    # 1. Highest-overlap pair — name the actual shared stocks
+    # 1. Highest-overlap pair
     if not sel_sim.empty:
         worst    = sel_sim.loc[sel_sim["normalized_score"].idxmax()]
         fa, fb   = worst["fund_a"], worst["fund_b"]
@@ -691,22 +962,24 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
         icon     = "⚠️"   if wscore >= 60 else "📊"
         if wscore >= 60:
             tail = (
-                "At this level, both funds rise and fall almost in tandem — the risk-reduction benefit "
-                "of holding both is minimal. Check the <strong>Holdings tab</strong> to see what, if anything, "
-                "each fund exclusively contributes."
+                "That is a lot of overlap — both funds will usually move up or down together, "
+                "so holding both does not spread your risk much. "
+                "See <strong>Fund Overlap</strong> or <strong>What You Actually Own</strong> for the shared names."
             )
         else:
             tail = (
-                "A sizeable chunk of your money ends up in the same underlying companies across both funds. "
-                "The <strong>Unique Exposure</strong> section below shows what each fund distinctly adds."
+                "A fair chunk of your money lands in the same companies through both funds. "
+                "Open the <strong>What each fund adds on its own</strong> section below to see what is different."
             )
         insights.append({
             "category": "overlap", "type": stype, "icon": icon,
             "text": (
-                f"<strong>{display_name(fa)}</strong> and <strong>{display_name(fb)}</strong> share "
-                f"<strong>{wcommon} of the same companies</strong> — <strong>{wscore:.0f}% overlap</strong> "
-                f"(healthy diversification is typically below 30%). "
-                f"Biggest shared names: {top3_txt}. {tail}"
+                f"<strong>Most overlapping pair:</strong> "
+                f"<strong>{display_name(fa)}</strong> and <strong>{display_name(fb)}</strong> "
+                f"both hold about <strong>{wcommon}</strong> of the same companies "
+                f"(<strong>{wscore:.0f}% overlap</strong>). "
+                f"As a rough guide, overlap below 30% usually means more variety. "
+                f"Largest shared names: {top3_txt}. {tail}"
             ),
         })
 
@@ -718,16 +991,15 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
             insights.append({
                 "category": "overlap", "type": "success", "icon": "✅",
                 "text": (
+                    f"<strong>Best variety between two funds:</strong> "
                     f"<strong>{display_name(best['fund_a'])}</strong> and "
-                    f"<strong>{display_name(best['fund_b'])}</strong> are your most complementary funds — "
-                    f"only <strong>{bscore:.0f}% overlap</strong>, meaning roughly "
-                    f"<strong>{100 - int(bscore)}% of their stock picks are distinct</strong>. "
-                    "This pairing is doing the most diversification work in your selection: a drop in one "
-                    "is less likely to drag the other down at the same time."
+                    f"<strong>{display_name(best['fund_b'])}</strong> overlap only "
+                    f"<strong>{bscore:.0f}%</strong> — most of their stock lists are different. "
+                    f"This pair does the most to spread your money across different companies."
                 ),
             })
 
-    # 3. Stocks held by ALL funds — name the top ones
+    # 3. Stocks held by ALL funds
     if not sel_h.empty:
         counts        = sel_h.groupby("stock_name")["fund_name"].nunique()
         unani_stocks  = counts[counts == len(fund_list)].index.tolist()
@@ -741,15 +1013,15 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
             insights.append({
                 "category": "overlap", "type": "info", "icon": "📌",
                 "text": (
-                    f"<strong>{len(unani_stocks)} {'companies appear' if len(unani_stocks) > 1 else 'company appears'}</strong> "
-                    f"in all {len(fund_list)} of your selected funds: {top5_txt}. "
-                    "These are your <strong>unavoidable bets</strong> — regardless of how you split your money "
-                    "across these funds, you always end up owning these stocks. Open the "
-                    "<strong>Holdings tab</strong> to see how large this combined exposure actually is."
+                    f"<strong>Stocks every fund owns:</strong> "
+                    f"{len(unani_stocks)} "
+                    f"{'companies show up' if len(unani_stocks) > 1 else 'company shows up'} "
+                    f"in all {len(fund_list)} funds — including {top5_txt}. "
+                    f"No matter how you split money across these funds, you always end up owning these names."
                 ),
             })
 
-    # 4. Sector dominance — which fund is most/least exposed and by how much
+    # 4. Sector dominance
     sel_sector = sector_df[sector_df["fund_name"].isin(fund_list)]
     if not sel_sector.empty:
         avg_by_sec = sel_sector.groupby("sector")["allocation_percent"].mean()
@@ -766,25 +1038,32 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
             if len(by_fund) > 1:
                 lo_fund = display_name(by_fund.iloc[-1]["fund_name"])
                 lo_pct  = by_fund.iloc[-1]["allocation_percent"]
-                lo_txt  = (f" <strong>{lo_fund}</strong> has the least exposure at <strong>{lo_pct:.0f}%</strong>.")
+                lo_txt  = (
+                    f" <strong>{lo_fund}</strong> is lightest here at <strong>{lo_pct:.0f}%</strong>."
+                )
             if top_s.upper() == "FINANCIAL":
-                bench_note = " Financials typically make up 30–35% of broad India market indices — so this is broadly in line."
+                bench_note = (
+                    " Broad Indian market funds often have 30–35% in financial companies, "
+                    "so this is common — but still a big slice of your money."
+                )
             elif top_pct > 30:
-                bench_note = " Most diversified equity funds keep any single non-financial sector well below 25%."
+                bench_note = (
+                    " Many spread-out equity funds keep any one non-bank industry below about 25%."
+                )
             else:
                 bench_note = ""
             insights.append({
                 "category": "sector", "type": "warning", "icon": "🏦",
                 "text": (
-                    f"On average, <strong>{top_pct:.0f}% of each fund's money</strong> sits in "
-                    f"<strong>{top_s.title()}</strong> stocks — <strong>{hi_fund}</strong> leans "
-                    f"the heaviest at <strong>{hi_pct:.0f}%</strong>.{lo_txt}{bench_note} "
-                    f"A sector-wide event (rate changes, regulation, macro shift) would hit all your "
-                    f"funds simultaneously. See the <strong>Sector tab</strong> to compare fund-by-fund exposure."
+                    f"<strong>Top industry tilt:</strong> on average about "
+                    f"<strong>{top_pct:.0f}%</strong> of each fund is in "
+                    f"<strong>{top_s.title()}</strong> companies. "
+                    f"<strong>{hi_fund}</strong> leans most ({hi_pct:.0f}%).{lo_txt}{bench_note} "
+                    f"If that whole industry struggles, several of your funds can fall together. "
+                    f"See <strong>Sector & Cap Size</strong> for a full breakdown."
                 ),
             })
 
-        # Secondary sector: second-highest avg sector
         if len(avg_by_sec) > 1:
             sec_s   = avg_by_sec.drop(top_s).idxmax()
             sec_pct = avg_by_sec.drop(top_s).max()
@@ -792,16 +1071,17 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
                 insights.append({
                     "category": "sector", "type": "info", "icon": "🏗️",
                     "text": (
-                        f"<strong>{sec_s.title()}</strong> is the second-largest slice at "
-                        f"<strong>{sec_pct:.0f}%</strong> on average. "
-                        f"Combined, <strong>{top_s.title()} + {sec_s.title()} account for "
-                        f"~{int(top_pct + sec_pct)}%</strong> of your average fund allocation — "
-                        f"leaving just {max(0, 100 - int(top_pct + sec_pct))}% spread across all other sectors."
+                        f"<strong>Second-biggest industry:</strong> "
+                        f"<strong>{sec_s.title()}</strong> at about <strong>{sec_pct:.0f}%</strong> on average. "
+                        f"Together, <strong>{top_s.title()}</strong> and <strong>{sec_s.title()}</strong> "
+                        f"make up roughly <strong>{int(top_pct + sec_pct)}%</strong> — "
+                        f"the rest is spread across other industries."
                     ),
                 })
 
-    # 5. Per-fund unique holdings — what each fund contributes exclusively
+    # 5. Unique holdings — one combined note (avoids one card per fund)
     if not sel_h.empty and len(fund_list) >= 2:
+        unique_rows = []
         for fund in fund_list:
             fund_stocks   = set(sel_h[sel_h["fund_name"] == fund]["stock_name"])
             others_stocks = set(sel_h[sel_h["fund_name"] != fund]["stock_name"])
@@ -811,19 +1091,39 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
                     sel_h[(sel_h["fund_name"] == fund) & (sel_h["stock_name"].isin(unique))]
                     .nlargest(3, "allocation_percent")["stock_name"].tolist()
                 )
-                u_txt = ", ".join(f"<strong>{s}</strong>" for s in top_unique)
-                insights.append({
-                    "category": "unique", "type": "info", "icon": "🔬",
-                    "text": (
-                        f"<strong>{display_name(fund)}</strong> is the only fund in your selection holding "
-                        f"<strong>{len(unique)} companies</strong> that none of your other funds touch — "
-                        f"including: {u_txt}. This is the distinct contribution this fund makes. "
-                        "Open <strong>Holdings → Exclusive Holdings</strong> to see the full list and "
-                        "their current allocation sizes."
-                    ),
+                unique_rows.append({
+                    "fund": fund,
+                    "n": len(unique),
+                    "examples": top_unique,
                 })
+        if unique_rows:
+            unique_rows.sort(key=lambda r: r["n"], reverse=True)
+            show_rows = unique_rows[:4]
+            lines = []
+            for row in show_rows:
+                ex = ", ".join(f"<strong>{s}</strong>" for s in row["examples"])
+                lines.append(
+                    f"<strong>{display_name(row['fund'])}</strong> — "
+                    f"{row['n']} stocks only it holds (e.g. {ex})"
+                )
+            extra = ""
+            if len(unique_rows) > len(show_rows):
+                extra = (
+                    f" …and <strong>{len(unique_rows) - len(show_rows)}</strong> more fund"
+                    f"{'s' if len(unique_rows) - len(show_rows) != 1 else ''} "
+                    f"with their own picks."
+                )
+            insights.append({
+                "category": "unique", "type": "info", "icon": "🔬",
+                "text": (
+                    "<strong>What only one fund owns:</strong><br>"
+                    + "<br>".join(lines)
+                    + extra
+                    + " See <strong>What You Actually Own</strong> for the full stock list."
+                ),
+            })
 
-    # 6. Allocation momentum — stocks with consistent buying/selling across funds
+    # 6. Allocation momentum (3-month changes)
     if not sel_h.empty:
         trend_df  = sel_h.groupby("stock_name").agg(
             funds=("fund_name", "nunique"),
@@ -834,38 +1134,35 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
         declining = multi[multi["avg_3m"] < -0.8].nsmallest(2, "avg_3m")
         if not growing.empty:
             g_txt = ", ".join(
-                f"<strong>{r['stock_name']}</strong> (+{r['avg_3m']:.1f}%)"
+                f"<strong>{r['stock_name']}</strong> (managers added ~{r['avg_3m']:.1f}% on average)"
                 for _, r in growing.iterrows()
             )
             insights.append({
                 "category": "momentum", "type": "success", "icon": "📈",
                 "text": (
-                    f"Multiple fund managers have been consistently <strong>increasing their stake</strong> in: {g_txt} "
-                    "over the past 3 months. When independent managers make the same move simultaneously, "
-                    "it reflects shared conviction about the company's near-term direction. "
-                    "See the <strong>Holdings tab</strong> for the full allocation trend."
+                    f"<strong>Managers have been buying more of:</strong> {g_txt} "
+                    f"over the last 3 months (across at least two of your funds). "
+                    f"That can mean they liked recent results or outlook — not a guarantee of future gains."
                 ),
             })
         if not declining.empty:
             d_txt = ", ".join(
-                f"<strong>{r['stock_name']}</strong> ({r['avg_3m']:.1f}%)"
+                f"<strong>{r['stock_name']}</strong> (trimmed ~{abs(r['avg_3m']):.1f}% on average)"
                 for _, r in declining.iterrows()
             )
             insights.append({
                 "category": "momentum", "type": "warning", "icon": "📉",
                 "text": (
-                    f"Multiple fund managers have been <strong>trimming their stakes</strong> in: {d_txt} "
-                    "over the past 3 months. Coordinated selling across independent funds can indicate "
-                    "reduced institutional confidence in these companies. "
-                    "See the <strong>Holdings tab</strong> for the full allocation history across all time periods."
+                    f"<strong>Managers have been cutting back on:</strong> {d_txt} "
+                    f"over the last 3 months. Several funds moving the same way can mean "
+                    f"less enthusiasm for those companies right now."
                 ),
             })
 
-    # 7. Cost & Risk — expense ratio + std_dev from master data
+    # 7. Fees and volatility
     if master_df is not None and not master_df.empty:
         sel_master = master_df[master_df["fund_name"].isin(fund_list)].copy()
 
-        # ── Expense ratio insights ──
         er_df = sel_master.dropna(subset=["expense_ratio"]).copy()
         er_df["expense_ratio"] = pd.to_numeric(er_df["expense_ratio"], errors="coerce")
         er_df = er_df.dropna(subset=["expense_ratio"])
@@ -877,23 +1174,22 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
             if er_gap > 0.3:
                 worst_overlap = sel_sim["normalized_score"].max() if not sel_sim.empty else 0
                 overlap_note  = (
-                    f" Since both funds share <strong>{worst_overlap:.0f}% of the same stocks</strong>, "
-                    "the higher fee isn't buying any extra variety."
+                    f" They also share about <strong>{worst_overlap:.0f}%</strong> of the same stocks, "
+                    f"so the pricier fund is not giving you much extra variety."
                     if worst_overlap >= 50 else ""
                 )
                 _10yr_impact = int(100_000 * ((1.12 ** 10) - ((1.12 - er_gap / 100) ** 10)))
                 insights.append({
                     "category": "cost_risk", "type": "warning", "icon": "💸",
                     "text": (
+                        f"<strong>Fee gap between funds:</strong> "
                         f"<strong>{display_name(costliest['fund_name'])}</strong> charges "
-                        f"<strong>{costliest['expense_ratio']:.2f}%/yr</strong> vs "
+                        f"<strong>{costliest['expense_ratio']:.2f}%</strong> per year vs "
                         f"<strong>{display_name(cheapest['fund_name'])}</strong> at "
-                        f"<strong>{cheapest['expense_ratio']:.2f}%/yr</strong> — a "
-                        f"<strong>{er_gap:.2f}% annual gap</strong>. "
-                        f"On ₹1 lakh invested for 10 years (assuming 12% gross return), this difference "
-                        f"compounds to roughly <strong>₹{_10yr_impact:,} in extra fees</strong> silently "
-                        f"eroding your returns.{overlap_note} "
-                        f"Check the <strong>Fund Profile tab</strong> for the full cost breakdown."
+                        f"<strong>{cheapest['expense_ratio']:.2f}%</strong>. "
+                        f"The <strong>{er_gap:.2f}%</strong> yearly difference adds up — on ₹1 lakh over "
+                        f"10 years (if returns were ~12% before fees), that is roughly "
+                        f"<strong>₹{_10yr_impact:,}</strong> more in charges on the expensive fund.{overlap_note}"
                     ),
                 })
             elif len(er_df) > 1:
@@ -901,23 +1197,21 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
                 insights.append({
                     "category": "cost_risk", "type": "success", "icon": "✅",
                     "text": (
-                        f"All selected funds charge similar annual fees — around <strong>{avg_er:.2f}%</strong>, "
-                        f"with only <strong>{er_gap:.2f}%</strong> between cheapest and priciest. "
-                        "Cost is not a differentiator here. Focus your comparison on portfolio quality, "
-                        "tracking consistency, and risk-adjusted returns — see the "
-                        "<strong>Risk & Efficiency tab</strong> for Sharpe ratio and Alpha."
+                        f"<strong>Similar yearly fees:</strong> your funds charge about "
+                        f"<strong>{avg_er:.2f}%</strong> on average — only "
+                        f"<strong>{er_gap:.2f}%</strong> between the cheapest and priciest. "
+                        f"Fees are not the main difference here; compare holdings and how bumpy returns are."
                     ),
                 })
 
-        # ── Std dev (volatility) insights ──
         sd_df = sel_master.dropna(subset=["std_dev"]).copy()
         sd_df["std_dev"] = pd.to_numeric(sd_df["std_dev"], errors="coerce")
         sd_df = sd_df.dropna(subset=["std_dev"])
         if not sd_df.empty:
             def _risk_label(v):
-                if v < 13:   return "Low"
-                if v < 18:   return "Moderate"
-                return "High"
+                if v < 13:   return "calmer"
+                if v < 18:   return "moderately bumpy"
+                return "quite bumpy"
 
             sd_df["_risk"] = sd_df["std_dev"].apply(_risk_label)
             riskiest  = sd_df.loc[sd_df["std_dev"].idxmax()]
@@ -930,27 +1224,27 @@ def generate_insights(fund_list, similarity_df, holdings_df, sector_df, master_d
                 insights.append({
                     "category": "cost_risk", "type": "info", "icon": "📊",
                     "text": (
-                        f"<strong>{display_name(riskiest['fund_name'])}</strong> has a standard deviation of "
-                        f"<strong>{r_sd:.1f}%</strong> — returns can swing that far above or below its average "
-                        f"in any given year (<strong>{_risk_label(r_sd)} volatility</strong>). "
-                        f"<strong>{display_name(steadiest['fund_name'])}</strong> is steadier at "
-                        f"<strong>{s_sd:.1f}%</strong> (<strong>{_risk_label(s_sd)} volatility</strong>). "
-                        "Holding both together smooths out the combined swings — a higher-risk and "
-                        "lower-risk fund in tandem reduces your overall portfolio volatility."
+                        f"<strong>Some funds swing more than others:</strong> "
+                        f"<strong>{display_name(riskiest['fund_name'])}</strong> has been "
+                        f"<strong>{_risk_label(r_sd)}</strong> (typical yearly move around "
+                        f"<strong>{r_sd:.1f}%</strong> vs its own average). "
+                        f"<strong>{display_name(steadiest['fund_name'])}</strong> has been steadier "
+                        f"(<strong>{s_sd:.1f}%</strong>). Mixing a calmer and a bumpier fund can "
+                        f"smooth your overall ride a little."
                     ),
                 })
             else:
                 risk_labels = sd_df["_risk"].unique().tolist()
-                label_str   = risk_labels[0].lower() if len(risk_labels) == 1 else "similar"
+                label_str   = risk_labels[0] if len(risk_labels) == 1 else "similar"
                 avg_sd      = sd_df["std_dev"].mean()
                 insights.append({
                     "category": "cost_risk", "type": "info", "icon": "📊",
                     "text": (
-                        f"All selected funds have <strong>{label_str} volatility</strong> "
-                        f"(avg std dev: <strong>{avg_sd:.1f}%</strong>) — they tend to rise and fall in near-lockstep. "
-                        "Adding more funds from the same risk band doesn't meaningfully reduce your "
-                        "overall portfolio volatility. See the <strong>Risk & Efficiency tab</strong> "
-                        "for the full Sharpe ratio and standard deviation breakdown per fund."
+                        f"<strong>Similar ups and downs:</strong> your funds have "
+                        f"<strong>{label_str}</strong> year-to-year swings "
+                        f"(around <strong>{avg_sd:.1f}%</strong> on average). "
+                        f"Adding more funds like these may not calm your portfolio much. "
+                        f"See <strong>Fund Performance</strong> for return and risk numbers."
                     ),
                 })
 
@@ -3139,532 +3433,14 @@ def page_compare():
     with tab_perf:
         st.markdown('<div class="section-title">Fund Performance Comparison</div>', unsafe_allow_html=True)
         st.markdown('<div class="section-sub">Returns, risk, and efficiency metrics side by side across selected funds</div>', unsafe_allow_html=True)
-
-        PERF_COLORS = [_a, "#F59E0B", "#06B6D4", "#10B981", "#EF4444"]
-        sel_master  = master[master["fund_name"].isin(selected)].copy()
-
-        if sel_master.empty:
-            st.info("Performance data not available for the selected funds.")
-        else:
-            sel_master["_order"] = sel_master["fund_name"].apply(lambda f: selected.index(f) if f in selected else 99)
-            sel_master = sel_master.sort_values("_order").drop(columns=["_order"])
-            sel_master["short_name"] = sel_master["fund_name"].apply(display_name)
-
-            fund_color_map = {
-                row["short_name"]: PERF_COLORS[i % len(PERF_COLORS)]
-                for i, (_, row) in enumerate(sel_master.iterrows())
-            }
-
-            # ── Fund Summary Cards ────────────────────────────────────────────
-            _rank_col = "return_since_inception" if "return_since_inception" in sel_master.columns else (
-                        "return_3y" if "return_3y" in sel_master.columns else None)
-            if _rank_col:
-                sel_master["_rv"] = pd.to_numeric(sel_master[_rank_col], errors="coerce")
-                sel_master["_rk"] = sel_master["_rv"].rank(ascending=False, method="min").fillna(99).astype(int)
-            _rank_label = "Since Inception Return" if _rank_col == "return_since_inception" else "3Y Return"
-
-            _cards_html = ""
-            for _ci, (_, _crow) in enumerate(sel_master.iterrows()):
-                _cc   = PERF_COLORS[_ci % len(PERF_COLORS)]
-                _cfn  = display_name(_crow["fund_name"])
-                _crk  = int(_crow.get("_rk", 99)) if _rank_col else None
-                _crv  = _crow.get("_rv") if _rank_col else None
-                _crs  = f"{float(_crv):+.1f}%" if _rank_col and pd.notna(_crv) else "—"
-                _crc  = _col_green if _rank_col and pd.notna(_crv) and float(_crv) > 0 else _col_red
-                _trophy = " 🏆" if _crk == 1 else ""
-                # Inception date
-                _cld = _crow.get("launch_date", "")
-                _cld_str = ""
-                if _cld and str(_cld) not in ("", "nan", "NaT", "None"):
-                    try:
-                        _cld_str = pd.to_datetime(str(_cld)).strftime("%d %b %Y")
-                    except Exception:
-                        pass
-                _cards_html += (
-                    f'<div style="background:{_cd};border:1px solid {_bdr};border-top:3px solid {_cc};'
-                    f'border-radius:12px;padding:1rem 1.1rem;flex:1;min-width:170px;">'
-                    f'<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">'
-                    f'<div style="width:9px;height:9px;border-radius:50%;background:{_cc};flex-shrink:0;"></div>'
-                    f'<div style="font-size:0.75rem;font-weight:600;color:{_bd};line-height:1.3;">{_cfn}</div></div>'
-                    f'<div style="font-size:0.6rem;color:{_sb};margin-bottom:6px;">{_rank_label}</div>'
-                    f'<div style="display:flex;align-items:flex-end;justify-content:space-between;">'
-                    f'<div style="font-size:1.55rem;font-weight:800;color:{_crc};line-height:1;">{_crs}</div>'
-                    f'<div style="font-size:0.85rem;font-weight:700;color:{_sb};">{"#"+str(_crk)+_trophy if _crk else ""}</div>'
-                    f'</div>'
-                    + (f'<div style="font-size:0.58rem;color:{_sb};margin-top:5px;">Since {_cld_str}</div>' if _cld_str else '')
-                    + f'</div>'
-                )
-            st.markdown(
-                f'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem;">{_cards_html}</div>',
-                unsafe_allow_html=True,
-            )
-
-            # ── Returns: 4 mini charts ────────────────────────────────────────
-            _PERIODS = [
-                ("return_1y",              "1 Year",         "Short term",   "📅"),
-                ("return_3y",              "3 Year",         "Medium term",  "📅"),
-                ("return_5y",              "5 Year",         "Long term",    "📅"),
-                ("return_since_inception", "Since Inception","Overall",      "📅"),
-            ]
-            _avail_p = [(k, lbl, sub, ic) for k, lbl, sub, ic in _PERIODS if k in sel_master.columns]
-
-            if _avail_p:
-                st.markdown(
-                    f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:0.5rem;">'
-                    f'<span style="font-size:1rem;">📈</span>'
-                    f'<span style="font-size:0.95rem;font-weight:700;color:{_hd};">Returns (%)</span>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-                # Shared color legend — shown once above all charts
-                _NA_COLOR = "rgba(156,163,175,0.35)" if _is_dark else "rgba(156,163,175,0.4)"
-                _legend_items = ""
-                for _lfi, (_, _lrow) in enumerate(sel_master.iterrows()):
-                    _lc  = PERF_COLORS[_lfi % len(PERF_COLORS)]
-                    _lfn = display_name(_lrow["fund_name"])
-                    _legend_items += (
-                        f'<div style="display:flex;align-items:center;gap:5px;">'
-                        f'<div style="width:10px;height:10px;border-radius:3px;background:{_lc};flex-shrink:0;"></div>'
-                        f'<span style="font-size:0.68rem;color:{_bd};white-space:nowrap;">{_lfn}</span>'
-                        f'</div>'
-                    )
-                st.markdown(
-                    f'<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;'
-                    f'margin-bottom:0.5rem;padding:0.5rem 0.75rem;background:{_cd};'
-                    f'border:1px solid {_bdr};border-radius:10px;">{_legend_items}</div>',
-                    unsafe_allow_html=True,
-                )
-
-                _pcols = st.columns(len(_avail_p))
-                for _pi, (pk, plbl, psub, pic) in enumerate(_avail_p):
-                    with _pcols[_pi]:
-                        _pdata = []
-                        for _pfi, (_, _prow) in enumerate(sel_master.iterrows()):
-                            _pv  = pd.to_numeric(_prow.get(pk), errors="coerce")
-                            _has = pd.notna(_pv)
-                            _pdata.append({
-                                "fn":  display_name(_prow["fund_name"]),
-                                "v":   float(_pv) if _has else 0.0,
-                                "c":   PERF_COLORS[_pfi % len(PERF_COLORS)] if _has else _NA_COLOR,
-                                "has": _has,
-                            })
-                        _with_data = [d for d in _pdata if d["has"]]
-                        if _with_data:
-                            _leader = max(_with_data, key=lambda x: x["v"])
-                            st.markdown(
-                                f'<div style="text-align:center;margin-bottom:2px;">'
-                                f'<div style="font-size:0.78rem;font-weight:700;color:{_hd};">{pic} {plbl}</div>'
-                                f'<div style="font-size:0.62rem;color:{_sb};">{psub} performance</div>'
-                                f'</div>',
-                                unsafe_allow_html=True,
-                            )
-                            _fig_m = go.Figure()
-                            for _pd in _pdata:
-                                _fig_m.add_trace(go.Bar(
-                                    x=[_pd["fn"]], y=[_pd["v"]],
-                                    marker_color=_pd["c"],
-                                    showlegend=False,
-                                    text=[f"{_pd['v']:.1f}%" if _pd["has"] else "N/A"],
-                                    textposition="outside" if _pd["has"] else "inside",
-                                ))
-                            _fig_m.update_traces(
-                                textfont=dict(size=9, color=_bd, family="Inter, sans-serif"),
-                                marker_line_width=0, opacity=0.92,
-                            )
-                            _fig_m.update_layout(**_dark_layout(
-                                height=200, font=_cf,
-                                margin=dict(t=28, b=5, l=5, r=5),
-                                xaxis=_dark_xaxis(showticklabels=False, tickfont=dict(size=8, color=_bd)),
-                                yaxis=_dark_yaxis(ticksuffix="%", tickfont=dict(size=8, color=_bd),
-                                                  gridcolor=_cg, zerolinecolor=_cg),
-                            ))
-                            st.plotly_chart(_fig_m, use_container_width=True, config={"displayModeBar": False})
-                            # Callout: if not all funds have data, note which ones do
-                            _missing = [d["fn"] for d in _pdata if not d["has"]]
-                            if _missing:
-                                _have_names = " & ".join(d["fn"] for d in _with_data)
-                                _callout_line2 = f"{'has' if len(_with_data)==1 else 'have'} {plbl.lower()} track record"
-                                _callout_fn    = _have_names
-                            else:
-                                _callout_fn    = _leader["fn"]
-                                _callout_line2 = f"leads in {plbl.lower()} returns"
-                            st.markdown(
-                                f'<div style="background:{_al};border:1px solid {_bdr};border-radius:8px;'
-                                f'padding:0.35rem 0.5rem;text-align:center;margin-top:-10px;margin-bottom:4px;">'
-                                f'<div style="font-size:0.68rem;font-weight:700;color:{_leader["c"]};">{_callout_fn}</div>'
-                                f'<div style="font-size:0.58rem;color:{_sb};">{_callout_line2}</div>'
-                                f'</div>',
-                                unsafe_allow_html=True,
-                            )
-                        else:
-                            st.markdown(
-                                f'<div style="text-align:center;color:{_sb};font-size:0.75rem;padding:3rem 0;">'
-                                f'No {plbl} data</div>',
-                                unsafe_allow_html=True,
-                            )
-
-            # ── Performance Summary ───────────────────────────────────────────
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown(
-                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:0.75rem;">'
-                f'<span style="font-size:1rem;">⭐</span>'
-                f'<span style="font-size:0.95rem;font-weight:700;color:{_hd};">Performance Summary</span>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-
-            def _best_in(col, higher_is_better=True):
-                if col not in sel_master.columns: return None, None, None
-                s = pd.to_numeric(sel_master[col], errors="coerce")
-                if s.isna().all(): return None, None, None
-                idx = s.idxmax() if higher_is_better else s.idxmin()
-                row = sel_master.loc[idx]
-                ci  = list(sel_master.index).index(idx) % len(PERF_COLORS)
-                return display_name(row["fund_name"]), float(s[idx]), PERF_COLORS[ci]
-
-            _bo_col  = "return_since_inception" if "return_since_inception" in sel_master.columns else "return_3y"
-            _bo_fn,  _bo_v,  _bo_c  = _best_in(_bo_col)
-            _mc_fn,  _mc_v,  _mc_c  = _best_in("std_dev", higher_is_better=False)
-            _bra_fn, _bra_v, _bra_c = _best_in("sharpe_ratio")
-            _hs_fn,  _hs_v,  _hs_c  = _best_in("return_1y")
-
-            _sum_cards = [
-                ("📈", "Best Overall Performer",   _bo_fn,  f"{_bo_v:+.1f}%"  if _bo_v  is not None else None, "Since Inception Return" if _bo_col=="return_since_inception" else "3Y Return", _bo_c),
-                ("📊", "Most Consistent",           _mc_fn,  None,              "Lowest volatility",              _mc_c),
-                ("🛡️", "Best Risk Adjusted",        _bra_fn, f"{_bra_v:.2f}"   if _bra_v is not None else None, "Highest Sharpe Ratio",   _bra_c),
-                ("🚀", "Highest Short-Term Return", _hs_fn,  f"{_hs_v:+.1f}%"  if _hs_v  is not None else None, "1 Year Return",          _hs_c),
-            ]
-
-            _metric_cards_html = ""
-            for ico, title, fn, val, sub, fc in _sum_cards:
-                if fn:
-                    _metric_cards_html += (
-                        f'<div style="flex:3;min-width:150px;background:{_cd};border:1px solid {_bdr};'
-                        f'border-radius:12px;padding:0.9rem 1rem;">'
-                        f'<div style="font-size:1.1rem;margin-bottom:4px;">{ico}</div>'
-                        f'<div style="font-size:0.65rem;color:{_sb};font-weight:600;text-transform:uppercase;'
-                        f'letter-spacing:0.4px;margin-bottom:6px;">{title}</div>'
-                        f'<div style="font-size:0.88rem;font-weight:700;color:{fc};margin-bottom:2px;">{fn}</div>'
-                        + (f'<div style="font-size:1.2rem;font-weight:800;color:{fc};">{val}</div>' if val else "")
-                        + f'<div style="font-size:0.65rem;color:{_sb};margin-top:2px;">{sub}</div>'
-                        f'</div>'
-                    )
-            _info_card_html = (
-                f'<div style="flex:2;min-width:130px;background:{_al};border:1px solid {_bdr};'
-                f'border-radius:12px;padding:0.9rem 1rem;">'
-                f'<div style="font-size:0.68rem;font-weight:700;color:{_a};margin-bottom:8px;">ℹ️ How to read this?</div>'
-                f'<div style="font-size:0.68rem;color:{_sb};line-height:1.6;">'
-                f'Returns are annualised for periods &gt; 1 year.<br><br>'
-                f'Past performance is not indicative of future results.<br><br>'
-                f'<span style="color:{_a};font-weight:600;">Scroll down for deeper analysis ↓</span>'
-                f'</div></div>'
-            )
-            st.markdown(
-                f'<div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;">'
-                f'{_metric_cards_html}{_info_card_html}</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown("<br>", unsafe_allow_html=True)
-
-            # ── Section 2: Risk & Efficiency ────────────────────────────────
-            risk_cols = {
-                "std_dev":      "Std Dev (%)",
-                "sharpe_ratio": "Sharpe Ratio",
-                "alpha":        "Alpha (%)",
-                "beta":         "Beta",
-            }
-            avail_risk = {k: v for k, v in risk_cols.items() if k in sel_master.columns}
-
-            if avail_risk:
-                _RISK_DEFS = [
-                    ("std_dev",      "Std Dev",    "%",  "Volatility of returns — below 13% = low, 13–18% = moderate, above 18% = high"),
-                    ("sharpe_ratio", "Sharpe",     "",   "Return per unit of risk — above 1.0 is good, above 1.5 is excellent"),
-                    ("alpha",        "Alpha",      "%",  "Excess return vs benchmark — positive means the manager beat the index"),
-                    ("beta",         "Beta",       "",   "Market sensitivity — below 1 = less volatile than market, above 1 = amplified swings"),
-                ]
-                _avail_defs = [(k, lbl, u, tip) for k, lbl, u, tip in _RISK_DEFS if k in sel_master.columns]
-
-                def _risk_cell(col_key, raw):
-                    try:
-                        v = float(raw)
-                    except (TypeError, ValueError):
-                        return _cd, _sb, "—"
-                    _dk = _is_dark
-                    if col_key == "std_dev":
-                        if v < 13:  return ("rgba(16,185,129,0.18)" if _dk else "#D1FAE5"), _col_green, "Low ✓"
-                        if v < 18:  return ("rgba(245,158,11,0.18)" if _dk else "#FEF3C7"), _col_amber, "Moderate"
-                        return ("rgba(239,68,68,0.18)" if _dk else "#FEE2E2"), _col_red, "High ⚠"
-                    if col_key == "sharpe_ratio":
-                        if v >= 1.5: return ("rgba(16,185,129,0.18)" if _dk else "#D1FAE5"), _col_green, "Excellent ✓"
-                        if v >= 1.0: return ("rgba(16,185,129,0.10)" if _dk else "#ECFDF5"), _col_green, "Good ✓"
-                        if v >= 0.5: return ("rgba(245,158,11,0.18)" if _dk else "#FEF3C7"), _col_amber, "Fair"
-                        return ("rgba(239,68,68,0.18)" if _dk else "#FEE2E2"), _col_red, "Weak ⚠"
-                    if col_key == "alpha":
-                        if v > 2:   return ("rgba(16,185,129,0.18)" if _dk else "#D1FAE5"), _col_green, "Strong ✓"
-                        if v > 0:   return ("rgba(16,185,129,0.10)" if _dk else "#ECFDF5"), _col_green, "Positive ✓"
-                        if v > -2:  return ("rgba(245,158,11,0.15)" if _dk else "#FEF3C7"), _col_amber, "Slight lag"
-                        return ("rgba(239,68,68,0.18)" if _dk else "#FEE2E2"), _col_red, "Negative ⚠"
-                    if col_key == "beta":
-                        if v < 0.85: return ("rgba(16,185,129,0.18)" if _dk else "#D1FAE5"), _col_green, "Low β"
-                        if v <= 1.1: return _cd, _bd, "Market β"
-                        return ("rgba(245,158,11,0.18)" if _dk else "#FEF3C7"), _col_amber, "High β ⚠"
-                    return _cd, _sb, "—"
-
-                _n_r = len(sel_master)
-                _col_w_r = f"repeat({_n_r}, 1fr)"
-                _chip_bg = "rgba(255,255,255,0.10)" if _is_dark else "rgba(0,0,0,0.07)"
-
-                # Header row — fund names with PERF_COLORS
-                _hdr_r = "".join(
-                    f'<div style="background:{PERF_COLORS[i % len(PERF_COLORS)]};'
-                    f'padding:0.65rem 0.5rem;text-align:center;'
-                    f'border-right:1px solid rgba(255,255,255,0.15);">'
-                    f'<div style="font-size:0.72rem;font-weight:700;color:#fff;'
-                    f'line-height:1.3;word-break:break-word;">{display_name(row["fund_name"])}</div>'
-                    f'</div>'
-                    for i, (_, row) in enumerate(sel_master.iterrows())
-                )
-
-                _rows_r = ""
-                for col_key, lbl, unit, tip in _avail_defs:
-                    cells_r = ""
-                    for _, row in sel_master.iterrows():
-                        raw = row.get(col_key)
-                        try:
-                            v = float(raw)
-                            if col_key == "std_dev":   v_str = f"{v:.1f}{unit}"
-                            elif col_key == "alpha":   v_str = f"{v:+.2f}{unit}"
-                            else:                      v_str = f"{v:.2f}{unit}"
-                        except (TypeError, ValueError):
-                            v_str = "—"
-                        cell_bg, cell_txt, chip = _risk_cell(col_key, raw)
-                        cells_r += (
-                            f'<div style="padding:0.65rem 0.5rem;text-align:center;'
-                            f'background:{cell_bg};border-right:1px solid {_bdr};border-bottom:1px solid {_bdr};">'
-                            f'<div style="font-size:0.64rem;font-weight:700;color:{cell_txt};'
-                            f'background:{_chip_bg};border-radius:4px;padding:1px 6px;'
-                            f'display:inline-block;margin-bottom:4px;">{chip}</div>'
-                            f'<div style="font-size:0.9rem;font-weight:800;color:{_hd};">{v_str}</div>'
-                            f'</div>'
-                        )
-                    _rows_r += (
-                        f'<div style="display:grid;grid-template-columns:120px {_col_w_r};">'
-                        f'<div style="padding:0.6rem 0.75rem;border-right:1px solid {_bdr};'
-                        f'border-bottom:1px solid {_bdr};display:flex;flex-direction:column;justify-content:center;">'
-                        f'<div style="font-size:0.78rem;font-weight:700;color:{_bd};">{lbl}</div>'
-                        f'<div style="font-size:0.6rem;color:{_sb};margin-top:2px;line-height:1.3;">{tip}</div>'
-                        f'</div>{cells_r}</div>'
-                    )
-
-                _risk_grid_html = (
-                    f'<div style="border:1px solid {_bdr};border-radius:12px;overflow:hidden;">'
-                    f'<div style="display:grid;grid-template-columns:120px {_col_w_r};">'
-                    f'<div style="background:{_bdr};padding:0.65rem 0.75rem;display:flex;align-items:center;">'
-                    f'<span style="font-size:0.7rem;font-weight:700;color:{_sb};'
-                    f'text-transform:uppercase;letter-spacing:0.5px;">Metric</span></div>'
-                    f'{_hdr_r}</div>'
-                    f'{_rows_r}'
-                    f'</div>'
-                )
-            else:
-                _risk_grid_html = None
-
-            with st.expander("📊 Risk & Efficiency — Sharpe, Alpha, Beta, Volatility", expanded=False):
-                render_risk_metric_explainer("cmp")
-                if _risk_grid_html:
-                    st.markdown(_risk_grid_html, unsafe_allow_html=True)
-
-            # ── Section 3: Fund Profile ───────────────────────────────────────
-            _CONS_LABEL = {4: "Very High", 3: "High", 2: "Moderate", 1: "Low", 0: "—"}
-            _PROF_METRICS = [
-                ("★ Rating",    "star_rating",       lambda v: "★ " * int(v) if pd.notna(v) else "—",                   "Star rating from value research / similar"),
-                ("Expense",     "expense_ratio",     lambda v: f"{float(v):.2f}%" if pd.notna(v) else "—",              "Annual fee — lower is better"),
-                ("AUM",         "aum_cr",            lambda v: (f"₹{float(v)/1000:.1f}K Cr" if float(v)>=10000 else f"₹{float(v):.0f} Cr") if pd.notna(v) else "—", "Assets under management"),
-                ("Consistency", "consistency_score", lambda v: _CONS_LABEL.get(int(float(v)), "—") if pd.notna(v) else "—", "How often top-quartile across periods"),
-                ("Cat. Rank",   "category_rank",     lambda v: f"#{int(float(v))}" if pd.notna(v) and float(v) != -1 else "—", "Rank within category"),
-            ]
-            n_funds = len(sel_master)
-            col_w = f"repeat({n_funds}, 1fr)"
-            hdr_cells = "".join(
-                f'<div style="background:{PERF_COLORS[i%len(PERF_COLORS)]};'
-                f'padding:0.65rem 0.5rem;text-align:center;border-right:1px solid rgba(255,255,255,0.15);">'
-                f'<div style="font-size:0.72rem;font-weight:700;color:#fff;'
-                f'line-height:1.3;word-break:break-word;">{display_name(row["fund_name"])}</div>'
-                f'<div style="font-size:0.62rem;color:rgba(255,255,255,0.7);margin-top:2px;">{row.get("category","")}</div>'
-                f'</div>'
-                for i, (_, row) in enumerate(sel_master.iterrows())
-            )
-            metric_rows_html = ""
-            for m_label, m_col, m_fmt, m_tip in _PROF_METRICS:
-                if m_col not in sel_master.columns:
-                    continue
-                cells = "".join(
-                    f'<div style="padding:0.55rem 0.5rem;text-align:center;'
-                    f'border-right:1px solid {_bdr};border-bottom:1px solid {_bdr};">'
-                    f'<span style="font-size:0.85rem;font-weight:700;color:{_hd};">'
-                    f'{m_fmt(row.get(m_col))}</span></div>'
-                    for _, row in sel_master.iterrows()
-                )
-                metric_rows_html += (
-                    f'<div style="display:grid;grid-template-columns:110px {col_w};">'
-                    f'<div style="padding:0.55rem 0.75rem;border-right:1px solid {_bdr};'
-                    f'border-bottom:1px solid {_bdr};display:flex;flex-direction:column;justify-content:center;">'
-                    f'<div style="font-size:0.75rem;font-weight:600;color:{_bd};">{m_label}</div>'
-                    f'<div style="font-size:0.6rem;color:{_sb};margin-top:1px;">{m_tip}</div></div>'
-                    f'{cells}</div>'
-                )
-            _prof_grid_html = (
-                f'<div style="border:1px solid {_bdr};border-radius:12px;overflow:hidden;">'
-                f'<div style="display:grid;grid-template-columns:110px {col_w};">'
-                f'<div style="background:{_bdr};padding:0.65rem 0.75rem;display:flex;align-items:center;">'
-                f'<span style="font-size:0.7rem;font-weight:700;color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">Metric</span></div>'
-                f'{hdr_cells}</div>'
-                f'{metric_rows_html}'
-                f'</div>'
-            )
-            with st.expander("🧾 Fund Profile — Rating, Expense, AUM, Consistency", expanded=False):
-                st.markdown(_prof_grid_html, unsafe_allow_html=True)
-
-            # ── Section 4: Plain English Summary ────────────────────────────
-
-            def _plain_bullets(frow):
-                bullets = []  # (icon, bold_label, description)
-
-                sd     = pd.to_numeric(frow.get("std_dev"),      errors="coerce")
-                sharpe = pd.to_numeric(frow.get("sharpe_ratio"), errors="coerce")
-                alpha  = pd.to_numeric(frow.get("alpha"),        errors="coerce")
-                beta   = pd.to_numeric(frow.get("beta"),         errors="coerce")
-                exp    = pd.to_numeric(frow.get("expense_ratio"),errors="coerce")
-                r1y    = pd.to_numeric(frow.get("return_1y"),    errors="coerce")
-                r3y    = pd.to_numeric(frow.get("return_3y"),    errors="coerce")
-                r5y    = pd.to_numeric(frow.get("return_5y"),    errors="coerce")
-
-                if pd.notna(sd):
-                    if sd < 13:
-                        bullets.append(("🟢", "Smooth ride",
-                            f"Volatility is low at {sd:.1f}%. Returns stay relatively steady — "
-                            f"less stressful to hold, especially during rough markets."))
-                    elif sd < 18:
-                        bullets.append(("🟡", "Moderate bumps",
-                            f"Volatility of {sd:.1f}% means returns swing somewhat. Manageable "
-                            f"for investors with a 3+ year horizon who won't panic at short-term dips."))
-                    else:
-                        bullets.append(("🔴", "Bumpy road",
-                            f"High volatility at {sd:.1f}%. Expect sharp swings in value. Best suited "
-                            f"for investors with a long time horizon who can hold through downturns."))
-
-                if pd.notna(sharpe):
-                    if sharpe >= 1.5:
-                        bullets.append(("🟢", "Excellent risk-reward",
-                            f"Sharpe ratio of {sharpe:.2f} — earning strong returns without taking "
-                            f"excessive risk. Think of it as getting great value for the risk you're accepting."))
-                    elif sharpe >= 1.0:
-                        bullets.append(("🟢", "Good risk-reward",
-                            f"Sharpe ratio of {sharpe:.2f} — the returns justify the risk taken. "
-                            f"The fund is earning its keep and not just riding market luck."))
-                    elif sharpe >= 0.5:
-                        bullets.append(("🟡", "Fair risk-reward",
-                            f"Sharpe ratio of {sharpe:.2f} — the fund delivers some return for its risk, "
-                            f"but could be working harder. There may be better options for the same risk level."))
-                    else:
-                        bullets.append(("🔴", "Risk not rewarded",
-                            f"Sharpe ratio of {sharpe:.2f} — taking meaningful risk but not earning "
-                            f"enough return for it. Worth asking whether a safer fund would serve you better."))
-
-                if pd.notna(alpha):
-                    if alpha > 2:
-                        bullets.append(("🟢", "Active management paying off",
-                            f"Alpha of +{alpha:.2f}% — the fund manager is clearly beating the market "
-                            f"index. You're paying higher fees for skill that's actually delivering results."))
-                    elif alpha > 0:
-                        bullets.append(("🟢", "Beating the benchmark",
-                            f"Alpha of +{alpha:.2f}% — modestly ahead of a plain index fund. The manager "
-                            f"is adding some value, though not dramatically."))
-                    elif alpha > -2:
-                        bullets.append(("🟡", "Roughly tracking the market",
-                            f"Alpha of {alpha:+.2f}% — performance is close to a simple index fund. "
-                            f"The active stock-picking isn't adding much beyond what the market gives for free."))
-                    else:
-                        bullets.append(("🔴", "Lagging the benchmark",
-                            f"Alpha of {alpha:.2f}% — underperforming the market index. A low-cost index "
-                            f"fund would have done better here. The active fees aren't being earned back."))
-
-                if pd.notna(beta):
-                    if beta < 0.85:
-                        bullets.append(("🟢", "Less sensitive to market swings",
-                            f"Beta of {beta:.2f} — when markets fall 10%, this fund typically falls only "
-                            f"~{beta*10:.0f}%. It cushions downside, making it more defensive."))
-                    elif beta <= 1.1:
-                        bullets.append(("⚪", "Moves with the market",
-                            f"Beta of {beta:.2f} — closely mirrors the Sensex/Nifty. Good market days "
-                            f"are good days for this fund, and the same goes for bad days."))
-                    else:
-                        bullets.append(("🟡", "Amplifies market moves",
-                            f"Beta of {beta:.2f} — this fund swings more than the overall market. "
-                            f"Higher upside potential when markets rally, but steeper falls when they dip."))
-
-                if pd.notna(exp):
-                    if exp < 0.5:
-                        bullets.append(("🟢", "Very low cost",
-                            f"Just {exp:.2f}% per year — nearly free to hold. Low fees compound into "
-                            f"a significant advantage over a 10–15 year period."))
-                    elif exp < 1.0:
-                        bullets.append(("🟢", "Low cost",
-                            f"Annual fee of {exp:.2f}% — reasonable. Most of the returns stay in "
-                            f"your hands rather than going to the fund house."))
-                    elif exp < 1.5:
-                        bullets.append(("🟡", "Moderate cost",
-                            f"Fee of {exp:.2f}% per year — not cheap. The performance needs to justify "
-                            f"this extra cost versus a similar but cheaper fund."))
-                    else:
-                        bullets.append(("🔴", "High fees",
-                            f"Annual fee of {exp:.2f}% — on the expensive side. Over 15 years, high "
-                            f"fees compound significantly against you. The alpha should more than offset it."))
-
-                if pd.notna(r1y):
-                    parts = [f"1Y: {r1y:+.1f}%"]
-                    if pd.notna(r3y): parts.append(f"3Y: {r3y:+.1f}%")
-                    if pd.notna(r5y): parts.append(f"5Y: {r5y:+.1f}%")
-                    r_icon  = "🟢" if r1y >= 15 else ("🟡" if r1y >= 8 else "🔴")
-                    r_label = "Strong recent returns" if r1y >= 15 else ("Decent recent returns" if r1y >= 8 else "Weak recent returns")
-                    r_desc  = f"Historical track record — {' · '.join(parts)}."
-                    if pd.notna(r3y) and r1y < r3y - 5:
-                        r_desc += " Recent performance has dipped below the longer-term average — could be a short-term blip or an early sign of change."
-                    elif pd.notna(r3y) and r1y > r3y + 5:
-                        r_desc += " Recent returns are running well ahead of the long-term average — strong momentum, but don't bank on this pace continuing."
-                    bullets.append((r_icon, r_label, r_desc))
-
-                return bullets
-
-            _plain_all_html = ""
-            for _fi, (_, _frow) in enumerate(sel_master.iterrows()):
-                _fc   = PERF_COLORS[_fi % len(PERF_COLORS)]
-                _fn   = display_name(_frow["fund_name"])
-                _fcat = _frow.get("category", "")
-                _fbullets = _plain_bullets(_frow)
-                if not _fbullets:
-                    continue
-                _bhtml = ""
-                for _icon, _bold, _desc in _fbullets:
-                    _bhtml += (
-                        f'<div style="display:flex;gap:10px;padding:0.55rem 0;border-bottom:1px solid {_bdr};">'
-                        f'<div style="font-size:1rem;flex-shrink:0;width:22px;text-align:center;padding-top:1px;">{_icon}</div>'
-                        f'<div style="font-size:0.82rem;color:{_bd};line-height:1.6;">'
-                        f'<strong style="color:{_hd};">{_bold}:</strong> {_desc}'
-                        f'</div></div>'
-                    )
-                _plain_all_html += (
-                    f'<div style="border:1px solid {_bdr};border-radius:12px;overflow:hidden;margin-bottom:1rem;">'
-                    f'<div style="background:{_fc};padding:0.65rem 1rem;display:flex;align-items:center;gap:10px;">'
-                    f'<div style="font-size:0.88rem;font-weight:700;color:#fff;">{_fn}</div>'
-                    f'<div style="font-size:0.72rem;color:rgba(255,255,255,0.72);">{_fcat}</div>'
-                    f'</div>'
-                    f'<div style="padding:0.15rem 1rem 0.6rem;">{_bhtml}</div>'
-                    f'</div>'
-                )
-            if _plain_all_html:
-                with st.expander("💬 Plain English Summary — what these numbers mean for you", expanded=False):
-                    st.markdown(_plain_all_html, unsafe_allow_html=True)
+        _render_fund_performance_tab(
+            master[master["fund_name"].isin(selected)].copy(),
+            selected,
+            hd=_hd, sb=_sb, bd=_bd, a=_a, cd=_cd, bdr=_bdr, al=_al,
+            col_amber=_col_amber, col_green=_col_green, col_red=_col_red,
+            cf=_cf, cg=_cg, ct=_ct, is_dark=_is_dark,
+            explainer_key="cmp",
+        )
 
     # ── Tab 3: Holdings Deep Dive ────────────────────────────────────────────
     with tab_ol:
@@ -4624,42 +4400,27 @@ def page_compare():
     # ── Tab 6: Insights ──────────────────────────────────────────────────────
     with tab_ins:
         st.markdown('<div class="section-title">Key Insights</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-sub">Data-driven observations — for analysis only, not investment advice</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="section-sub">Plain-English notes on your selected funds — '
+            'grouped by topic, for learning only</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f'<div style="font-size:0.82rem;color:{_bd};line-height:1.65;margin-bottom:1rem;'
+            f'padding:0.75rem 1rem;background:{_al};border:1px solid {_bdr};border-radius:10px;">'
+            f'Open each section below to read one topic at a time. '
+            f'Sections with warnings start open. Numbers come from latest holdings data — '
+            f'they describe how funds are built, not whether you should buy or sell.</div>',
+            unsafe_allow_html=True,
+        )
 
         insights = generate_insights(selected, similarity, holdings, sector_df, master)
-        if not insights:
-            st.info("No significant patterns detected for this fund combination.")
-        else:
-            cls_map = {"alert": "insight-alert", "warning": "insight-warning",
-                       "info": "insight-info", "success": "insight-success"}
-
-            CATEGORIES = [
-                ("overlap",    "🔗 Overlap & Redundancy",    "How much these funds duplicate each other's holdings"),
-                ("sector",     "🏗️ Sector Concentration",    "Which sectors dominate across the selected funds"),
-                ("unique",     "🔬 Unique Exposure",          "What each fund contributes that no other fund holds"),
-                ("momentum",   "📈 Allocation Momentum",      "Stocks fund managers are collectively buying or selling"),
-                ("cost_risk",  "💰 Cost & Risk",              "Expense ratio comparison and relative volatility across selected funds"),
-            ]
-
-            for cat_key, cat_title, cat_sub in CATEGORIES:
-                cat_insights = [i for i in insights if i.get("category") == cat_key]
-                if not cat_insights:
-                    continue
-                st.markdown(
-                    f'<div style="margin:1.4rem 0 0.35rem;">'
-                    f'<div style="font-size:0.95rem;font-weight:700;color:{_hd};">{cat_title}</div>'
-                    f'<div style="font-size:0.72rem;color:{_sb};margin-top:2px;">{cat_sub}</div>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-                for ins in cat_insights:
-                    st.markdown(
-                        f'<div class="insight-card {cls_map[ins["type"]]}">'
-                        f'<div class="insight-icon">{ins["icon"]}</div>'
-                        f'<div class="insight-text">{ins["text"]}</div>'
-                        f'</div>',
-                        unsafe_allow_html=True,
-                    )
+        _render_categorized_insights(
+            insights,
+            hd=_hd, sb=_sb, bd=_bd, al=_al, bdr=_bdr,
+            page_key="cmp",
+            empty_msg="No clear patterns stood out for these funds. Try different picks or use the other tabs.",
+        )
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown('<div class="section-title">Diversification Summary</div>', unsafe_allow_html=True)
@@ -5270,6 +5031,583 @@ def _sector_exposure_table_html(
     return hdr + f'<div style="{_wrap_style}">' + rows + "</div>"
 
 
+def _render_fund_performance_tab(
+    sel_master: pd.DataFrame,
+    fund_order: list[str],
+    *,
+    hd: str, sb: str, bd: str, a: str, cd: str, bdr: str, al: str,
+    col_amber: str, col_green: str, col_red: str,
+    cf: dict, cg: str, ct: dict, is_dark: bool,
+    explainer_key: str = "cmp",
+    max_display: int = 8,
+    amount_map: dict | None = None,
+    matched_funds: list | None = None,
+    has_amounts: bool = False,
+) -> None:
+    """Shared Fund Performance tab UI (Compare + Portfolio X-Ray)."""
+    _hd, _sb, _bd, _a, _al, _cd, _bdr = hd, sb, bd, a, al, cd, bdr
+    _col_amber, _col_green, _col_red = col_amber, col_green, col_red
+    _is_dark, _cf, _cg = is_dark, cf, cg
+
+    if sel_master.empty:
+        st.info("Performance data not available for the selected funds.")
+        return
+    for _rc in ("std_dev", "sharpe_ratio", "alpha", "beta"):
+        if _rc in sel_master.columns:
+            sel_master[_rc] = pd.to_numeric(sel_master[_rc], errors="coerce")
+    sel_master = sel_master.copy()
+    sel_master["_order"] = sel_master["fund_name"].apply(
+        lambda f: fund_order.index(f) if f in fund_order else 99)
+    sel_master = sel_master.sort_values("_order").drop(columns=["_order"])
+    _n_all = len(sel_master)
+    if _n_all > max_display:
+        st.info(
+            f"Showing top {max_display} of {_n_all} funds by sort order — "
+            "narrow filters to compare more side by side."
+        )
+        sel_master = sel_master.head(max_display)
+    sel_master["short_name"] = sel_master["fund_name"].apply(display_name)
+    PERF_COLORS = [a, "#F59E0B", "#06B6D4", "#10B981", "#EF4444"]
+
+    # ── Fund Summary Cards ────────────────────────────────────────────
+    _rank_col = "return_since_inception" if "return_since_inception" in sel_master.columns else (
+                "return_3y" if "return_3y" in sel_master.columns else None)
+    if _rank_col:
+        sel_master["_rv"] = pd.to_numeric(sel_master[_rank_col], errors="coerce")
+        sel_master["_rk"] = sel_master["_rv"].rank(ascending=False, method="min").fillna(99).astype(int)
+    _rank_label = "Since Inception Return" if _rank_col == "return_since_inception" else "3Y Return"
+
+    _cards_html = ""
+    for _ci, (_, _crow) in enumerate(sel_master.iterrows()):
+        _cc   = PERF_COLORS[_ci % len(PERF_COLORS)]
+        _cfn  = display_name(_crow["fund_name"])
+        _crk  = int(_crow.get("_rk", 99)) if _rank_col else None
+        _crv  = _crow.get("_rv") if _rank_col else None
+        _crs  = f"{float(_crv):+.1f}%" if _rank_col and pd.notna(_crv) else "—"
+        _crc  = _col_green if _rank_col and pd.notna(_crv) and float(_crv) > 0 else _col_red
+        _trophy = " 🏆" if _crk == 1 else ""
+        # Inception date
+        _cld = _crow.get("launch_date", "")
+        _cld_str = ""
+        if _cld and str(_cld) not in ("", "nan", "NaT", "None"):
+            try:
+                _cld_str = pd.to_datetime(str(_cld)).strftime("%d %b %Y")
+            except Exception:
+                pass
+        _cards_html += (
+            f'<div style="background:{_cd};border:1px solid {_bdr};border-top:3px solid {_cc};'
+            f'border-radius:12px;padding:1rem 1.1rem;flex:1;min-width:170px;">'
+            f'<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">'
+            f'<div style="width:9px;height:9px;border-radius:50%;background:{_cc};flex-shrink:0;"></div>'
+            f'<div style="font-size:0.75rem;font-weight:600;color:{_bd};line-height:1.3;">{_cfn}</div></div>'
+            f'<div style="font-size:0.6rem;color:{_sb};margin-bottom:6px;">{_rank_label}</div>'
+            f'<div style="display:flex;align-items:flex-end;justify-content:space-between;">'
+            f'<div style="font-size:1.55rem;font-weight:800;color:{_crc};line-height:1;">{_crs}</div>'
+            f'<div style="font-size:0.85rem;font-weight:700;color:{_sb};">{"#"+str(_crk)+_trophy if _crk else ""}</div>'
+            f'</div>'
+            + (f'<div style="font-size:0.58rem;color:{_sb};margin-top:5px;">Since {_cld_str}</div>' if _cld_str else '')
+            + f'</div>'
+        )
+    st.markdown(
+        f'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem;">{_cards_html}</div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Returns: 4 mini charts ────────────────────────────────────────
+    _PERIODS = [
+        ("return_1y",              "1 Year",         "Short term",   "📅"),
+        ("return_3y",              "3 Year",         "Medium term",  "📅"),
+        ("return_5y",              "5 Year",         "Long term",    "📅"),
+        ("return_since_inception", "Since Inception","Overall",      "📅"),
+    ]
+    _avail_p = [(k, lbl, sub, ic) for k, lbl, sub, ic in _PERIODS if k in sel_master.columns]
+
+    if _avail_p:
+        st.markdown(
+            f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:0.5rem;">'
+            f'<span style="font-size:1rem;">📈</span>'
+            f'<span style="font-size:0.95rem;font-weight:700;color:{_hd};">Returns (%)</span>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        # Shared color legend — shown once above all charts
+        _NA_COLOR = "rgba(156,163,175,0.35)" if _is_dark else "rgba(156,163,175,0.4)"
+        _legend_items = ""
+        for _lfi, (_, _lrow) in enumerate(sel_master.iterrows()):
+            _lc  = PERF_COLORS[_lfi % len(PERF_COLORS)]
+            _lfn = display_name(_lrow["fund_name"])
+            _legend_items += (
+                f'<div style="display:flex;align-items:center;gap:5px;">'
+                f'<div style="width:10px;height:10px;border-radius:3px;background:{_lc};flex-shrink:0;"></div>'
+                f'<span style="font-size:0.68rem;color:{_bd};white-space:nowrap;">{_lfn}</span>'
+                f'</div>'
+            )
+        st.markdown(
+            f'<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;'
+            f'margin-bottom:0.5rem;padding:0.5rem 0.75rem;background:{_cd};'
+            f'border:1px solid {_bdr};border-radius:10px;">{_legend_items}</div>',
+            unsafe_allow_html=True,
+        )
+
+        _pcols = st.columns(len(_avail_p))
+        for _pi, (pk, plbl, psub, pic) in enumerate(_avail_p):
+            with _pcols[_pi]:
+                _pdata = []
+                for _pfi, (_, _prow) in enumerate(sel_master.iterrows()):
+                    _pv  = pd.to_numeric(_prow.get(pk), errors="coerce")
+                    _has = pd.notna(_pv)
+                    _pdata.append({
+                        "fn":  display_name(_prow["fund_name"]),
+                        "v":   float(_pv) if _has else 0.0,
+                        "c":   PERF_COLORS[_pfi % len(PERF_COLORS)] if _has else _NA_COLOR,
+                        "has": _has,
+                    })
+                _with_data = [d for d in _pdata if d["has"]]
+                if _with_data:
+                    _leader = max(_with_data, key=lambda x: x["v"])
+                    st.markdown(
+                        f'<div style="text-align:center;margin-bottom:2px;">'
+                        f'<div style="font-size:0.78rem;font-weight:700;color:{_hd};">{pic} {plbl}</div>'
+                        f'<div style="font-size:0.62rem;color:{_sb};">{psub} performance</div>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+                    _fig_m = go.Figure()
+                    for _pd in _pdata:
+                        _fig_m.add_trace(go.Bar(
+                            x=[_pd["fn"]], y=[_pd["v"]],
+                            marker_color=_pd["c"],
+                            showlegend=False,
+                            text=[f"{_pd['v']:.1f}%" if _pd["has"] else "N/A"],
+                            textposition="outside" if _pd["has"] else "inside",
+                        ))
+                    _fig_m.update_traces(
+                        textfont=dict(size=9, color=_bd, family="Inter, sans-serif"),
+                        marker_line_width=0, opacity=0.92,
+                    )
+                    _fig_m.update_layout(**_dark_layout(
+                        height=200, font=_cf,
+                        margin=dict(t=28, b=5, l=5, r=5),
+                        xaxis=_dark_xaxis(showticklabels=False, tickfont=dict(size=8, color=_bd)),
+                        yaxis=_dark_yaxis(ticksuffix="%", tickfont=dict(size=8, color=_bd),
+                                          gridcolor=_cg, zerolinecolor=_cg),
+                    ))
+                    st.plotly_chart(_fig_m, use_container_width=True, config={"displayModeBar": False})
+                    # Callout: if not all funds have data, note which ones do
+                    _missing = [d["fn"] for d in _pdata if not d["has"]]
+                    if _missing:
+                        _have_names = " & ".join(d["fn"] for d in _with_data)
+                        _callout_line2 = f"{'has' if len(_with_data)==1 else 'have'} {plbl.lower()} track record"
+                        _callout_fn    = _have_names
+                    else:
+                        _callout_fn    = _leader["fn"]
+                        _callout_line2 = f"leads in {plbl.lower()} returns"
+                    st.markdown(
+                        f'<div style="background:{_al};border:1px solid {_bdr};border-radius:8px;'
+                        f'padding:0.35rem 0.5rem;text-align:center;margin-top:-10px;margin-bottom:4px;">'
+                        f'<div style="font-size:0.68rem;font-weight:700;color:{_leader["c"]};">{_callout_fn}</div>'
+                        f'<div style="font-size:0.58rem;color:{_sb};">{_callout_line2}</div>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.markdown(
+                        f'<div style="text-align:center;color:{_sb};font-size:0.75rem;padding:3rem 0;">'
+                        f'No {plbl} data</div>',
+                        unsafe_allow_html=True,
+                    )
+
+    # ── Performance Summary ───────────────────────────────────────────
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:0.75rem;">'
+        f'<span style="font-size:1rem;">⭐</span>'
+        f'<span style="font-size:0.95rem;font-weight:700;color:{_hd};">Performance Summary</span>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    def _best_in(col, higher_is_better=True):
+        if col not in sel_master.columns: return None, None, None
+        s = pd.to_numeric(sel_master[col], errors="coerce")
+        if s.isna().all(): return None, None, None
+        idx = s.idxmax() if higher_is_better else s.idxmin()
+        row = sel_master.loc[idx]
+        ci  = list(sel_master.index).index(idx) % len(PERF_COLORS)
+        return display_name(row["fund_name"]), float(s[idx]), PERF_COLORS[ci]
+
+    _bo_col  = "return_since_inception" if "return_since_inception" in sel_master.columns else "return_3y"
+    _bo_fn,  _bo_v,  _bo_c  = _best_in(_bo_col)
+    _mc_fn,  _mc_v,  _mc_c  = _best_in("std_dev", higher_is_better=False)
+    _bra_fn, _bra_v, _bra_c = _best_in("sharpe_ratio")
+    _hs_fn,  _hs_v,  _hs_c  = _best_in("return_1y")
+
+    _sum_cards = [
+        ("📈", "Best Overall Performer",   _bo_fn,  f"{_bo_v:+.1f}%"  if _bo_v  is not None else None, "Since Inception Return" if _bo_col=="return_since_inception" else "3Y Return", _bo_c),
+        ("📊", "Most Consistent",           _mc_fn,  None,              "Lowest volatility",              _mc_c),
+        ("🛡️", "Best Risk Adjusted",        _bra_fn, f"{_bra_v:.2f}"   if _bra_v is not None else None, "Highest Sharpe Ratio",   _bra_c),
+        ("🚀", "Highest Short-Term Return", _hs_fn,  f"{_hs_v:+.1f}%"  if _hs_v  is not None else None, "1 Year Return",          _hs_c),
+    ]
+
+    _metric_cards_html = ""
+    for ico, title, fn, val, sub, fc in _sum_cards:
+        if fn:
+            _metric_cards_html += (
+                f'<div style="flex:3;min-width:150px;background:{_cd};border:1px solid {_bdr};'
+                f'border-radius:12px;padding:0.9rem 1rem;">'
+                f'<div style="font-size:1.1rem;margin-bottom:4px;">{ico}</div>'
+                f'<div style="font-size:0.65rem;color:{_sb};font-weight:600;text-transform:uppercase;'
+                f'letter-spacing:0.4px;margin-bottom:6px;">{title}</div>'
+                f'<div style="font-size:0.88rem;font-weight:700;color:{fc};margin-bottom:2px;">{fn}</div>'
+                + (f'<div style="font-size:1.2rem;font-weight:800;color:{fc};">{val}</div>' if val else "")
+                + f'<div style="font-size:0.65rem;color:{_sb};margin-top:2px;">{sub}</div>'
+                f'</div>'
+            )
+    _info_card_html = (
+        f'<div style="flex:2;min-width:130px;background:{_al};border:1px solid {_bdr};'
+        f'border-radius:12px;padding:0.9rem 1rem;">'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{_a};margin-bottom:8px;">ℹ️ How to read this?</div>'
+        f'<div style="font-size:0.68rem;color:{_sb};line-height:1.6;">'
+        f'Returns are annualised for periods &gt; 1 year.<br><br>'
+        f'Past performance is not indicative of future results.<br><br>'
+        f'<span style="color:{_a};font-weight:600;">Scroll down for deeper analysis ↓</span>'
+        f'</div></div>'
+    )
+    st.markdown(
+        f'<div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;">'
+        f'{_metric_cards_html}{_info_card_html}</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── Section 2: Risk & Efficiency ────────────────────────────────
+    risk_cols = {
+        "std_dev":      "Std Dev (%)",
+        "sharpe_ratio": "Sharpe Ratio",
+        "alpha":        "Alpha (%)",
+        "beta":         "Beta",
+    }
+    avail_risk = {k: v for k, v in risk_cols.items() if k in sel_master.columns}
+
+    if avail_risk:
+        _RISK_DEFS = [
+            ("std_dev",      "Std Dev",    "%",  "Volatility of returns — below 13% = low, 13–18% = moderate, above 18% = high"),
+            ("sharpe_ratio", "Sharpe",     "",   "Return per unit of risk — above 1.0 is good, above 1.5 is excellent"),
+            ("alpha",        "Alpha",      "%",  "Excess return vs benchmark — positive means the manager beat the index"),
+            ("beta",         "Beta",       "",   "Market sensitivity — below 1 = less volatile than market, above 1 = amplified swings"),
+        ]
+        _avail_defs = [(k, lbl, u, tip) for k, lbl, u, tip in _RISK_DEFS if k in sel_master.columns]
+
+        def _risk_cell(col_key, raw):
+            try:
+                v = float(raw)
+            except (TypeError, ValueError):
+                return _cd, _sb, "—"
+            _dk = _is_dark
+            if col_key == "std_dev":
+                if v < 13:  return ("rgba(16,185,129,0.18)" if _dk else "#D1FAE5"), _col_green, "Low ✓"
+                if v < 18:  return ("rgba(245,158,11,0.18)" if _dk else "#FEF3C7"), _col_amber, "Moderate"
+                return ("rgba(239,68,68,0.18)" if _dk else "#FEE2E2"), _col_red, "High ⚠"
+            if col_key == "sharpe_ratio":
+                if v >= 1.5: return ("rgba(16,185,129,0.18)" if _dk else "#D1FAE5"), _col_green, "Excellent ✓"
+                if v >= 1.0: return ("rgba(16,185,129,0.10)" if _dk else "#ECFDF5"), _col_green, "Good ✓"
+                if v >= 0.5: return ("rgba(245,158,11,0.18)" if _dk else "#FEF3C7"), _col_amber, "Fair"
+                return ("rgba(239,68,68,0.18)" if _dk else "#FEE2E2"), _col_red, "Weak ⚠"
+            if col_key == "alpha":
+                if v > 2:   return ("rgba(16,185,129,0.18)" if _dk else "#D1FAE5"), _col_green, "Strong ✓"
+                if v > 0:   return ("rgba(16,185,129,0.10)" if _dk else "#ECFDF5"), _col_green, "Positive ✓"
+                if v > -2:  return ("rgba(245,158,11,0.15)" if _dk else "#FEF3C7"), _col_amber, "Slight lag"
+                return ("rgba(239,68,68,0.18)" if _dk else "#FEE2E2"), _col_red, "Negative ⚠"
+            if col_key == "beta":
+                if v < 0.85: return ("rgba(16,185,129,0.18)" if _dk else "#D1FAE5"), _col_green, "Low β"
+                if v <= 1.1: return _cd, _bd, "Market β"
+                return ("rgba(245,158,11,0.18)" if _dk else "#FEF3C7"), _col_amber, "High β ⚠"
+            return _cd, _sb, "—"
+
+        _n_r = len(sel_master)
+        _col_w_r = f"repeat({_n_r}, 1fr)"
+        _chip_bg = "rgba(255,255,255,0.10)" if _is_dark else "rgba(0,0,0,0.07)"
+
+        # Header row — fund names with PERF_COLORS
+        _hdr_r = "".join(
+            f'<div style="background:{PERF_COLORS[i % len(PERF_COLORS)]};'
+            f'padding:0.65rem 0.5rem;text-align:center;'
+            f'border-right:1px solid rgba(255,255,255,0.15);">'
+            f'<div style="font-size:0.72rem;font-weight:700;color:#fff;'
+            f'line-height:1.3;word-break:break-word;">{display_name(row["fund_name"])}</div>'
+            f'</div>'
+            for i, (_, row) in enumerate(sel_master.iterrows())
+        )
+
+        _rows_r = ""
+        for col_key, lbl, unit, tip in _avail_defs:
+            cells_r = ""
+            for _, row in sel_master.iterrows():
+                raw = row.get(col_key)
+                try:
+                    v = float(raw)
+                    if col_key == "std_dev":   v_str = f"{v:.1f}{unit}"
+                    elif col_key == "alpha":   v_str = f"{v:+.2f}{unit}"
+                    else:                      v_str = f"{v:.2f}{unit}"
+                except (TypeError, ValueError):
+                    v_str = "—"
+                cell_bg, cell_txt, chip = _risk_cell(col_key, raw)
+                cells_r += (
+                    f'<div style="padding:0.65rem 0.5rem;text-align:center;'
+                    f'background:{cell_bg};border-right:1px solid {_bdr};border-bottom:1px solid {_bdr};">'
+                    f'<div style="font-size:0.64rem;font-weight:700;color:{cell_txt};'
+                    f'background:{_chip_bg};border-radius:4px;padding:1px 6px;'
+                    f'display:inline-block;margin-bottom:4px;">{chip}</div>'
+                    f'<div style="font-size:0.9rem;font-weight:800;color:{_hd};">{v_str}</div>'
+                    f'</div>'
+                )
+            _rows_r += (
+                f'<div style="display:grid;grid-template-columns:120px {_col_w_r};">'
+                f'<div style="padding:0.6rem 0.75rem;border-right:1px solid {_bdr};'
+                f'border-bottom:1px solid {_bdr};display:flex;flex-direction:column;justify-content:center;">'
+                f'<div style="font-size:0.78rem;font-weight:700;color:{_bd};">{lbl}</div>'
+                f'<div style="font-size:0.6rem;color:{_sb};margin-top:2px;line-height:1.3;">{tip}</div>'
+                f'</div>{cells_r}</div>'
+            )
+
+        _risk_grid_html = (
+            f'<div style="border:1px solid {_bdr};border-radius:12px;overflow:hidden;">'
+            f'<div style="display:grid;grid-template-columns:120px {_col_w_r};">'
+            f'<div style="background:{_bdr};padding:0.65rem 0.75rem;display:flex;align-items:center;">'
+            f'<span style="font-size:0.7rem;font-weight:700;color:{_sb};'
+            f'text-transform:uppercase;letter-spacing:0.5px;">Metric</span></div>'
+            f'{_hdr_r}</div>'
+            f'{_rows_r}'
+            f'</div>'
+        )
+    else:
+        _risk_grid_html = None
+
+    with st.expander("📊 Risk & Efficiency — Sharpe, Alpha, Beta, Volatility", expanded=False):
+        render_risk_metric_explainer(explainer_key)
+        if _risk_grid_html:
+            st.markdown(_risk_grid_html, unsafe_allow_html=True)
+
+    # ── Section 3: Fund Profile ───────────────────────────────────────
+    _CONS_LABEL = {4: "Very High", 3: "High", 2: "Moderate", 1: "Low", 0: "—"}
+    _PROF_METRICS = [
+        ("★ Rating",    "star_rating",       lambda v: "★ " * int(v) if pd.notna(v) else "—",                   "Star rating from value research / similar"),
+        ("Expense",     "expense_ratio",     lambda v: f"{float(v):.2f}%" if pd.notna(v) else "—",              "Annual fee — lower is better"),
+        ("AUM",         "aum_cr",            lambda v: (f"₹{float(v)/1000:.1f}K Cr" if float(v)>=10000 else f"₹{float(v):.0f} Cr") if pd.notna(v) else "—", "Assets under management"),
+        ("Consistency", "consistency_score", lambda v: _CONS_LABEL.get(int(float(v)), "—") if pd.notna(v) else "—", "How often top-quartile across periods"),
+        ("Cat. Rank",   "category_rank",     lambda v: f"#{int(float(v))}" if pd.notna(v) and float(v) != -1 else "—", "Rank within category"),
+    ]
+    n_funds = len(sel_master)
+    col_w = f"repeat({n_funds}, 1fr)"
+    hdr_cells = "".join(
+        f'<div style="background:{PERF_COLORS[i%len(PERF_COLORS)]};'
+        f'padding:0.65rem 0.5rem;text-align:center;border-right:1px solid rgba(255,255,255,0.15);">'
+        f'<div style="font-size:0.72rem;font-weight:700;color:#fff;'
+        f'line-height:1.3;word-break:break-word;">{display_name(row["fund_name"])}</div>'
+        f'<div style="font-size:0.62rem;color:rgba(255,255,255,0.7);margin-top:2px;">{row.get("category","")}</div>'
+        f'</div>'
+        for i, (_, row) in enumerate(sel_master.iterrows())
+    )
+    metric_rows_html = ""
+    for m_label, m_col, m_fmt, m_tip in _PROF_METRICS:
+        if m_col not in sel_master.columns:
+            continue
+        cells = "".join(
+            f'<div style="padding:0.55rem 0.5rem;text-align:center;'
+            f'border-right:1px solid {_bdr};border-bottom:1px solid {_bdr};">'
+            f'<span style="font-size:0.85rem;font-weight:700;color:{_hd};">'
+            f'{m_fmt(row.get(m_col))}</span></div>'
+            for _, row in sel_master.iterrows()
+        )
+        metric_rows_html += (
+            f'<div style="display:grid;grid-template-columns:110px {col_w};">'
+            f'<div style="padding:0.55rem 0.75rem;border-right:1px solid {_bdr};'
+            f'border-bottom:1px solid {_bdr};display:flex;flex-direction:column;justify-content:center;">'
+            f'<div style="font-size:0.75rem;font-weight:600;color:{_bd};">{m_label}</div>'
+            f'<div style="font-size:0.6rem;color:{_sb};margin-top:1px;">{m_tip}</div></div>'
+            f'{cells}</div>'
+        )
+    _prof_grid_html = (
+        f'<div style="border:1px solid {_bdr};border-radius:12px;overflow:hidden;">'
+        f'<div style="display:grid;grid-template-columns:110px {col_w};">'
+        f'<div style="background:{_bdr};padding:0.65rem 0.75rem;display:flex;align-items:center;">'
+        f'<span style="font-size:0.7rem;font-weight:700;color:{_sb};text-transform:uppercase;letter-spacing:0.5px;">Metric</span></div>'
+        f'{hdr_cells}</div>'
+        f'{metric_rows_html}'
+        f'</div>'
+    )
+    with st.expander("🧾 Fund Profile — Rating, Expense, AUM, Consistency", expanded=False):
+        if has_amounts and amount_map and matched_funds:
+            _inv_hdr = "".join(
+                f'<div style="background:{PERF_COLORS[i % len(PERF_COLORS)]};'
+                f'padding:0.65rem 0.5rem;text-align:center;border-right:1px solid rgba(255,255,255,0.15);">'
+                f'<div style="font-size:0.72rem;font-weight:700;color:#fff;line-height:1.3;">'
+                f'{display_name(row["fund_name"])}</div></div>'
+                for i, (_, row) in enumerate(sel_master.iterrows())
+            )
+            _inv_cells = "".join(
+                f'<div style="padding:0.55rem 0.5rem;text-align:center;border-right:1px solid {_bdr};'
+                f'border-bottom:1px solid {_bdr};">'
+                f'<span style="font-size:0.85rem;font-weight:700;color:{_hd};">'
+                f'₹{amount_map.get(row["fund_name"], 0):,.0f}</span></div>'
+                for _, row in sel_master.iterrows()
+            )
+            st.markdown(
+                f'<div style="border:1px solid {_bdr};border-radius:12px;overflow:hidden;margin-bottom:0.75rem;">'
+                f'<div style="display:grid;grid-template-columns:110px {col_w};">'
+                f'<div style="background:{_bdr};padding:0.65rem 0.75rem;">'
+                f'<span style="font-size:0.7rem;font-weight:700;color:{_sb};">Metric</span></div>'
+                f'{_inv_hdr}</div>'
+                f'<div style="display:grid;grid-template-columns:110px {col_w};">'
+                f'<div style="padding:0.55rem 0.75rem;border-right:1px solid {_bdr};'
+                f'border-bottom:1px solid {_bdr};"><div style="font-size:0.75rem;font-weight:600;color:{_bd};">'
+                f'Invested</div></div>{_inv_cells}</div></div>',
+                unsafe_allow_html=True,
+            )
+        st.markdown(_prof_grid_html, unsafe_allow_html=True)
+
+    # ── Section 4: Plain English Summary ────────────────────────────
+
+    def _plain_bullets(frow):
+        bullets = []  # (icon, bold_label, description)
+
+        sd     = pd.to_numeric(frow.get("std_dev"),      errors="coerce")
+        sharpe = pd.to_numeric(frow.get("sharpe_ratio"), errors="coerce")
+        alpha  = pd.to_numeric(frow.get("alpha"),        errors="coerce")
+        beta   = pd.to_numeric(frow.get("beta"),         errors="coerce")
+        exp    = pd.to_numeric(frow.get("expense_ratio"),errors="coerce")
+        r1y    = pd.to_numeric(frow.get("return_1y"),    errors="coerce")
+        r3y    = pd.to_numeric(frow.get("return_3y"),    errors="coerce")
+        r5y    = pd.to_numeric(frow.get("return_5y"),    errors="coerce")
+
+        if pd.notna(sd):
+            if sd < 13:
+                bullets.append(("🟢", "Smooth ride",
+                    f"Volatility is low at {sd:.1f}%. Returns stay relatively steady — "
+                    f"less stressful to hold, especially during rough markets."))
+            elif sd < 18:
+                bullets.append(("🟡", "Moderate bumps",
+                    f"Volatility of {sd:.1f}% means returns swing somewhat. Manageable "
+                    f"for investors with a 3+ year horizon who won't panic at short-term dips."))
+            else:
+                bullets.append(("🔴", "Bumpy road",
+                    f"High volatility at {sd:.1f}%. Expect sharp swings in value. Best suited "
+                    f"for investors with a long time horizon who can hold through downturns."))
+
+        if pd.notna(sharpe):
+            if sharpe >= 1.5:
+                bullets.append(("🟢", "Excellent risk-reward",
+                    f"Sharpe ratio of {sharpe:.2f} — earning strong returns without taking "
+                    f"excessive risk. Think of it as getting great value for the risk you're accepting."))
+            elif sharpe >= 1.0:
+                bullets.append(("🟢", "Good risk-reward",
+                    f"Sharpe ratio of {sharpe:.2f} — the returns justify the risk taken. "
+                    f"The fund is earning its keep and not just riding market luck."))
+            elif sharpe >= 0.5:
+                bullets.append(("🟡", "Fair risk-reward",
+                    f"Sharpe ratio of {sharpe:.2f} — the fund delivers some return for its risk, "
+                    f"but could be working harder. There may be better options for the same risk level."))
+            else:
+                bullets.append(("🔴", "Risk not rewarded",
+                    f"Sharpe ratio of {sharpe:.2f} — taking meaningful risk but not earning "
+                    f"enough return for it. Worth asking whether a safer fund would serve you better."))
+
+        if pd.notna(alpha):
+            if alpha > 2:
+                bullets.append(("🟢", "Active management paying off",
+                    f"Alpha of +{alpha:.2f}% — the fund manager is clearly beating the market "
+                    f"index. You're paying higher fees for skill that's actually delivering results."))
+            elif alpha > 0:
+                bullets.append(("🟢", "Beating the benchmark",
+                    f"Alpha of +{alpha:.2f}% — modestly ahead of a plain index fund. The manager "
+                    f"is adding some value, though not dramatically."))
+            elif alpha > -2:
+                bullets.append(("🟡", "Roughly tracking the market",
+                    f"Alpha of {alpha:+.2f}% — performance is close to a simple index fund. "
+                    f"The active stock-picking isn't adding much beyond what the market gives for free."))
+            else:
+                bullets.append(("🔴", "Lagging the benchmark",
+                    f"Alpha of {alpha:.2f}% — underperforming the market index. A low-cost index "
+                    f"fund would have done better here. The active fees aren't being earned back."))
+
+        if pd.notna(beta):
+            if beta < 0.85:
+                bullets.append(("🟢", "Less sensitive to market swings",
+                    f"Beta of {beta:.2f} — when markets fall 10%, this fund typically falls only "
+                    f"~{beta*10:.0f}%. It cushions downside, making it more defensive."))
+            elif beta <= 1.1:
+                bullets.append(("⚪", "Moves with the market",
+                    f"Beta of {beta:.2f} — closely mirrors the Sensex/Nifty. Good market days "
+                    f"are good days for this fund, and the same goes for bad days."))
+            else:
+                bullets.append(("🟡", "Amplifies market moves",
+                    f"Beta of {beta:.2f} — this fund swings more than the overall market. "
+                    f"Higher upside potential when markets rally, but steeper falls when they dip."))
+
+        if pd.notna(exp):
+            if exp < 0.5:
+                bullets.append(("🟢", "Very low cost",
+                    f"Just {exp:.2f}% per year — nearly free to hold. Low fees compound into "
+                    f"a significant advantage over a 10–15 year period."))
+            elif exp < 1.0:
+                bullets.append(("🟢", "Low cost",
+                    f"Annual fee of {exp:.2f}% — reasonable. Most of the returns stay in "
+                    f"your hands rather than going to the fund house."))
+            elif exp < 1.5:
+                bullets.append(("🟡", "Moderate cost",
+                    f"Fee of {exp:.2f}% per year — not cheap. The performance needs to justify "
+                    f"this extra cost versus a similar but cheaper fund."))
+            else:
+                bullets.append(("🔴", "High fees",
+                    f"Annual fee of {exp:.2f}% — on the expensive side. Over 15 years, high "
+                    f"fees compound significantly against you. The alpha should more than offset it."))
+
+        if pd.notna(r1y):
+            parts = [f"1Y: {r1y:+.1f}%"]
+            if pd.notna(r3y): parts.append(f"3Y: {r3y:+.1f}%")
+            if pd.notna(r5y): parts.append(f"5Y: {r5y:+.1f}%")
+            r_icon  = "🟢" if r1y >= 15 else ("🟡" if r1y >= 8 else "🔴")
+            r_label = "Strong recent returns" if r1y >= 15 else ("Decent recent returns" if r1y >= 8 else "Weak recent returns")
+            r_desc  = f"Historical track record — {' · '.join(parts)}."
+            if pd.notna(r3y) and r1y < r3y - 5:
+                r_desc += " Recent performance has dipped below the longer-term average — could be a short-term blip or an early sign of change."
+            elif pd.notna(r3y) and r1y > r3y + 5:
+                r_desc += " Recent returns are running well ahead of the long-term average — strong momentum, but don't bank on this pace continuing."
+            bullets.append((r_icon, r_label, r_desc))
+
+        return bullets
+
+    _plain_all_html = ""
+    for _fi, (_, _frow) in enumerate(sel_master.iterrows()):
+        _fc   = PERF_COLORS[_fi % len(PERF_COLORS)]
+        _fn   = display_name(_frow["fund_name"])
+        _fcat = _frow.get("category", "")
+        _fbullets = _plain_bullets(_frow)
+        if not _fbullets:
+            continue
+        _bhtml = ""
+        for _icon, _bold, _desc in _fbullets:
+            _bhtml += (
+                f'<div style="display:flex;gap:10px;padding:0.55rem 0;border-bottom:1px solid {_bdr};">'
+                f'<div style="font-size:1rem;flex-shrink:0;width:22px;text-align:center;padding-top:1px;">{_icon}</div>'
+                f'<div style="font-size:0.82rem;color:{_bd};line-height:1.6;">'
+                f'<strong style="color:{_hd};">{_bold}:</strong> {_desc}'
+                f'</div></div>'
+            )
+        _plain_all_html += (
+            f'<div style="border:1px solid {_bdr};border-radius:12px;overflow:hidden;margin-bottom:1rem;">'
+            f'<div style="background:{_fc};padding:0.65rem 1rem;display:flex;align-items:center;gap:10px;">'
+            f'<div style="font-size:0.88rem;font-weight:700;color:#fff;">{_fn}</div>'
+            f'<div style="font-size:0.72rem;color:rgba(255,255,255,0.72);">{_fcat}</div>'
+            f'</div>'
+            f'<div style="padding:0.15rem 1rem 0.6rem;">{_bhtml}</div>'
+            f'</div>'
+        )
+    if _plain_all_html:
+        with st.expander("💬 Plain English Summary — what these numbers mean for you", expanded=False):
+            st.markdown(_plain_all_html, unsafe_allow_html=True)
+
+
 # ── PAGE: PORTFOLIO X-RAY ─────────────────────────────────────────────────────
 
 def page_portfolio_xray():
@@ -5413,13 +5751,21 @@ def page_portfolio_xray():
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    tab_ov, tab_ol, tab_exp, tab_perf, tab_sec, tab_risk, tab_ins = st.tabs([
+    def _norm_sector_label_sc(s) -> str:
+        t = str(s).strip() if pd.notna(s) else ""
+        if not t or t.lower() in ("nan", "none"):
+            return "Other"
+        return t.title()
+
+    sel_sector = sector_df[sector_df["fund_name"].isin(matched_funds)].copy()
+    sel_sector["sector"] = sel_sector["sector"].map(_norm_sector_label_sc)
+
+    tab_ov, tab_ol, tab_exp, tab_perf, tab_sec, tab_ins = st.tabs([
         "📊 Overview",
         "🔗 Fund Overlap",
         "🔍 What You Actually Own",
         "📉 Fund Performance",
         "🏗️ Sector & Cap Size",
-        "⚡ Concentration Risks",
         "💡 Insights",
     ])
 
@@ -6315,136 +6661,104 @@ def page_portfolio_xray():
 
     # ── Tab 2: Fund Performance ───────────────────────────────────────────────
     with tab_perf:
+        from analytics.overlap_filters import MIN_RETURN_SLIDER_MAX, fund_return_pct, sort_funds_by_return
+
         st.markdown('<div class="section-title">Fund Performance Comparison</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-sub">Returns, risk and cost metrics for each fund in your portfolio</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="section-sub">Returns, risk, and efficiency metrics for funds in your portfolio</div>',
+            unsafe_allow_html=True,
+        )
 
-        PERF_COLORS = ["#7C3AED", "#F59E0B", "#06B6D4", "#10B981", "#EF4444"]
+        _pf_perf_cat_map: dict[str, str] = {}
+        for _f in matched_funds:
+            _row = master[master["fund_name"] == _f]
+            if not _row.empty:
+                _cv = _row.iloc[0].get("category", "Other")
+                _pf_perf_cat_map[_f] = str(_cv) if pd.notna(_cv) else "Other"
+            else:
+                _pf_perf_cat_map[_f] = "Other"
+        _pf_perf_cats = sorted(set(_pf_perf_cat_map.values()))
+        _PF_PERF_ALL = "All"
 
-        if sel_master.empty:
-            st.info("Performance data not available.")
-        else:
-            fund_color_map = {row["short_name"]: PERF_COLORS[i % len(PERF_COLORS)] for i, (_, row) in enumerate(sel_master.iterrows())}
-
-            # Returns chart
-            st.markdown('<div class="section-title" style="font-size:0.9rem;margin-top:0.25rem;">Returns (%)</div>', unsafe_allow_html=True)
-            return_cols = {"return_1y": "1Y", "return_3y": "3Y", "return_5y": "5Y", "return_since_inception": "Since Inc."}
-            avail_ret   = {k: v for k, v in return_cols.items() if k in sel_master.columns}
-
-            if avail_ret:
-                ret_rows = []
-                for _, row in sel_master.iterrows():
-                    for col, label in avail_ret.items():
-                        val = pd.to_numeric(row.get(col), errors="coerce")
-                        if pd.notna(val):
-                            ret_rows.append({"Fund": row["short_name"], "Period": label, "Return (%)": val})
-                if ret_rows:
-                    ret_df = pd.DataFrame(ret_rows)
-                    fig = px.bar(ret_df, x="Period", y="Return (%)", color="Fund",
-                                 barmode="group", color_discrete_map=fund_color_map,
-                                 category_orders={"Period": list(avail_ret.values())},
-                                 text="Return (%)")
-                    fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside",
-                                      textfont=dict(size=11, family="Inter, sans-serif", color=_bd),
-                                      marker_line_width=0, opacity=0.9)
-                    fig.update_layout(
-                        **_dark_layout(
-                            height=380,
-                            font=_cf,
-                            margin=dict(t=44, b=10, l=10, r=10),
-                            bargap=0.25, bargroupgap=0.08,
-                            legend=dict(orientation="h", yanchor="bottom", y=1.04,
-                                        xanchor="left", x=0, font=dict(size=12, color=_sb)),
-                            xaxis=_dark_xaxis(tickfont=dict(size=13, color=_sb)),
-                            yaxis=_dark_yaxis(ticksuffix="%", gridcolor=_cg, zerolinecolor=_cg),
-                        )
-                    )
-                    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-
-            st.markdown("<br>", unsafe_allow_html=True)
-
-            # Risk & Efficiency
-            st.markdown('<div class="section-title" style="font-size:0.9rem;">Risk & Efficiency</div>', unsafe_allow_html=True)
-            render_risk_metric_explainer("xray")
-            risk_cols  = {"std_dev": "Std Dev %", "sharpe_ratio": "Sharpe", "alpha": "Alpha %", "beta": "Beta"}
-            avail_risk = {k: v for k, v in risk_cols.items() if k in sel_master.columns}
-            if avail_risk:
-                def _rl(v):
-                    try:
-                        v = float(v)
-                        return "🟢 Low" if v < 13 else ("🟡 Moderate" if v < 18 else "🔴 High")
-                    except Exception: return "—"
-                risk_tbl = sel_master[["short_name"] + list(avail_risk.keys())].copy()
-                risk_tbl = risk_tbl.rename(columns={"short_name": "Fund", **avail_risk})
-                for c in avail_risk.values():
-                    risk_tbl[c] = pd.to_numeric(risk_tbl[c], errors="coerce")
-                if "Std Dev %" in risk_tbl.columns:
-                    risk_tbl.insert(1, "Volatility", risk_tbl["Std Dev %"].apply(_rl))
-                max_sd = risk_tbl["Std Dev %"].max() * 1.25 if "Std Dev %" in risk_tbl.columns else 1.0
-                rcfg = {
-                    "Fund":       st.column_config.TextColumn("Fund",       width="medium"),
-                    "Volatility": st.column_config.TextColumn("Volatility", width="small",
-                                      help="How steady is this fund? Based on Std Dev: below 13% = Low, 13–18% = Moderate, above 18% = High"),
-                    "Std Dev %":  st.column_config.ProgressColumn("Std Dev %", format="%.1f%%", min_value=0, max_value=max_sd,
-                                      help="How much returns fluctuate year to year — lower means a more predictable ride"),
-                    "Sharpe":     st.column_config.NumberColumn("Sharpe",   format="%.2f",    width="small",
-                                      help="Return earned per unit of risk taken — above 1.0 is generally good, higher is better"),
-                    "Alpha %":    st.column_config.NumberColumn("Alpha %",  format="%+.2f%%", width="small",
-                                      help="Extra return added by the fund manager beyond the market — positive means they beat the benchmark"),
-                    "Beta":       st.column_config.NumberColumn("Beta",     format="%.2f",    width="small",
-                                      help="How much the fund swings with the market — below 1 means less sensitive, above 1 means amplified moves"),
-                }
-                st.dataframe(risk_tbl, use_container_width=True, hide_index=True,
-                             height=36 * len(risk_tbl) + 38,
-                             column_config={k: v for k, v in rcfg.items() if k in risk_tbl.columns})
-
-            st.markdown("<br>", unsafe_allow_html=True)
-
-            # Fund profile + cost
-            st.markdown('<div class="section-title" style="font-size:0.9rem;">Cost & Fund Profile</div>', unsafe_allow_html=True)
-            if has_amounts and total_invested > 0 and wtd_er:
-                st.caption(f"Portfolio weighted expense ratio: **{wtd_er:.2f}%** — approx **₹{total_invested * wtd_er / 100:,.0f}/year** in fees on your invested amount.")
-            prof_cols  = {"star_rating": "★ Rating", "expense_ratio": "Exp Ratio %", "aum_cr": "AUM (₹Cr)", "consistency_score": "Consistency", "category_rank": "Cat. Rank"}
-            avail_prof = {k: v for k, v in prof_cols.items() if k in sel_master.columns}
-            prof_tbl   = sel_master[["short_name"] + list(avail_prof.keys())].copy()
-            prof_tbl   = prof_tbl.rename(columns={"short_name": "Fund", **avail_prof})
-            if has_amounts and total_invested > 0:
-                prof_tbl.insert(1, "Invested", prof_tbl["Fund"].apply(
-                    lambda fn: amount_map.get(next((f for f in matched_funds if display_name(f) == fn), ""), 0)
-                ))
-            for c in ["Exp Ratio %", "AUM (₹Cr)", "Cat. Rank"]:
-                if c in prof_tbl.columns:
-                    prof_tbl[c] = pd.to_numeric(prof_tbl[c], errors="coerce")
-
-            # -1 = no rank data — show blank
-            if "Cat. Rank" in prof_tbl.columns:
-                prof_tbl["Cat. Rank"] = prof_tbl["Cat. Rank"].replace(-1, float("nan"))
-
-            # Convert numeric consistency score (0–4) to readable label
-            _CONS_LABEL_XR = {4: "Very High", 3: "High", 2: "Moderate", 1: "Low", 0: "—"}
-            if "Consistency" in prof_tbl.columns:
-                prof_tbl["Consistency"] = (
-                    pd.to_numeric(prof_tbl["Consistency"], errors="coerce")
-                    .apply(lambda v: _CONS_LABEL_XR.get(int(v), "—") if pd.notna(v) else "—")
+        st.markdown('<div class="ov-tb-sentinel"></div>', unsafe_allow_html=True)
+        _ppc_cat, _ppc_ret, _ppc_min = st.columns(
+            [1.2, 0.8, 1.8], gap="small", vertical_alignment="top",
+        )
+        with _ppc_cat:
+            st.markdown('<div class="ov-filter-lbl">Category</div>', unsafe_allow_html=True)
+            _ppc_sel_cats = st.multiselect(
+                "Category",
+                _pf_perf_cats,
+                placeholder="All categories",
+                key="portfolio_perf_cats",
+                label_visibility="collapsed",
+            )
+            if not _ppc_sel_cats:
+                _ppc_sel_cats = [_PF_PERF_ALL]
+        with _ppc_ret:
+            st.markdown('<div class="ov-filter-lbl">Return yrs</div>', unsafe_allow_html=True)
+            _ppc_period = st.selectbox(
+                "Return period",
+                ("1Y", "3Y", "5Y"),
+                key="portfolio_perf_period",
+                label_visibility="collapsed",
+            )
+        with _ppc_min:
+            st.markdown('<div class="ov-filter-lbl">Min. past return</div>', unsafe_allow_html=True)
+            _ppc_sl, _ppc_val = st.columns([4, 1], vertical_alignment="center")
+            with _ppc_sl:
+                _ppc_min_ret = st.slider(
+                    "Min return",
+                    min_value=0, max_value=MIN_RETURN_SLIDER_MAX, step=1,
+                    key="portfolio_perf_min_return",
+                    format="%d%%",
+                    label_visibility="collapsed",
+                    help="0 = Any (no minimum return filter).",
+                )
+            with _ppc_val:
+                st.markdown(
+                    f'<div class="ov-min-val">{"Any" if _ppc_min_ret == 0 else f"≥{_ppc_min_ret}%"}</div>',
+                    unsafe_allow_html=True,
                 )
 
-            max_aum = prof_tbl["AUM (₹Cr)"].max() * 1.25 if "AUM (₹Cr)" in prof_tbl.columns else 1.0
-            max_er  = prof_tbl["Exp Ratio %"].max() * 1.25 if "Exp Ratio %" in prof_tbl.columns else 1.0
-            pcfg = {
-                "Fund":        st.column_config.TextColumn("Fund",          width="medium"),
-                "Invested":    st.column_config.NumberColumn("Invested ₹",  format="₹%,.0f",  width="small"),
-                "★ Rating":    st.column_config.NumberColumn("★",           format="%d ★",    width="small"),
-                "Exp Ratio %": st.column_config.ProgressColumn("Exp Ratio %", format="%.2f%%", min_value=0, max_value=max_er,
-                                   help="Annual fee charged by the fund — lower is better for the same level of performance"),
-                "AUM (₹Cr)":  st.column_config.ProgressColumn("AUM (₹Cr)", format="%.0f",    min_value=0, max_value=max_aum,
-                                   help="Total money managed by the fund — larger AUM generally means more stability"),
-                "Consistency": st.column_config.TextColumn("Consistency",   width="small",
-                                   help="How consistently this fund stays in the top performers across different time periods — Very High means it rarely has bad years"),
-                "Cat. Rank":   st.column_config.NumberColumn("Cat. Rank",   format="#%d",     width="small",
-                                   help="Rank among all funds in the same category — #1 is the best performer"),
-            }
-            st.dataframe(prof_tbl, use_container_width=True, hide_index=True,
-                         height=36 * len(prof_tbl) + 38,
-                         column_config={k: v for k, v in pcfg.items() if k in prof_tbl.columns})
+        if not _ppc_sel_cats or _PF_PERF_ALL in _ppc_sel_cats:
+            _ppc_funds = list(matched_funds)
+        else:
+            _ppc_funds = [f for f in matched_funds if _pf_perf_cat_map.get(f) in _ppc_sel_cats]
+
+        if _ppc_min_ret > 0:
+            _ppc_funds = [
+                f for f in _ppc_funds
+                if (fund_return_pct(master, f, _ppc_period) or -999) >= _ppc_min_ret
+            ]
+
+        _ppc_funds = sort_funds_by_return(_ppc_funds, master, _ppc_period)
+
+        if not _ppc_funds:
+            st.warning("No portfolio funds match the current filters. Widen category or lower the return threshold.")
+        else:
+            _ppc_master = sel_master[sel_master["fund_name"].isin(_ppc_funds)].copy()
+            if _ppc_master.empty:
+                st.info("Performance data not available for the matching funds.")
+            else:
+                st.markdown(
+                f'<div style="font-size:0.72rem;color:{_sb};margin:0.25rem 0 0.75rem;">'
+                f'Comparing <strong style="color:{_hd};">{len(_ppc_funds)}</strong> fund'
+                f'{"s" if len(_ppc_funds) != 1 else ""} from your portfolio</div>',
+                unsafe_allow_html=True,
+                )
+                _render_fund_performance_tab(
+                    _ppc_master,
+                    _ppc_funds,
+                    hd=_hd, sb=_sb, bd=_bd, a=_a, cd=_cd, bdr=_bdr, al=_al,
+                    col_amber=_col_amber, col_green=_col_green, col_red=_col_red,
+                    cf=_cf, cg=_cg, ct=_ct, is_dark=_is_dark,
+                    explainer_key="xray",
+                    max_display=8,
+                    amount_map=amount_map,
+                    matched_funds=matched_funds,
+                    has_amounts=has_amounts,
+                )
 
     # ── Tab 3: Fund Overlap ───────────────────────────────────────────────────
     with tab_ol:
@@ -6965,13 +7279,54 @@ def page_portfolio_xray():
     with tab_sec:
         st.markdown('<div class="section-title">Sector Concentration</div>', unsafe_allow_html=True)
 
-        sel_sector = sector_df[sector_df["fund_name"].isin(matched_funds)]
-        avg_sec    = sel_sector.groupby("sector")["allocation_percent"].mean().reset_index()
-        avg_sec    = avg_sec.sort_values("allocation_percent", ascending=False)
+        _sec_stocks = (
+            sel_h.assign(sector=sel_h["sector"].map(_norm_sector_label_sc))
+            .groupby("sector")["stock_name"]
+            .nunique()
+            .reset_index(name="n_stocks")
+        )
+        avg_sec = (
+            sel_sector.groupby("sector", as_index=False)
+            .agg(avg_alloc=("allocation_percent", "mean"))
+            .sort_values("avg_alloc", ascending=False)
+        )
+        avg_sec = avg_sec.merge(_sec_stocks, on="sector", how="left")
+        avg_sec["n_stocks"] = avg_sec["n_stocks"].fillna(0).astype(int)
+        _sec_conc = avg_sec.rename(columns={"avg_alloc": "eff_alloc"})
+
+        _sec_total = float(_sec_conc["eff_alloc"].sum()) if not _sec_conc.empty else 0.0
+        st.markdown(
+            f'<div class="section-sub">Average sector allocation across your funds (Avg Alloc %) — '
+            f'sectors total {_sec_total:.1f}%</div>',
+            unsafe_allow_html=True,
+        )
+
+        _sec_top_n = 8
+        _sec_top = _sec_conc.head(_sec_top_n).copy()
+        _sec_rest = _sec_conc.iloc[_sec_top_n:]
+        _sec_pie = _sec_top.copy()
+        if not _sec_rest.empty:
+            _other_avg = float(_sec_rest["eff_alloc"].sum())
+            _other_n = int(_sec_rest["n_stocks"].sum())
+            _other_mask = _sec_pie["sector"].str.lower().eq("other")
+            if _other_mask.any():
+                _oi = _sec_pie.index[_other_mask][0]
+                _sec_pie.loc[_oi, "eff_alloc"] += _other_avg
+                _sec_pie.loc[_oi, "n_stocks"] += _other_n
+            else:
+                _sec_pie = pd.concat([_sec_pie, pd.DataFrame([{
+                    "sector": "Other",
+                    "eff_alloc": _other_avg,
+                    "n_stocks": _other_n,
+                }])], ignore_index=True)
+
+        _sec_scale_max = float(_sec_conc["eff_alloc"].max()) if not _sec_conc.empty else 1.0
 
         c_donut, c_table = st.columns([2, 3])
         with c_donut:
-            fig_d = px.pie(avg_sec.head(8), names="sector", values="allocation_percent", hole=0.52, height=360)
+            fig_d = px.pie(
+                _sec_pie, names="sector", values="eff_alloc", hole=0.52, height=360,
+            )
             fig_d.update_layout(
                 **_dark_layout(
                     margin=dict(l=10, r=10, t=10, b=10),
@@ -6982,19 +7337,48 @@ def page_portfolio_xray():
                     ),
                 )
             )
-            fig_d.update_traces(textposition="inside", textinfo="percent",
-                                insidetextfont=dict(size=11, color=_hd))
+            _pie_text_sc = _sec_pie["eff_alloc"].map(lambda v: f"{v:.1f}%")
+            fig_d.update_traces(
+                textposition="inside",
+                textinfo="text",
+                text=_pie_text_sc,
+                customdata=_sec_pie["eff_alloc"],
+                hovertemplate="%{label}<br>%{customdata:.2f}% Avg Alloc<extra></extra>",
+                insidetextfont=dict(size=11, color=_hd),
+            )
             st.plotly_chart(fig_d, use_container_width=True, config={"displayModeBar": False})
         with c_table:
-            st.dataframe(
-                avg_sec[["sector", "allocation_percent"]].reset_index(drop=True),
-                use_container_width=True, height=360, hide_index=True,
-                column_config={
-                    "sector":             st.column_config.TextColumn("Sector"),
-                    "allocation_percent": st.column_config.ProgressColumn(
-                        "Avg Allocation %", format="%.1f%%", min_value=0, max_value=float(avg_sec["allocation_percent"].max()) if not avg_sec.empty else 50
-                    ),
-                },
+            _sec_table_html = _sector_exposure_table_html(
+                _sec_top,
+                hd=_hd, sb=_sb, bd=_bd, a=_a, cd=_cd, bdr=_bdr,
+                col_amber=_col_amber, is_dark=_is_dark,
+                weight_hdr="Avg Alloc",
+                high_thresh=25.0,
+                scale_max=_sec_scale_max,
+            )
+            st.markdown(_sec_table_html, unsafe_allow_html=True)
+            if not _sec_rest.empty:
+                _n_sec_rest = len(_sec_rest)
+                _rest_avg = float(_sec_rest["eff_alloc"].sum())
+                with st.expander(
+                    f"Show {_n_sec_rest} more sector{'s' if _n_sec_rest != 1 else ''} "
+                    f"({_rest_avg:.1f}% combined Avg Alloc)",
+                    expanded=False,
+                ):
+                    _sec_rest_html = _sector_exposure_table_html(
+                        _sec_rest,
+                        hd=_hd, sb=_sb, bd=_bd, a=_a, cd=_cd, bdr=_bdr,
+                        col_amber=_col_amber, is_dark=_is_dark,
+                        weight_hdr="Avg Alloc",
+                        high_thresh=25.0,
+                        scale_max=_sec_scale_max,
+                        show_header=False,
+                    )
+                    st.markdown(_sec_rest_html, unsafe_allow_html=True)
+            st.markdown(
+                f'<div style="font-size:0.62rem;color:{_sb};margin-top:6px;text-align:right;">'
+                f'▲ HIGH = sector ≥25% average allocation across funds</div>',
+                unsafe_allow_html=True,
             )
 
         # Cap-size breakdown
@@ -7047,138 +7431,49 @@ def page_portfolio_xray():
             st.dataframe(fund_cap_tbl, use_container_width=True, hide_index=True,
                          height=36 * len(fund_cap_tbl) + 38)
 
-    # ── Tab 5: Concentration Risks ────────────────────────────────────────────
-    with tab_risk:
-        st.markdown('<div class="section-title">Concentration Risk Flags</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-sub">Potential over-exposure areas in your portfolio — for analysis only</div>', unsafe_allow_html=True)
-
-        flags_found = False
-
-        # Flag 1: High-overlap fund pairs
-        if not sel_sim.empty:
-            high_ol = sel_sim[sel_sim["normalized_score"] >= 65]
-            for _, row in high_ol.iterrows():
-                flags_found = True
-                st.markdown(f"""<div class="insight-card insight-alert">
-                    <div class="insight-icon">🔁</div>
-                    <div class="insight-text"><strong>{display_name(row['fund_a'])} + {display_name(row['fund_b'])} overlap by {row['normalized_score']:.0f}%</strong> —
-                    {int(row['common_stocks'])} of the same companies held in both funds. Each rupee split across these two
-                    largely buys the same underlying stocks, so the diversification benefit of holding both is minimal.
-                    The <strong>Overlap tab</strong> shows exactly which stocks are shared.</div></div>""", unsafe_allow_html=True)
-
-        # Flag 2: Stock concentration > 5% effective exposure
-        sel_h_wt2 = sel_h.copy()
-        sel_h_wt2["weight"]    = sel_h_wt2["fund_name"].map(weight_map).fillna(0)
-        sel_h_wt2["eff_alloc"] = sel_h_wt2["allocation_percent"] * sel_h_wt2["weight"]
-        eff_exp = sel_h_wt2.groupby("stock_name")["eff_alloc"].sum()
-        heavy_stocks = eff_exp[eff_exp > 5].sort_values(ascending=False)
-        if not heavy_stocks.empty:
-            flags_found = True
-            stocks_txt = ", ".join(f"<strong>{s}</strong> ({v:.1f}%)" for s, v in heavy_stocks.items())
-            st.markdown(f"""<div class="insight-card insight-warning">
-                <div class="insight-icon">📌</div>
-                <div class="insight-text"><strong>Concentrated single-stock bets</strong> —
-                {stocks_txt} each account for more than 5% of your effective portfolio. A single material
-                event on any of these companies — an earnings miss, regulatory action, or management change —
-                would visibly move your overall portfolio value.</div></div>""",
-                unsafe_allow_html=True)
-
-        # Flag 3: Sector > 40%
-        if not sel_sector.empty:
-            avg_by_sec = sel_sector.groupby("sector")["allocation_percent"].mean()
-            heavy_secs = avg_by_sec[avg_by_sec > 40].sort_values(ascending=False)
-            for sec, pct in heavy_secs.items():
-                flags_found = True
-                if sec.upper() == "FINANCIAL":
-                    _sec_bench = " (Financials typically make up 30–35% of broad India indices, so this is high even by that measure.)"
-                else:
-                    _sec_bench = " Most diversified equity funds keep any single non-financial sector well below 25%."
-                st.markdown(f"""<div class="insight-card insight-warning">
-                    <div class="insight-icon">🏗️</div>
-                    <div class="insight-text"><strong>{pct:.1f}% in {sec.title()} — high sector concentration</strong> —
-                    {sec.title()} accounts for <strong>{pct:.1f}%</strong> of your average fund allocation.{_sec_bench}
-                    A sector-wide downturn (rate hikes, regulation, commodity cycles) would hit all your
-                    funds at the same time.</div></div>""", unsafe_allow_html=True)
-
-        # Flag 4: All funds in the same cap category
-        if not master.empty and "category" in master.columns:
-            cat_map2  = dict(zip(master["fund_name"], master["category"]))
-            fund_cats = list({cat_map2.get(f, "Other") for f in matched_funds})
-            if len(fund_cats) == 1:
-                flags_found = True
-                _all_caps = ["Large Cap", "Mid Cap", "Small Cap"]
-                _missing  = [c for c in _all_caps if c != fund_cats[0]]
-                _missing_str = " and ".join(f"<strong>{c}</strong>" for c in _missing)
-                st.markdown(f"""<div class="insight-card insight-info">
-                    <div class="insight-icon">📊</div>
-                    <div class="insight-text"><strong>All funds in {fund_cats[0]} — same market-cap risk</strong> —
-                    Large, mid, and small caps behave differently across market cycles. Heavy downturns often hit
-                    smaller caps harder while large caps are more resilient, and vice versa in bull phases.
-                    Your entire equity portfolio shares the same market-cap risk profile — {_missing_str} exposure
-                    is currently zero.</div></div>""",
-                    unsafe_allow_html=True)
-
-        # Flag 5: Cost outlier — any fund > 2× cheapest
-        if not sel_master.empty and "expense_ratio" in sel_master.columns:
-            er_vals = pd.to_numeric(sel_master["expense_ratio"], errors="coerce").dropna()
-            if len(er_vals) > 1 and er_vals.min() > 0:
-                most_exp = sel_master.loc[er_vals.idxmax()]
-                cheapest = sel_master.loc[er_vals.idxmin()]
-                if er_vals.max() > er_vals.min() * 2:
-                    flags_found = True
-                    _er_gap_pf   = float(most_exp["expense_ratio"]) - float(cheapest["expense_ratio"])
-                    _10yr_pf     = int(100_000 * ((1.12 ** 10) - ((1.12 - _er_gap_pf / 100) ** 10)))
-                    st.markdown(f"""<div class="insight-card insight-info">
-                        <div class="insight-icon">💸</div>
-                        <div class="insight-text"><strong>{display_name(most_exp['fund_name'])} costs more than 2× as much</strong> —
-                        <strong>{float(most_exp['expense_ratio']):.2f}%/yr</strong> vs
-                        <strong>{display_name(cheapest['fund_name'])}</strong> at
-                        <strong>{float(cheapest['expense_ratio']):.2f}%/yr</strong>.
-                        On ₹1 lakh invested for 10 years (assuming 12% gross return), this
-                        <strong>{_er_gap_pf:.2f}% annual fee gap</strong> compounds to roughly
-                        <strong>₹{_10yr_pf:,} in extra fees</strong>.</div></div>""", unsafe_allow_html=True)
-
-        if not flags_found:
-            st.success("✅ No major concentration risks detected in your portfolio.")
-
-        st.markdown("""<div class="disclaimer">Risk flags are data-driven observations for analytical purposes only — not investment advice.</div>""", unsafe_allow_html=True)
-
-    # ── Tab 6: Insights ───────────────────────────────────────────────────────
+    # ── Tab 5: Insights (priority flags + detailed notes) ─────────────────────
     with tab_ins:
         st.markdown('<div class="section-title">Portfolio Insights</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-sub">Findings based on your uploaded portfolio — for analysis only</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="section-sub">Priority warnings first, then deeper notes by topic — '
+            'for learning only, not advice</div>',
+            unsafe_allow_html=True,
+        )
+
+        _render_concentration_flags(
+            matched_funds=matched_funds,
+            sel_sim=sel_sim,
+            sel_h=sel_h,
+            sel_sector=sel_sector,
+            sel_master=sel_master,
+            master=master,
+            weight_map=weight_map,
+            hd=_hd, bd=_bd, al=_al, bdr=_bdr,
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown(
+            f'<div style="margin:0 0 0.5rem;">'
+            f'<div style="font-size:0.95rem;font-weight:700;color:{_hd};">'
+            f'📚 More detail by topic</div>'
+            f'<div style="font-size:0.72rem;color:{_bd};margin-top:2px;">'
+            f'Broader observations — including positive notes. Expand each section.</div></div>',
+            unsafe_allow_html=True,
+        )
 
         insights = generate_insights(matched_funds, similarity, holdings, sector_df, master)
-        cls_map  = {"alert": "insight-alert", "warning": "insight-warning",
-                    "info": "insight-info", "success": "insight-success"}
+        _render_categorized_insights(
+            insights,
+            hd=_hd, sb=_sb, bd=_bd, al=_al, bdr=_bdr,
+            page_key="xray",
+            empty_msg="No clear patterns stood out for your portfolio. Check the other X-Ray tabs for details.",
+        )
 
-        CATEGORIES = [
-            ("overlap",   "🔗 Overlap & Redundancy",   "How much your funds duplicate each other's holdings"),
-            ("sector",    "🏗️ Sector Concentration",   "Which sectors dominate across your funds"),
-            ("unique",    "🔬 Unique Exposure",          "What each fund contributes that no other holds"),
-            ("momentum",  "📈 Allocation Momentum",      "Stocks fund managers are collectively buying or selling"),
-            ("cost_risk", "💰 Cost & Risk",              "Expense ratio and volatility comparison"),
-        ]
-        if not insights:
-            st.info("No significant patterns detected.")
-        else:
-            for cat_key, cat_title, cat_sub in CATEGORIES:
-                cat_ins = [i for i in insights if i.get("category") == cat_key]
-                if not cat_ins:
-                    continue
-                st.markdown(
-                    f'<div style="margin:1.4rem 0 0.35rem;">'
-                    f'<div style="font-size:0.95rem;font-weight:700;color:{_hd};">{cat_title}</div>'
-                    f'<div style="font-size:0.72rem;color:{_sb};margin-top:2px;">{cat_sub}</div>'
-                    f'</div>', unsafe_allow_html=True)
-                for ins in cat_ins:
-                    st.markdown(
-                        f'<div class="insight-card {cls_map[ins["type"]]}">'
-                        f'<div class="insight-icon">{ins["icon"]}</div>'
-                        f'<div class="insight-text">{ins["text"]}</div></div>',
-                        unsafe_allow_html=True)
-
-        st.markdown("""<div class="disclaimer">Insights are for informational and analytical purposes only — not investment advice.</div>""", unsafe_allow_html=True)
+        st.markdown(
+            '<div class="disclaimer">These notes help you understand how your funds are built. '
+            "They are not buy, sell, or hold advice.</div>",
+            unsafe_allow_html=True,
+        )
 
 
 # ── ROUTER ────────────────────────────────────────────────────────────────────
