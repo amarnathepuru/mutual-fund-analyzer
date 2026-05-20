@@ -2,6 +2,8 @@
 port = 8501
 address = "localhost"
 headless = false
+# Avoids watchdog/semaphore crashes on Windows when the dev server runs a long time
+fileWatcherType = "none"
 
 [browser]
 gatherUsageStats = false

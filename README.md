@@ -1,8 +1,28 @@
-# Mutual Fund Analyzer
+# FundLens — Mutual Fund Analyzer
 
-A portfolio intelligence platform for analyzing:
-- Mutual fund overlap
-- Similarity scores
-- Common holdings
-- Sector concentration
-- Portfolio crowding
+Portfolio intelligence for Indian mutual funds: overlap, holdings, sector exposure, and portfolio X-Ray.
+
+## Run locally
+
+```bash
+pip install -r requirements.txt
+python -m streamlit run app.py
+```
+
+Open **http://localhost:8501** (or double-click `run_app.bat` on Windows).
+
+## Streamlit Cloud (GitHub deploy)
+
+In [share.streamlit.io](https://share.streamlit.io), connect this repo with:
+
+| Setting | Value |
+|---------|--------|
+| Repository | `amarnathepuru/mutual-fund-analyzer` |
+| Branch | `main` |
+| Main file | `app.py` |
+
+After pushing to `main`, use **Manage app → Reboot app** so the cloud instance picks up the latest code.
+
+If the public URL shows an old sidebar (“Analyze Category” / equity picker), that deployment is **not** this app — create a new app or fix the repo/branch/main file above. This codebase is **FundLens** (home → Analyse Portfolio → Portfolio X-Ray).
+
+Data CSVs under `data/` are committed so the cloud app can load holdings without scraping.
