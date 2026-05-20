@@ -6085,31 +6085,45 @@ def page_portfolio_xray():
             'Sector exposure (effective)</div>',
             unsafe_allow_html=True,
         )
-        st.markdown(
-            f'<div class="section-sub">Effective exposure by sector (Eff. Exp %) — '
-            f'sums to ~100% across sectors</div>',
-            unsafe_allow_html=True,
-        )
+        def _norm_sector_label(s) -> str:
+            t = str(s).strip() if pd.notna(s) else ""
+            if not t or t.lower() in ("nan", "none"):
+                return "Other"
+            return t.title()
 
         _sec_exp = (
-            exp.assign(sector=lambda d: d["sector"].fillna("Other").astype(str).str.strip())
+            exp.assign(sector=exp["sector"].map(_norm_sector_label))
             .groupby("sector", as_index=False)
             .agg(eff_alloc=("eff_alloc", "sum"), n_stocks=("stock_name", "count"))
             .sort_values("eff_alloc", ascending=False)
         )
-        _sec_pie = _sec_exp.head(8).copy()
-        if len(_sec_exp) > 8:
-            _other = pd.DataFrame([{
-                "sector": "Other",
-                "eff_alloc": _sec_exp.iloc[8:]["eff_alloc"].sum(),
-                "n_stocks": int(_sec_exp.iloc[8:]["n_stocks"].sum()),
-            }])
-            _sec_pie = pd.concat([_sec_pie, _other], ignore_index=True)
+        _sec_total = float(_sec_exp["eff_alloc"].sum()) if not _sec_exp.empty else 0.0
+        st.markdown(
+            f'<div class="section-sub">Effective exposure by sector (Eff. Exp %) — '
+            f'sectors total {_sec_total:.1f}% of portfolio</div>',
+            unsafe_allow_html=True,
+        )
 
         _sec_top_n = 8
-        _sec_scale_max = float(_sec_exp["eff_alloc"].max()) if not _sec_exp.empty else 1.0
-        _sec_top = _sec_exp.head(_sec_top_n)
+        _sec_top = _sec_exp.head(_sec_top_n).copy()
         _sec_rest = _sec_exp.iloc[_sec_top_n:]
+        _sec_pie = _sec_top.copy()
+        if not _sec_rest.empty:
+            _other_eff = float(_sec_rest["eff_alloc"].sum())
+            _other_n = int(_sec_rest["n_stocks"].sum())
+            _other_mask = _sec_pie["sector"].str.lower().eq("other")
+            if _other_mask.any():
+                _oi = _sec_pie.index[_other_mask][0]
+                _sec_pie.loc[_oi, "eff_alloc"] += _other_eff
+                _sec_pie.loc[_oi, "n_stocks"] += _other_n
+            else:
+                _sec_pie = pd.concat([_sec_pie, pd.DataFrame([{
+                    "sector": "Other",
+                    "eff_alloc": _other_eff,
+                    "n_stocks": _other_n,
+                }])], ignore_index=True)
+
+        _sec_scale_max = float(_sec_exp["eff_alloc"].max()) if not _sec_exp.empty else 1.0
 
         _c_sec_pie, _c_sec_tbl = st.columns([2, 3])
         with _c_sec_pie:
@@ -6126,8 +6140,13 @@ def page_portfolio_xray():
                     ),
                 )
             )
+            _pie_text = _sec_pie["eff_alloc"].map(lambda v: f"{v:.1f}%")
             fig_sec.update_traces(
-                textposition="inside", textinfo="percent",
+                textposition="inside",
+                textinfo="text",
+                text=_pie_text,
+                customdata=_sec_pie["eff_alloc"],
+                hovertemplate="%{label}<br>%{customdata:.2f}% Eff. Exp<extra></extra>",
                 insidetextfont=dict(size=11, color=_hd),
             )
             st.plotly_chart(fig_sec, use_container_width=True, config={"displayModeBar": False})
