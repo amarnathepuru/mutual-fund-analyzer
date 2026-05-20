@@ -5132,6 +5132,144 @@ def page_portfolio_upload():
         """, unsafe_allow_html=True)
 
 
+
+def _blended_exposure_table_html(
+    df: pd.DataFrame,
+    n_funds: int,
+    *,
+    hd: str, sb: str, bd: str, a: str, cd: str, bdr: str,
+    col_amber: str, col_green: str, is_dark: bool,
+    weight_col: str = "eff_alloc",
+    weight_hdr: str = "Eff. Exp",
+    high_thresh: float = 8.0,
+) -> str:
+    """HTML grid table matching Compare → Effective Portfolio design."""
+    if df.empty or n_funds < 1:
+        return ""
+
+    max_wt = float(df[weight_col].max()) if weight_col in df.columns else 1.0
+    grid = "display:grid;grid-template-columns:1fr 80px 80px 120px 100px;gap:0;"
+    hdr = (
+        f'<div style="{grid}background:{bdr};border-radius:10px 10px 0 0;padding:0.45rem 0.75rem;">'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{sb};text-transform:uppercase;letter-spacing:0.5px;">Stock · Sector</div>'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{sb};text-align:center;text-transform:uppercase;letter-spacing:0.5px;"># Funds</div>'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{sb};text-align:right;text-transform:uppercase;letter-spacing:0.5px;">Avg Alloc</div>'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{sb};text-align:center;text-transform:uppercase;letter-spacing:0.5px;">Coverage</div>'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{sb};text-align:right;text-transform:uppercase;letter-spacing:0.5px;">{weight_hdr}</div>'
+        f"</div>"
+    )
+
+    rows = ""
+    for _, er in df.iterrows():
+        sec = str(er.get("sector", "")).strip()
+        sec = sec if sec and sec.lower() != "nan" else ""
+        wt = float(er[weight_col])
+        bar_w = min(100, wt / max_wt * 100) if max_wt else 0
+        is_high = wt >= high_thresh
+        wt_col = col_amber if is_high else a
+        cov_pct = int(int(er["funds_holding"]) / n_funds * 100)
+        cov_col = col_green if cov_pct == 100 else (col_amber if cov_pct >= 50 else sb)
+        row_bg = ("rgba(245,158,11,0.06)" if is_dark else "#FFFBEB") if is_high else cd
+        high_badge = (
+            f' <span style="font-size:0.6rem;color:{col_amber};font-weight:700;">▲ HIGH</span>'
+            if is_high else ""
+        )
+        sec_line = (
+            f'<div style="font-size:0.62rem;color:{sb};margin-top:1px;">{sec}</div>' if sec else ""
+        )
+        rows += (
+            f'<div style="{grid}background:{row_bg};padding:0.5rem 0.75rem;'
+            f'border-bottom:1px solid {bdr};align-items:center;">'
+            f'<div>'
+            f'<div style="font-size:0.82rem;font-weight:600;color:{hd};">{er["stock_name"]}{high_badge}</div>'
+            f"{sec_line}"
+            f"</div>"
+            f'<div style="text-align:center;font-size:0.8rem;font-weight:700;color:{hd};">'
+            f'{int(er["funds_holding"])}/{n_funds}</div>'
+            f'<div style="text-align:right;font-size:0.8rem;font-weight:600;color:{bd};">'
+            f'{float(er["avg_alloc"]):.2f}%</div>'
+            f'<div style="padding:0 12px;">'
+                f'<div style="background:{bdr};border-radius:3px;height:6px;overflow:hidden;">'
+            f'<div style="background:{cov_col};width:{cov_pct}%;height:100%;border-radius:3px;"></div></div>'
+            f'<div style="font-size:0.6rem;color:{cov_col};margin-top:2px;text-align:center;">'
+            f"{cov_pct}% of funds</div></div>"
+            f'<div style="text-align:right;">'
+            f'<div style="font-size:0.88rem;font-weight:800;color:{wt_col};">{wt:.2f}%</div>'
+            f'<div style="background:{bdr};border-radius:3px;height:4px;overflow:hidden;margin-top:3px;">'
+            f'<div style="background:{wt_col};width:{bar_w:.1f}%;height:100%;border-radius:3px;"></div>'
+            f"</div></div></div>"
+        )
+
+    return (
+        hdr
+        + f'<div style="border:1px solid {bdr};border-top:none;border-radius:0 0 10px 10px;overflow:hidden;'
+        f'max-height:520px;overflow-y:auto;">'
+        + rows
+        + "</div>"
+    )
+
+
+def _sector_exposure_table_html(
+    df: pd.DataFrame,
+    *,
+    hd: str, sb: str, bd: str, a: str, cd: str, bdr: str,
+    col_amber: str, is_dark: bool,
+    weight_hdr: str = "Eff. Exp",
+    high_thresh: float = 25.0,
+    scale_max: float | None = None,
+    show_header: bool = True,
+) -> str:
+    """Sector-level effective exposure table (same visual language as holdings grid)."""
+    if df.empty:
+        return ""
+
+    max_wt = (
+        scale_max
+        if scale_max is not None
+        else (float(df["eff_alloc"].max()) if "eff_alloc" in df.columns else 1.0)
+    )
+    grid = "display:grid;grid-template-columns:1fr 90px 110px;gap:0;"
+    hdr = (
+        f'<div style="{grid}background:{bdr};border-radius:10px 10px 0 0;padding:0.45rem 0.75rem;">'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{sb};text-transform:uppercase;letter-spacing:0.5px;">Sector</div>'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{sb};text-align:center;text-transform:uppercase;letter-spacing:0.5px;"># Stocks</div>'
+        f'<div style="font-size:0.68rem;font-weight:700;color:{sb};text-align:right;text-transform:uppercase;letter-spacing:0.5px;">{weight_hdr}</div>'
+        f"</div>"
+    ) if show_header else ""
+
+    rows = ""
+    for _, er in df.iterrows():
+        wt = float(er["eff_alloc"])
+        bar_w = min(100, wt / max_wt * 100) if max_wt else 0
+        is_high = wt >= high_thresh
+        wt_col = col_amber if is_high else a
+        row_bg = ("rgba(245,158,11,0.06)" if is_dark else "#FFFBEB") if is_high else cd
+        sec_lbl = str(er["sector"]).strip().title() if str(er["sector"]).strip() else "Other"
+        high_badge = (
+            f' <span style="font-size:0.6rem;color:{col_amber};font-weight:700;">▲ HIGH</span>'
+            if is_high else ""
+        )
+        rows += (
+            f'<div style="{grid}background:{row_bg};padding:0.5rem 0.75rem;'
+            f'border-bottom:1px solid {bdr};align-items:center;">'
+            f'<div style="font-size:0.82rem;font-weight:600;color:{hd};">{sec_lbl}{high_badge}</div>'
+            f'<div style="text-align:center;font-size:0.8rem;font-weight:700;color:{hd};">'
+            f'{int(er["n_stocks"])}</div>'
+            f'<div style="text-align:right;">'
+            f'<div style="font-size:0.88rem;font-weight:800;color:{wt_col};">{wt:.2f}%</div>'
+            f'<div style="background:{bdr};border-radius:3px;height:4px;overflow:hidden;margin-top:3px;">'
+            f'<div style="background:{wt_col};width:{bar_w:.1f}%;height:100%;border-radius:3px;"></div>'
+            f"</div></div></div>"
+        )
+
+    _wrap_style = (
+        f"border:1px solid {bdr};border-top:none;border-radius:0 0 10px 10px;overflow:hidden;"
+        if show_header
+        else f"border:1px solid {bdr};border-radius:10px;overflow:hidden;"
+    )
+    return hdr + f'<div style="{_wrap_style}">' + rows + "</div>"
+
+
 # ── PAGE: PORTFOLIO X-RAY ─────────────────────────────────────────────────────
 
 def page_portfolio_xray():
@@ -5810,6 +5948,49 @@ def page_portfolio_xray():
     with tab_exp:
         st.markdown('<div class="section-title">What You Actually Own</div>', unsafe_allow_html=True)
 
+        with st.expander("ℹ️  Eff. Exp % vs Avg Alloc % — what's the difference?", expanded=False):
+            _wyo_has_amt = has_amounts and total_invested > 0
+            _wyo_eff_note = (
+                "Uses the <strong>amount you invested</strong> in each fund — "
+                "funds where you put more money count more."
+                if _wyo_has_amt
+                else
+                "Upload <strong>invested amounts</strong> on the portfolio page to enable this. "
+                "Until then, the chart uses Avg Alloc % only."
+            )
+            st.markdown(
+                f'<div style="font-size:0.82rem;color:{_bd};line-height:1.65;">'
+                f'<p style="margin:0 0 0.75rem;">'
+                f'This tab lists <strong>every stock</strong> in your portfolio. '
+                f'Two columns answer different questions:</p>'
+                f'<div style="display:grid;gap:10px;margin-bottom:0.85rem;">'
+                f'<div style="background:{_al};border:1px solid {_bdr};border-radius:10px;padding:0.75rem 1rem;">'
+                f'<div style="font-size:0.8rem;font-weight:700;color:{_a};margin-bottom:4px;">'
+                f'Eff. Exp % (Effective exposure)</div>'
+                f'<div style="font-size:0.78rem;color:{_bd};">'
+                f'<strong>“Out of every ₹100 in my portfolio, how much is in this stock?”</strong><br>'
+                f'For each fund: <em>(stock weight in fund) × (your share of money in that fund)</em>, '
+                f'then add up.<br>{_wyo_eff_note}</div></div>'
+                f'<div style="background:{_al};border:1px solid {_bdr};border-radius:10px;padding:0.75rem 1rem;">'
+                f'<div style="font-size:0.8rem;font-weight:700;color:{_hd};margin-bottom:4px;">'
+                f'Avg Alloc % (Average allocation)</div>'
+                f'<div style="font-size:0.78rem;color:{_bd};">'
+                f'<strong>“On average, how much does each fund put in this stock?”</strong><br>'
+                f'Simple average across funds that hold it — '
+                f'<em>every fund counts equally</em>, not weighted by your investment.<br>'
+                f'Example: 6%, 8%, and 11% in three funds → Avg Alloc ≈ 8.3%.</div></div>'
+                f'</div>'
+                f'<p style="margin:0 0 0.5rem;font-size:0.78rem;color:{_sb};">'
+                f'<strong>When they are close</strong> (e.g. Eff. Exp 8.66% vs Avg Alloc 8.34%) '
+                f'your money is spread evenly across funds, or those funds hold similar weights.</p>'
+                f'<p style="margin:0;font-size:0.78rem;color:{_sb};">'
+                f'<strong>Overview → Top Common Holdings</strong> uses the same '
+                f'<strong>Avg Alloc %</strong> for its bar, but shows only the top 12 stocks '
+                f'ranked by <em>how many funds</em> hold them (overlap), not by exposure.</p>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
         # Weighted effective exposure per stock
         sel_h_wt = sel_h.copy()
         sel_h_wt["weight"] = sel_h_wt["fund_name"].map(weight_map).fillna(0)
@@ -5829,24 +6010,58 @@ def page_portfolio_xray():
         exp["stock_name"] = exp["stock_name"].str.strip()
 
         if has_amounts and total_invested > 0:
-            st.markdown('<div class="section-sub">Effective exposure = weighted by your invested amount in each fund</div>', unsafe_allow_html=True)
             x_col, x_label = "eff_alloc", "Effective Exposure %"
+            _rank_by = "effective exposure"
         else:
-            st.markdown('<div class="section-sub">Average allocation across your funds — upload invested amounts for weighted view</div>', unsafe_allow_html=True)
             x_col, x_label = "avg_alloc", "Avg Allocation %"
+            _rank_by = "average allocation"
 
-        n_bars = min(15, len(exp))
+        _n_stocks = len(exp)
+        _top_n = min(15, _n_stocks)
+        if _n_stocks > _top_n:
+            st.markdown(
+                '<div class="section-title" style="font-size:0.95rem;margin-top:0.25rem;">'
+                f'Top {_top_n} holdings (chart)</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="section-sub">Largest positions by {_rank_by} — '
+                f'chart shows {_top_n} of {_n_stocks} stocks</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                '<div class="section-title" style="font-size:0.95rem;margin-top:0.25rem;">'
+                'Holdings overview (chart)</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="section-sub">All {_n_stocks} stocks in your portfolio, ranked by {_rank_by}</div>',
+                unsafe_allow_html=True,
+            )
+
+        n_bars = _top_n
+        _chart_df = exp.sort_values("eff_alloc", ascending=False).head(_top_n).copy()
+        _chart_y_order = _chart_df["stock_name"].tolist()
         fig_e = px.bar(
-            exp.head(15), x=x_col, y="stock_name", orientation="h",
+            _chart_df, x=x_col, y="stock_name", orientation="h",
             color="sector",
+            text=x_col,
             labels={x_col: x_label, "stock_name": ""},
             height=max(380, n_bars * 34 + 140),
+            category_orders={"stock_name": _chart_y_order},
         )
         fig_e.update_layout(
             **_dark_layout(
-                margin=dict(l=10, r=30, t=15, b=120),
+                margin=dict(l=10, r=72, t=15, b=120),
                 font=_cf,
-                yaxis=dict(autorange="reversed", tickfont=_ct, showgrid=False),
+                yaxis=dict(
+                    autorange="reversed",
+                    tickfont=_ct,
+                    showgrid=False,
+                    categoryorder="array",
+                    categoryarray=_chart_y_order,
+                ),
                 xaxis=_dark_xaxis(showgrid=True, gridcolor=_cg, title=x_label,
                                   title_font=dict(color=_sb, size=11)),
                 legend=dict(
@@ -5855,22 +6070,229 @@ def page_portfolio_xray():
                 ),
             )
         )
-        fig_e.update_traces(marker_line_width=0)
+        fig_e.update_traces(
+            texttemplate="%{text:.1f}%",
+            textposition="outside",
+            textfont=dict(size=11, color=_hd, family="Inter, sans-serif"),
+            marker_line_width=0,
+            cliponaxis=False,
+        )
         st.plotly_chart(fig_e, use_container_width=True, config={"displayModeBar": False})
 
-        max_exp = float(exp[x_col].max()) * 1.25 if not exp.empty else 1.0
-        st.dataframe(
-            exp.reset_index(drop=True),
-            use_container_width=True, height=400,
-            hide_index=True,
-            column_config={
-                "stock_name":    st.column_config.TextColumn("Stock",          width="medium"),
-                "funds_holding": st.column_config.NumberColumn("# Funds",      format="%d",     width="small"),
-                "eff_alloc":     st.column_config.ProgressColumn("Eff. Exp %", format="%.2f%%", min_value=0, max_value=max_exp),
-                "avg_alloc":     st.column_config.NumberColumn("Avg Alloc %",  format="%.2f%%", width="small"),
-                "sector":        st.column_config.TextColumn("Sector",         width="small"),
-            },
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown(
+            '<div class="section-title" style="font-size:0.95rem;">'
+            'Sector exposure (effective)</div>',
+            unsafe_allow_html=True,
         )
+        st.markdown(
+            f'<div class="section-sub">Effective exposure by sector (Eff. Exp %) — '
+            f'sums to ~100% across sectors</div>',
+            unsafe_allow_html=True,
+        )
+
+        _sec_exp = (
+            exp.assign(sector=lambda d: d["sector"].fillna("Other").astype(str).str.strip())
+            .groupby("sector", as_index=False)
+            .agg(eff_alloc=("eff_alloc", "sum"), n_stocks=("stock_name", "count"))
+            .sort_values("eff_alloc", ascending=False)
+        )
+        _sec_pie = _sec_exp.head(8).copy()
+        if len(_sec_exp) > 8:
+            _other = pd.DataFrame([{
+                "sector": "Other",
+                "eff_alloc": _sec_exp.iloc[8:]["eff_alloc"].sum(),
+                "n_stocks": int(_sec_exp.iloc[8:]["n_stocks"].sum()),
+            }])
+            _sec_pie = pd.concat([_sec_pie, _other], ignore_index=True)
+
+        _sec_top_n = 8
+        _sec_scale_max = float(_sec_exp["eff_alloc"].max()) if not _sec_exp.empty else 1.0
+        _sec_top = _sec_exp.head(_sec_top_n)
+        _sec_rest = _sec_exp.iloc[_sec_top_n:]
+
+        _c_sec_pie, _c_sec_tbl = st.columns([2, 3])
+        with _c_sec_pie:
+            fig_sec = px.pie(
+                _sec_pie, names="sector", values="eff_alloc", hole=0.52, height=360,
+            )
+            fig_sec.update_layout(
+                **_dark_layout(
+                    margin=dict(l=10, r=10, t=10, b=10),
+                    font=_cf,
+                    legend=dict(
+                        orientation="h", yanchor="top", y=-0.08,
+                        xanchor="center", x=0.5, font=dict(size=10, color=_sb),
+                    ),
+                )
+            )
+            fig_sec.update_traces(
+                textposition="inside", textinfo="percent",
+                insidetextfont=dict(size=11, color=_hd),
+            )
+            st.plotly_chart(fig_sec, use_container_width=True, config={"displayModeBar": False})
+        with _c_sec_tbl:
+            _sec_table_html = _sector_exposure_table_html(
+                _sec_top,
+                hd=_hd, sb=_sb, bd=_bd, a=_a, cd=_cd, bdr=_bdr,
+                col_amber=_col_amber, is_dark=_is_dark,
+                weight_hdr="Eff. Exp",
+                high_thresh=25.0,
+                scale_max=_sec_scale_max,
+            )
+            st.markdown(_sec_table_html, unsafe_allow_html=True)
+            if not _sec_rest.empty:
+                _n_sec_rest = len(_sec_rest)
+                _rest_eff = float(_sec_rest["eff_alloc"].sum())
+                with st.expander(
+                    f"Show {_n_sec_rest} more sector{'s' if _n_sec_rest != 1 else ''} "
+                    f"({_rest_eff:.1f}% combined Eff. Exp)",
+                    expanded=False,
+                ):
+                    _sec_rest_html = _sector_exposure_table_html(
+                        _sec_rest,
+                        hd=_hd, sb=_sb, bd=_bd, a=_a, cd=_cd, bdr=_bdr,
+                        col_amber=_col_amber, is_dark=_is_dark,
+                        weight_hdr="Eff. Exp",
+                        high_thresh=25.0,
+                        scale_max=_sec_scale_max,
+                        show_header=False,
+                    )
+                    st.markdown(_sec_rest_html, unsafe_allow_html=True)
+            st.markdown(
+                f'<div style="font-size:0.62rem;color:{_sb};margin-top:6px;text-align:right;">'
+                f'▲ HIGH = sector ≥25% of effective portfolio</div>',
+                unsafe_allow_html=True,
+            )
+
+        _wyo_wt_col = x_col
+        _wyo_wt_hdr = "Eff. Exp" if _wyo_wt_col == "eff_alloc" else "Avg Alloc"
+        with st.expander(
+            f"📋 Complete holdings (table) — all {_n_stocks} stocks",
+            expanded=False,
+        ):
+            st.markdown(
+                f'<div class="section-sub" style="margin-top:0;">All {_n_stocks} stocks — '
+                f'coverage bars, mini exposure bars, and ▲ HIGH flags for positions ≥8%</div>',
+                unsafe_allow_html=True,
+            )
+            _exp_tbl = exp.sort_values(_wyo_wt_col, ascending=False).copy()
+            _exp_tbl["_sector_clean"] = (
+                _exp_tbl["sector"].fillna("Other").astype(str).str.strip()
+            )
+            _exp_tbl.loc[_exp_tbl["_sector_clean"].eq(""), "_sector_clean"] = "Other"
+            _wyo_sectors = sorted(_exp_tbl["_sector_clean"].unique().tolist())
+            _wyo_stocks = sorted(_exp_tbl["stock_name"].tolist())
+            _wyo_eff_max = (
+                min(100.0, max(0.5, float(np.ceil(_exp_tbl["eff_alloc"].max() * 10) / 10)))
+                if not _exp_tbl.empty else 10.0
+            )
+
+            _wyo_fc_sec, _wyo_fc_stk, _wyo_fc_eff = st.columns(
+                [1.1, 1.4, 1.5], gap="small", vertical_alignment="top",
+            )
+            with _wyo_fc_sec:
+                st.markdown('<div class="ov-filter-lbl">Sector</div>', unsafe_allow_html=True)
+                _wyo_sel_sectors = st.multiselect(
+                    "Sector",
+                    _wyo_sectors,
+                    placeholder="All sectors",
+                    key="wyo_hold_sector",
+                    label_visibility="collapsed",
+                )
+            with _wyo_fc_stk:
+                st.markdown('<div class="ov-filter-lbl">Stock</div>', unsafe_allow_html=True)
+                _wyo_sel_stocks = st.multiselect(
+                    "Stock",
+                    _wyo_stocks,
+                    placeholder="All stocks",
+                    key="wyo_hold_stock",
+                    label_visibility="collapsed",
+                )
+            with _wyo_fc_eff:
+                st.markdown('<div class="ov-filter-lbl">Eff. Exp %</div>', unsafe_allow_html=True)
+                _wyo_eff_sl, _wyo_eff_val = st.columns([4, 1], vertical_alignment="center")
+                with _wyo_eff_sl:
+                    _wyo_eff_range = st.slider(
+                        "Eff. Exp range",
+                        min_value=0.0,
+                        max_value=_wyo_eff_max,
+                        value=(0.0, _wyo_eff_max),
+                        step=0.1,
+                        key="wyo_hold_eff_range",
+                        format="%.1f%%",
+                        label_visibility="collapsed",
+                    )
+                with _wyo_eff_val:
+                    _eff_lo, _eff_hi = _wyo_eff_range
+                    _eff_lbl = (
+                        "Any"
+                        if _eff_lo <= 0 and _eff_hi >= _wyo_eff_max
+                        else f"{_eff_lo:.1f}–{_eff_hi:.1f}%"
+                    )
+                    st.markdown(
+                        f'<div class="ov-min-val">{_eff_lbl}</div>',
+                        unsafe_allow_html=True,
+                    )
+
+            _exp_filtered = _exp_tbl
+            if _wyo_sel_sectors:
+                _exp_filtered = _exp_filtered[
+                    _exp_filtered["_sector_clean"].isin(_wyo_sel_sectors)
+                ]
+            if _wyo_sel_stocks:
+                _exp_filtered = _exp_filtered[
+                    _exp_filtered["stock_name"].isin(_wyo_sel_stocks)
+                ]
+            _eff_lo, _eff_hi = _wyo_eff_range
+            _exp_filtered = _exp_filtered[
+                (_exp_filtered["eff_alloc"] >= _eff_lo)
+                & (_exp_filtered["eff_alloc"] <= _eff_hi)
+            ]
+            _n_filtered = len(_exp_filtered)
+
+            st.markdown(
+                f'<div style="font-size:0.72rem;color:{_sb};margin:0.35rem 0 0.75rem;">'
+                f'Showing <strong style="color:{_hd};">{_n_filtered}</strong> of '
+                f'<strong style="color:{_hd};">{_n_stocks}</strong> stocks</div>',
+                unsafe_allow_html=True,
+            )
+
+            if _exp_filtered.empty:
+                st.info("No holdings match the current filters. Widen Eff. Exp % or clear sector/stock selections.")
+            else:
+                _wyo_table_html = _blended_exposure_table_html(
+                    _exp_filtered.drop(columns=["_sector_clean"]),
+                    len(matched_funds),
+                    hd=_hd, sb=_sb, bd=_bd, a=_a, cd=_cd, bdr=_bdr,
+                    col_amber=_col_amber, col_green=_col_green, is_dark=_is_dark,
+                    weight_col=_wyo_wt_col,
+                    weight_hdr=_wyo_wt_hdr,
+                    high_thresh=8.0,
+                )
+                _conc = _exp_filtered[_exp_filtered[_wyo_wt_col] >= 8.0]
+                if not _conc.empty:
+                    _cn = ", ".join(
+                        f"<strong>{s}</strong>"
+                        for s in _conc["stock_name"].head(5).tolist()
+                    )
+                    st.markdown(
+                        f'<div style="background:{"rgba(245,158,11,0.15)" if _is_dark else "#FEF3C7"};'
+                        f'border:1px solid {"rgba(245,158,11,0.35)" if _is_dark else "#FCD34D"};'
+                        f'border-left:3px solid {_col_amber};border-radius:10px;'
+                        f'padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:{_hd};line-height:1.55;">'
+                        f'⚠️ <strong style="color:{_col_amber};">Concentration alert:</strong> '
+                        f'{_cn} each make up ≥8% of your effective portfolio.</div>',
+                        unsafe_allow_html=True,
+                    )
+                st.markdown(_wyo_table_html, unsafe_allow_html=True)
+                st.markdown(
+                    f'<div style="font-size:0.62rem;color:{_sb};margin-top:6px;text-align:right;">'
+                    f'▲ HIGH = position ≥8% of portfolio · '
+                    f'{_n_filtered} row{"s" if _n_filtered != 1 else ""} shown</div>',
+                    unsafe_allow_html=True,
+                )
+
 
     # ── Tab 2: Fund Performance ───────────────────────────────────────────────
     with tab_perf:
@@ -6035,8 +6457,12 @@ def page_portfolio_xray():
             # ── Init portfolio overlap session state ──────────────────────────
             if "portfolio_overlap_selected_funds" not in st.session_state:
                 st.session_state.portfolio_overlap_selected_funds = []
-            if "portfolio_overlap_graph_shown" not in st.session_state:
-                st.session_state.portfolio_overlap_graph_shown = False
+            if "portfolio_overlap_period" not in st.session_state:
+                st.session_state.portfolio_overlap_period = "5Y"
+            if "portfolio_overlap_min_return" not in st.session_state:
+                st.session_state.portfolio_overlap_min_return = 8
+            if "portfolio_overlap_conn_bucket" not in st.session_state:
+                st.session_state.portfolio_overlap_conn_bucket = "✅ All connections"
 
             # ── Derive fund categories from master ────────────────────────────
             _pf_cat_map: dict[str, str] = {}
@@ -6104,7 +6530,6 @@ def page_portfolio_xray():
                 _pf_conn_bucket = st.selectbox(
                     "Show lines ≥",
                     [b[0] for b in OVERLAP_BUCKETS],
-                    index=next(i for i, b in enumerate(OVERLAP_BUCKETS) if b[0] == DEFAULT_BUCKET_LABEL),
                     key="portfolio_overlap_conn_bucket",
                     label_visibility="collapsed",
                     help="Draw connection lines only when overlap reaches this level.",
@@ -6127,27 +6552,6 @@ def page_portfolio_xray():
 
             st.markdown("<br>", unsafe_allow_html=True)
 
-            if not st.session_state.portfolio_overlap_graph_shown:
-                st.markdown(
-                    f'<div style="background:{_al};border:1px solid {_bdr};border-radius:14px;'
-                    f'padding:1.5rem 1.75rem;text-align:center;max-width:560px;margin:0 auto;">'
-                    f'<div style="font-size:1.6rem;margin-bottom:0.5rem;">🔗</div>'
-                    f'<div style="font-size:1rem;font-weight:700;color:{_hd};margin-bottom:0.4rem;">'
-                    f'Ready to explore fund overlaps?</div>'
-                    f'<div style="font-size:0.83rem;color:{_bd};line-height:1.6;margin-bottom:1.1rem;">'
-                    f'Use the filters above to narrow down by category, return period or minimum return, '
-                    f'then click the button below to generate the overlap graph.</div>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-                st.markdown("<br>", unsafe_allow_html=True)
-                _pf_btn_col = st.columns([1, 2, 1])[1]
-                with _pf_btn_col:
-                    if st.button("🔍  Show Overlap Graph", use_container_width=True,
-                                 key="portfolio_overlap_show_btn"):
-                        st.session_state.portfolio_overlap_graph_shown = True
-                        st.rerun()
-                st.stop()
 
             if len(_pf_funds) < 2:
                 _pf_filter_note = (
@@ -6184,18 +6588,19 @@ def page_portfolio_xray():
                         if _pf_show_bubble:
                             if not _pf_fund_a:
                                 st.markdown(
-                                    f'<div style="background:{_pf_ov_theme["al"]};border:1px solid {_pf_ov_theme["bdr"]};'
-                                    f'border-radius:12px;padding:1.25rem 1.5rem;text-align:center;margin:1rem 0;">'
-                                    f'<div style="font-size:1.4rem;margin-bottom:0.4rem;">📊</div>'
-                                    f'<div style="font-size:0.9rem;font-weight:700;color:{_pf_ov_theme["head"]};margin-bottom:0.3rem;">'
-                                    f'Select a base fund first</div>'
-                                    f'<div style="font-size:0.82rem;color:{_pf_ov_theme["body"]};line-height:1.5;">'
-                                    f'The bubble chart plots every other fund by its overlap with your chosen base fund.<br>'
-                                    f'Use the panel on the right to pick your base fund.</div>'
-                                    f'</div>',
+                                    _overlap_bubble_guide_html(
+                                        _pf_ov_theme, has_base=False, return_period=_pf_period,
+                                    ),
                                     unsafe_allow_html=True,
                                 )
                             else:
+                                with st.expander("📖 How to read this chart", expanded=False):
+                                    st.markdown(
+                                        _overlap_bubble_guide_html(
+                                            _pf_ov_theme, has_base=True, return_period=_pf_period,
+                                        ),
+                                        unsafe_allow_html=True,
+                                    )
                                 _pf_bubble_result = _overlap_bubble_chart_fig(
                                     _pf_graph, _pf_ov_theme, master,
                                     _pf_fund_a, _pf_fund_b, _pf_period,
@@ -6279,6 +6684,7 @@ def page_portfolio_xray():
                             _pf_ov_theme, similarity, holdings,
                             ns="portfolio_overlap",
                             return_source="portfolio_xray",
+                            bubble_mode=_pf_show_bubble,
                         )
 
                     # ── Full-width holdings expander (when 2 funds selected) ──
@@ -7402,6 +7808,112 @@ def _overlap_bubble_chart_fig(
     return fig, valid_funds, best_fund_lbl, best_ov, best_ret
 
 
+def _overlap_bubble_guide_html(theme: dict, *, has_base: bool, return_period: str = "5Y") -> str:
+    """User-facing guide for the overlap bubble chart (pick base fund or read the chart)."""
+    _hd = theme["head"]
+    _bd = theme["body"]
+    _sb = theme["sub"]
+    _a = theme["a"]
+    _al = theme["al"]
+    _bdr = theme["bdr"]
+
+    def _step(n: int, title: str, body: str) -> str:
+        return (
+            f'<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">'
+            f'<div style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:{_a};'
+            f'color:#fff;font-size:0.72rem;font-weight:700;display:flex;align-items:center;'
+            f'justify-content:center;">{n}</div>'
+            f'<div>'
+            f'<div style="font-size:0.82rem;font-weight:700;color:{_hd};margin-bottom:2px;">{title}</div>'
+            f'<div style="font-size:0.78rem;color:{_bd};line-height:1.55;">{body}</div>'
+            f'</div></div>'
+        )
+
+    if not has_base:
+        steps = (
+            _step(
+                1,
+                "Open the panel on the right",
+                'Look for <strong>Pick a base fund</strong> on the right side of this page.',
+            )
+            + _step(
+                2,
+                "Pick your base fund",
+                'Use the <strong>dropdown list</strong> under those slots and choose the fund you already hold '
+                'or want to compare against — e.g. "I have ICICI Large Cap; which fund should I add?". '
+                'Your first selection fills the highlighted <strong>Base fund</strong> pill on the right.',
+            )
+            + _step(
+                3,
+                "Chart appears here",
+                'Once your base fund is set, this chart loads automatically. Every bubble shows how another fund '
+                'overlaps with your base fund and how it has performed.',
+            )
+        )
+        tip = (
+            f'<div style="font-size:0.75rem;color:{_sb};margin-top:4px;padding-top:8px;'
+            f'border-top:1px solid {_bdr};">'
+            f'<strong>Tip:</strong> You can also pick your base fund on the <strong>Overlap Graph</strong> view '
+            f'(click any node), then switch back to <strong>Bubble Chart</strong>.'
+            f'</div>'
+        )
+        title = "How to get started"
+        intro = (
+            'The bubble chart answers: <em>"Which fund pairs best with the one I already have?"</em> '
+            'You need to choose a <strong>base fund</strong> first.'
+        )
+    else:
+        steps = (
+            _step(
+                1,
+                "Read the axes",
+                f'<strong>Horizontal:</strong> Overlap % with your base fund. '
+                f'<strong>Further left = less overlap = better diversification.</strong><br>'
+                f'<strong>Vertical:</strong> {return_period} past return. Higher = stronger recent performance.',
+            )
+            + _step(
+                2,
+                "Find the diamond",
+                'Your <strong>base fund (Fund A)</strong> is the purple diamond at <strong>0% overlap</strong> '
+                'on the left — every other fund is measured against it.',
+            )
+            + _step(
+                3,
+                "Hunt for the green zone (top-left)",
+                'The shaded <strong>Ideal zone</strong> marks funds with <strong>low overlap</strong> and '
+                '<strong>high return</strong> — the best candidates to add alongside your base fund.',
+            )
+            + _step(
+                4,
+                "Use bubble colours and the star",
+                'Green bubbles = healthy diversification; red = very high overlap (similar portfolio). '
+                'The <strong>star marker</strong> highlights our suggested best pair for your base fund.',
+            )
+            + _step(
+                5,
+                "Click a bubble to compare",
+                'Click any bubble to set it as <strong>Fund B</strong>. The right panel then shows overlap %, '
+                'shared stocks, and a <strong>Compare in detail</strong> button.',
+            )
+        )
+        tip = ""
+        title = "How to read this chart"
+        intro = (
+            'Each bubble is a fund (except your base fund). '
+            '<strong>Best additions sit in the top-left</strong> — low overlap with your base fund, solid returns.'
+        )
+
+    return (
+        f'<div class="ov-bubble-guide" style="background:{_al};border:1px solid {_bdr};'
+        f'border-radius:12px;padding:1rem 1.15rem;margin:0.5rem 0 0.75rem;">'
+        f'<div style="font-size:0.95rem;font-weight:700;color:{_hd};margin-bottom:4px;">📖 {title}</div>'
+        f'<div style="font-size:0.78rem;color:{_sb};line-height:1.5;margin-bottom:10px;">{intro}</div>'
+        f'{steps}{tip}'
+        f'</div>'
+    )
+
+
+
 def _overlap_theme_dict(t, t_name):
     return {**t, "is_dark": t_name == "dark_premium"}
 
@@ -7892,6 +8404,8 @@ def _overlap_render_fund_sidebar(
     holdings,
     ns: str = "overlap_matrix",
     return_source: str = "overlap_drilldown",
+    *,
+    bubble_mode: bool = False,
 ):
     from analytics.overlap_filters import fund_return_pct, sort_funds_by_return
     from analytics.overlap_graph import fund_label, pair_score
@@ -7903,31 +8417,81 @@ def _overlap_render_fund_sidebar(
 
     t = theme
     fund_a, fund_b = _overlap_get_ab(funds, ns)
-    sel_key   = f"{ns}_selected_funds"
-    drop_key  = f"{ns}_dropdown_last"
+    sel_key = f"{ns}_selected_funds"
+    pick_key = f"{ns}_fund_pick_label"
+    prev_pick_key = f"{ns}_fund_pick_prev"
 
-    hdr = (
-        f"Funds — vs {fund_label(fund_a, max_len=20)}"
-        if fund_a
-        else f"Funds ({len(funds)} matching)"
+    _accent = t["a"]
+    _pill_a_style = (
+        f"background:{_overlap_hex_rgba(_accent, 0.18)};"
+        f"border-color:{_overlap_hex_rgba(_accent, 0.55)};"
+        f"color:{_accent};"
     )
+    _pill_b_style = (
+        "background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.45);color:#059669;"
+    )
+
+    if bubble_mode:
+        hdr = (
+            f"Base fund — {fund_label(fund_a, max_len=20)}"
+            if fund_a
+            else f"Pick a base fund ({len(funds)} shown)"
+        )
+    else:
+        hdr = (
+            f"Funds — vs {fund_label(fund_a, max_len=20)}"
+            if fund_a
+            else f"Funds ({len(funds)} matching)"
+        )
     st.markdown(f'<div class="ov-side-hdr">{hdr}</div>', unsafe_allow_html=True)
 
-    # ── Selection pills (A + B in a flex row) ──────────────────────────
-    pill_a_html = (
-        f'<div class="ov-pill ov-pill-a">{fund_label(fund_a, max_len=22)}</div>'
-        if fund_a else
-        '<div class="ov-empty-slot">Fund A</div>'
-    )
-    pill_b_html = (
-        f'<div class="ov-pill ov-pill-b">{fund_label(fund_b, max_len=22)}</div>'
-        if fund_b else
-        '<div class="ov-empty-slot">Fund B</div>'
-    )
-    st.markdown(
-        f'<div class="ov-pills-row">{pill_a_html}{pill_b_html}</div>',
-        unsafe_allow_html=True,
-    )
+    if bubble_mode and not fund_a:
+        st.markdown(
+            '<div class="ov-pills-row">'
+            '<div class="ov-empty-slot">Base fund — choose from list below</div>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+    elif bubble_mode:
+        pill_a_html = (
+            f'<div class="ov-pill ov-pill-a" style="{_pill_a_style}">'
+            f'<span style="font-size:0.62rem;opacity:0.85;margin-right:5px;">BASE</span>'
+            f'{fund_label(fund_a, max_len=20)}</div>'
+        )
+        if fund_b:
+            pill_b_html = (
+                f'<div class="ov-pill ov-pill-b" style="{_pill_b_style}">'
+                f'<span style="font-size:0.62rem;opacity:0.85;margin-right:5px;">VS</span>'
+                f'{fund_label(fund_b, max_len=20)}</div>'
+            )
+            st.markdown(
+                f'<div class="ov-pills-row">{pill_a_html}{pill_b_html}</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                f'<div class="ov-pills-row">{pill_a_html}'
+                f'<div class="ov-empty-slot" style="flex:1;">Click a bubble to compare</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+    else:
+        pill_a_html = (
+            f'<div class="ov-pill ov-pill-a" style="{_pill_a_style}">'
+            f'{fund_label(fund_a, max_len=22)}</div>'
+            if fund_a else
+            '<div class="ov-empty-slot">Fund A</div>'
+        )
+        pill_b_html = (
+            f'<div class="ov-pill ov-pill-b" style="{_pill_b_style}">'
+            f'{fund_label(fund_b, max_len=22)}</div>'
+            if fund_b else
+            '<div class="ov-empty-slot">Fund B</div>'
+        )
+        st.markdown(
+            f'<div class="ov-pills-row">{pill_a_html}{pill_b_html}</div>',
+            unsafe_allow_html=True,
+        )
 
     # Clear buttons below pills
     if fund_a or fund_b:
@@ -7935,8 +8499,11 @@ def _overlap_render_fund_sidebar(
         with bc1:
             if fund_a:
                 st.markdown('<div class="ov-pill-x">', unsafe_allow_html=True)
-                if st.button(f"✕ Clear A", key=f"{ns}_clear_a", use_container_width=True):
+                _clear_a_lbl = "✕ Clear base" if bubble_mode else "✕ Clear A"
+                if st.button(_clear_a_lbl, key=f"{ns}_clear_a", use_container_width=True):
                     st.session_state[sel_key] = []
+                    for _k in (pick_key, prev_pick_key, f"{ns}_dropdown_last"):
+                        st.session_state.pop(_k, None)
                     st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
         with bc2:
@@ -7969,9 +8536,14 @@ def _overlap_render_fund_sidebar(
         ):
             _overlap_go_compare(fund_a, fund_b, return_source)
 
-    sub_label = (
-        f"By overlap with {fund_label(fund_a, max_len=16)}" if fund_a else "By return"
-    )
+    if bubble_mode and not fund_a:
+        sub_label = "Step 1 — select your base fund"
+    elif bubble_mode and fund_a and not fund_b:
+        sub_label = f"Other funds vs {fund_label(fund_a, max_len=16)} — or click a bubble"
+    else:
+        sub_label = (
+            f"By overlap with {fund_label(fund_a, max_len=16)}" if fund_a else "By return"
+        )
     st.markdown(f'<div class="ov-list-sub">{sub_label}</div>', unsafe_allow_html=True)
 
     def _return_str(fund: str) -> str:
@@ -8002,30 +8574,47 @@ def _overlap_render_fund_sidebar(
         ordered = sort_funds_by_return(funds, master, period)
         labels = [_option_label(f, None) for f in ordered]
 
-    if st.session_state.get(drop_key) not in funds:
-        st.session_state.pop(drop_key, None)
-
     label_to_fund = dict(zip(labels, ordered))
-    highlight = fund_b or fund_a
-    default_idx = ordered.index(highlight) if highlight in ordered else 0
 
-    # Determine the index to show without touching session_state (avoids Streamlit warning).
-    last_fund = st.session_state.get(drop_key)
-    show_idx  = ordered.index(last_fund) if last_fund and last_fund in ordered else default_idx
+    if fund_a:
+        if pick_key not in st.session_state or st.session_state[pick_key] not in labels:
+            highlight = fund_b or fund_a
+            default_idx = ordered.index(highlight) if highlight in ordered else 0
+            st.session_state[pick_key] = labels[default_idx]
+        pick_label = st.selectbox(
+            "Choose fund",
+            labels,
+            key=pick_key,
+            label_visibility="collapsed",
+        )
+    else:
+        pick_label = st.selectbox(
+            "Choose fund",
+            labels,
+            index=None,
+            placeholder="Select base fund…" if bubble_mode else "Choose a fund…",
+            key=pick_key,
+            label_visibility="collapsed",
+        )
 
-    pick_label = st.selectbox(
-        "Choose fund",
-        labels,
-        index=show_idx,
-        label_visibility="collapsed",
-    )
-    picked_fund = label_to_fund.get(pick_label, ordered[default_idx])
-    last_picked = st.session_state.get(drop_key)
-    if last_picked is not None and picked_fund != last_picked:
-        _overlap_pick_fund(picked_fund, funds, ns)
-        st.session_state[drop_key] = picked_fund
-        st.rerun()
-    st.session_state[drop_key] = picked_fund
+    if not pick_label:
+        return
+
+    picked_fund = label_to_fund[pick_label]
+
+    if not fund_a:
+        if picked_fund not in (st.session_state.get(sel_key) or []):
+            _overlap_pick_fund(picked_fund, funds, ns)
+            st.session_state[prev_pick_key] = pick_label
+            st.rerun()
+    else:
+        prev_label = st.session_state.get(prev_pick_key)
+        if prev_label is None:
+            st.session_state[prev_pick_key] = pick_label
+        elif pick_label != prev_label:
+            st.session_state[prev_pick_key] = pick_label
+            _overlap_pick_fund(picked_fund, funds, ns)
+            st.rerun()
 
     # ── Quick Facts comparison (only when both selected) ───────────────
     if fund_a and fund_b:
@@ -8334,18 +8923,15 @@ def page_overlap_drilldown():
         if _show_bubble:
             if not fund_a:
                 st.markdown(
-                    f'<div style="background:{theme["al"]};border:1px solid {theme["bdr"]};'
-                    f'border-radius:12px;padding:1.25rem 1.5rem;text-align:center;margin:1rem 0;">'
-                    f'<div style="font-size:1.4rem;margin-bottom:0.4rem;">📊</div>'
-                    f'<div style="font-size:0.9rem;font-weight:700;color:{theme["head"]};margin-bottom:0.3rem;">'
-                    f'Select a base fund first</div>'
-                    f'<div style="font-size:0.82rem;color:{theme["body"]};line-height:1.5;">'
-                    f'The bubble chart shows all other funds plotted by their overlap with your chosen base fund.<br>'
-                    f'Use the panel on the right to pick your base fund, then come back here.</div>'
-                    f'</div>',
+                    _overlap_bubble_guide_html(theme, has_base=False, return_period=period),
                     unsafe_allow_html=True,
                 )
             else:
+                with st.expander("📖 How to read this chart", expanded=False):
+                    st.markdown(
+                        _overlap_bubble_guide_html(theme, has_base=True, return_period=period),
+                        unsafe_allow_html=True,
+                    )
                 _bubble_result = _overlap_bubble_chart_fig(
                     graph, theme, master, fund_a, fund_b, period,
                 )
@@ -8414,7 +9000,10 @@ def page_overlap_drilldown():
 
     with col_side:
         st.markdown('<div class="ov-side-sentinel"></div>', unsafe_allow_html=True)
-        _overlap_render_fund_sidebar(graph, funds, master, period, theme, similarity, holdings)
+        _overlap_render_fund_sidebar(
+            graph, funds, master, period, theme, similarity, holdings,
+            bubble_mode=_show_bubble,
+        )
 
     # ── Full-width shared holdings expander (only when both funds selected) ──
     if fund_a and fund_b:
