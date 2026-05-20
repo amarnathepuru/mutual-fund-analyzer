@@ -33,3 +33,17 @@ data/raw/
 # Secrets / credentials
 *.env
 secrets.json
+
+# Local / debug / one-off scripts (not part of the app)
+app_backup_*.py
+patch_*.py
+*_patch.py
+_build_*.py
+_insert_*.py
+_perf_fn.txt
+st_out.txt
+st_err.txt
+saved_portfolio.json
+
+# IDE (Cursor)
+.cursorignore
