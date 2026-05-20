@@ -2455,6 +2455,7 @@ def page_compare():
     _cf = dict(family="Inter, sans-serif", color=_bd, size=12)
     _ct = dict(color=_bd, size=11)
     _cg = _bdr  # grid / zero-line color
+    PERF_COLORS = [_a, "#F59E0B", "#06B6D4", "#10B981", "#EF4444"]
 
     selected = st.session_state.get("selected_funds", [])
     if len(selected) < 2:

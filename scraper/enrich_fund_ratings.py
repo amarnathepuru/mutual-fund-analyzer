@@ -75,6 +75,30 @@ def _find_fund_in_returns(duration_data: list, scheme_id: int) -> dict | None:
     return None
 
 
+def _extract_report_card_data(content: str) -> dict:
+    """Parse reportCardData JSON blob keyed by scheme_id (string keys)."""
+    marker = '"reportCardData":'
+    idx = content.find(marker)
+    if idx < 0:
+        return {}
+    start = content.find("{", idx)
+    if start < 0:
+        return {}
+    depth = 0
+    for j in range(start, min(start + 120_000, len(content))):
+        ch = content[j]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                try:
+                    return json.loads(content[start : j + 1])
+                except json.JSONDecodeError:
+                    return {}
+    return {}
+
+
 # ── Core fetch ─────────────────────────────────────────────────────────────────
 
 def fetch_ratings(slug: str, scheme_id: int) -> dict:
@@ -137,14 +161,18 @@ def fetch_ratings(slug: str, scheme_id: int) -> dict:
                     if rk is not None:
                         result["category_rank"] = int(rk)
 
-    # ── Risk metrics ──────────────────────────────────────────────────────────
-    risk_pattern = r'"standardDeviation"\s*:\s*([\d.]+).*?"sharpeRatio"\s*:\s*([-\d.]+).*?"alpha"\s*:\s*([-\d.]+).*?"beta"\s*:\s*([-\d.]+)'
-    rm = re.search(risk_pattern, content, re.DOTALL)
-    if rm:
-        result["std_dev"]      = round(float(rm.group(1)), 4)
-        result["sharpe_ratio"] = round(float(rm.group(2)), 4)
-        result["alpha"]        = round(float(rm.group(3)), 4)
-        result["beta"]         = round(float(rm.group(4)), 4)
+    # ── Risk metrics (per-fund via reportCardData[scheme_id]) ────────────────
+    report_cards = _extract_report_card_data(content)
+    card = report_cards.get(str(scheme_id)) or report_cards.get(scheme_id)
+    if card:
+        if card.get("standardDeviation") is not None:
+            result["std_dev"] = round(float(card["standardDeviation"]), 4)
+        if card.get("sharpeRatio") is not None:
+            result["sharpe_ratio"] = round(float(card["sharpeRatio"]), 4)
+        if card.get("alpha") is not None:
+            result["alpha"] = round(float(card["alpha"]), 4)
+        if card.get("beta") is not None:
+            result["beta"] = round(float(card["beta"]), 4)
 
     # ── Return since inception ────────────────────────────────────────────────
     si_match = re.search(r'"returnSinceInception"\s*:\s*([-\d.]+)', content)
