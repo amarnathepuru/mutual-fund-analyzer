@@ -8,6 +8,11 @@ import urllib.parse
 import json as _json
 import pathlib as _pathlib
 
+try:
+    from streamlit_searchbox import st_searchbox as _st_searchbox
+except ImportError:
+    _st_searchbox = None
+
 # ── PORTFOLIO PERSISTENCE ─────────────────────────────────────────────────────
 
 _PORTFOLIO_SAVE_PATH = _pathlib.Path("saved_portfolio.json")
@@ -610,21 +615,133 @@ def display_name(name, max_len=32):
 
 
 def filter_fund_names(lookup: pd.DataFrame, query: str, *, limit: int = 25) -> list[str]:
-    """Return fund_name matches for category-page search / searchbox."""
+    """Return fund_name matches for searchbox suggestions (name + optional AMC)."""
     q = (query or "").strip()
-    if len(q) < 2 or lookup.empty:
+    if len(q) < 2 or lookup.empty or "fund_name" not in lookup.columns:
         return []
-    _mask = lookup["fund_name"].str.lower().str.contains(re.escape(q.lower()), na=False)
+    _ql = q.lower()
+    _mask = lookup["fund_name"].str.lower().str.contains(re.escape(_ql), na=False)
+    if "fund_house" in lookup.columns:
+        _mask = _mask | lookup["fund_house"].astype(str).str.lower().str.contains(
+            re.escape(_ql), na=False
+        )
     if not _mask.any():
-        _tokens = [w for w in re.split(r"\s+", q.lower()) if len(w) >= 2]
+        _tokens = [w for w in re.split(r"\s+", _ql) if len(w) >= 2]
         if _tokens:
             _combined = pd.Series(True, index=lookup.index)
             for _tok in _tokens:
-                _combined &= lookup["fund_name"].str.lower().str.contains(
+                _tok_mask = lookup["fund_name"].str.lower().str.contains(
                     re.escape(_tok), na=False
                 )
+                if "fund_house" in lookup.columns:
+                    _tok_mask = _tok_mask | lookup["fund_house"].astype(str).str.lower().str.contains(
+                        re.escape(_tok), na=False
+                    )
+                _combined &= _tok_mask
             _mask = _combined
-    return lookup.loc[_mask, "fund_name"].head(limit).tolist()
+    return lookup.loc[_mask, "fund_name"].drop_duplicates().head(limit).tolist()
+
+
+def _fund_search_display_label(fn: str, amc_by_fn: dict) -> str:
+    _amc = str(amc_by_fn.get(fn, "") or "").strip()
+    return f"{display_name(fn, max_len=48)} — {_amc}" if _amc else display_name(fn, max_len=56)
+
+
+def _fund_search_suggest_pairs(lookup: pd.DataFrame, query: str, amc_by_fn: dict, *, limit: int = 25):
+    """(display label, fund_name) pairs for live autocomplete."""
+    return [
+        (_fund_search_display_label(fn, amc_by_fn), fn)
+        for fn in filter_fund_names(lookup, query, limit=limit)
+    ]
+
+
+def _live_fund_searchbox(
+    lookup: pd.DataFrame,
+    *,
+    widget_key: str,
+    placeholder: str,
+    query_session_key: str,
+) -> str | None:
+    """
+    Autocomplete searchbox; updates on each keystroke when streamlit-searchbox is installed.
+    Returns selected fund_name, or None if only typing / cleared.
+    Always stores the current typed term in query_session_key.
+    """
+    if lookup.empty:
+        return None
+    _amc_by_fn = dict(zip(lookup["fund_name"], lookup["fund_house"].fillna("")))
+
+    def _search(term: str):
+        st.session_state[query_session_key] = (term or "").strip()
+        return _fund_search_suggest_pairs(lookup, term, _amc_by_fn)
+
+    if _st_searchbox is not None:
+        _picked = _st_searchbox(
+            _search,
+            placeholder=placeholder,
+            key=f"fl_sb_{widget_key}",
+            rerun_on_update=True,
+            debounce=200,
+            default_use_searchterm=True,
+            edit_after_submit="option",
+            clear_on_submit=False,
+        )
+        if _picked is not None and _picked != "":
+            if _picked in _amc_by_fn:
+                return _picked
+            if _picked in lookup["fund_name"].values:
+                return _picked
+        return None
+
+    if hasattr(st, "searchbox"):
+        def _native_suggest(query: str) -> list[str]:
+            st.session_state[query_session_key] = (query or "").strip()
+            return [_fund_search_display_label(fn, _amc_by_fn) for fn in filter_fund_names(lookup, query)]
+
+        _label_to_fn = {_fund_search_display_label(fn, _amc_by_fn): fn for fn in lookup["fund_name"]}
+        _picked_label = st.searchbox(
+            "Search funds",
+            _native_suggest,
+            placeholder=placeholder,
+            key=f"fl_sb_{widget_key}_native",
+            label_visibility="collapsed",
+        )
+        if _picked_label:
+            return _label_to_fn.get(_picked_label)
+        return None
+
+    st.session_state[query_session_key] = (
+        st.text_input(
+            "Search funds",
+            placeholder=placeholder,
+            key=f"fl_sb_{widget_key}_txt",
+            label_visibility="collapsed",
+        )
+        or ""
+    ).strip()
+    return None
+
+
+def _explorer_search_filter_query(
+    funds_df: pd.DataFrame,
+    *,
+    widget_key: str,
+    placeholder: str = "Type fund or AMC name (e.g. Nippon, HDFC)…",
+) -> str:
+    """Fund Explorer search with live dropdown; returns text for list filtering."""
+    if funds_df.empty:
+        return ""
+    _lookup = funds_df[["fund_name", "fund_house"]].drop_duplicates(subset=["fund_name"])
+    _qkey = f"exp_q_{widget_key}"
+    _picked_fn = _live_fund_searchbox(
+        _lookup,
+        widget_key=widget_key,
+        placeholder=placeholder,
+        query_session_key=_qkey,
+    )
+    if _picked_fn:
+        return _picked_fn
+    return st.session_state.get(_qkey, "")
 
 
 def format_aum(val):
@@ -2067,41 +2184,12 @@ def page_category_select():
 
     _picked_fn = None
     if not _fund_lookup.empty:
-        def _fund_suggest_label(fn: str) -> str:
-            return f"{display_name(fn, max_len=44)} — {_cat_by_fn.get(fn, '')}"
-
-        def _cat_search_suggest(query: str) -> list[str]:
-            return [_fund_suggest_label(fn) for fn in filter_fund_names(_fund_lookup, query, limit=25)]
-
-        _label_to_fn = {_fund_suggest_label(fn): fn for fn in _cat_by_fn}
-
-        if hasattr(st, "searchbox"):
-            _picked_label = st.searchbox(
-                "Search funds",
-                _cat_search_suggest,
-                placeholder="Type fund or AMC name (e.g. Nippon, HDFC Mid Cap)…",
-                key="cat_fund_searchbox",
-                label_visibility="collapsed",
-            )
-            _picked_fn = _label_to_fn.get(_picked_label) if _picked_label else None
-        else:
-            _all_funds = _fund_lookup["fund_name"].tolist()
-
-            def _fmt_fund_option(fn: str) -> str:
-                if fn == "":
-                    return "Choose a fund from the list…"
-                return f"{display_name(fn, max_len=48)} — {_cat_by_fn.get(fn, '')}"
-
-            _picked_fn = st.selectbox(
-                "Search funds",
-                options=[""] + _all_funds,
-                format_func=_fmt_fund_option,
-                index=0,
-                key="cat_fund_select",
-                label_visibility="collapsed",
-                help="Open the list and type to filter funds (509 total).",
-            )
-            _picked_fn = _picked_fn if _picked_fn else None
+        _picked_fn = _live_fund_searchbox(
+            _fund_lookup,
+            widget_key="cat",
+            placeholder="Type fund or AMC name (e.g. Nippon, HDFC Mid Cap)…",
+            query_session_key="cat_fund_query",
+        )
 
     if _picked_fn and _picked_fn in _cat_by_fn:
         _fc = _cat_by_fn[_picked_fn]
@@ -2131,7 +2219,7 @@ def page_category_select():
                     )
                 st.rerun()
     elif not _fund_lookup.empty:
-        st.caption("Type at least 2 characters, then choose a fund from the suggestions.")
+        st.caption("Type at least 2 characters — matching funds appear in the dropdown as you type.")
 
     st.markdown('<div style="height:.5rem;"></div>', unsafe_allow_html=True)
 
@@ -2368,8 +2456,8 @@ def page_fund_explorer():
     # ─── LAYOUT A: Card Grid ─────────────────────────────────────────────────
     if layout == "A":
         fc = st.columns([3, 2, 2, 2] if show_cat_filter else [3, 2, 2])
-        search     = fc[0].text_input("Search", placeholder="Fund name or AMC…",
-                                       label_visibility="collapsed", key="a_srch")
+        with fc[0]:
+            search = _explorer_search_filter_query(cat_funds, widget_key="a")
         amc_filter = fc[1].selectbox("AMC", amcs_list,
                                       label_visibility="collapsed", key="a_amc")
         sort_by    = fc[2].selectbox(
@@ -2468,8 +2556,7 @@ def page_fund_explorer():
 
     # ─── LAYOUT B: Two-Panel Split ───────────────────────────────────────────
     elif layout == "B":
-        b_search = st.text_input("Search", placeholder="Fund name or AMC…",
-                                  label_visibility="collapsed", key="b_srch")
+        b_search = _explorer_search_filter_query(cat_funds, widget_key="b")
         bc1, bc2 = st.columns(2)
         b_amc  = bc1.selectbox("AMC", amcs_list, label_visibility="collapsed", key="b_amc")
         b_sort = bc2.selectbox(
@@ -2555,8 +2642,8 @@ def page_fund_explorer():
     # ─── LAYOUT C: Selectable Table ──────────────────────────────────────────
     elif layout == "C":
         cc = st.columns([3, 2, 2])
-        c_search = cc[0].text_input("Search", placeholder="Fund name or AMC…",
-                                     label_visibility="collapsed", key="c_srch")
+        with cc[0]:
+            c_search = _explorer_search_filter_query(cat_funds, widget_key="c")
         c_amc    = cc[1].selectbox("AMC", amcs_list, label_visibility="collapsed", key="c_amc")
         c_sort   = cc[2].selectbox(
             "Sort", ["Star Rating (High→Low)", "3Y Return (High→Low)", "1Y Return (High→Low)", "5Y Return (High→Low)", "Returns Since Inception (High→Low)", "Consistency (High→Low)", "AUM (High→Low)", "AUM (Low→High)", "Expense Ratio (Low→High)", "Holdings Count"],
@@ -2657,7 +2744,13 @@ def page_fund_explorer():
                 st.session_state.selected_funds = []
                 st.rerun()
 
-        d_search = st.text_input("", placeholder="Search by fund name or AMC…", key="d_srch")
+        d_search = _explorer_search_filter_query(
+            cat_funds,
+            widget_key="d",
+            placeholder="Search by fund name or AMC…",
+        )
+        if _st_searchbox is not None:
+            st.caption("Suggestions appear as you type — pick one from the list or keep typing to filter.")
         da1, da2 = st.columns(2)
         d_amc  = da1.selectbox("AMC", amcs_list, label_visibility="collapsed", key="d_amc")
         d_sort = da2.selectbox(
