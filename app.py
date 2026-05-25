@@ -669,7 +669,10 @@ def _live_fund_searchbox(
     """
     if lookup.empty:
         return None
-    _amc_by_fn = dict(zip(lookup["fund_name"], lookup["fund_house"].fillna("")))
+    if "fund_house" in lookup.columns:
+        _amc_by_fn = dict(zip(lookup["fund_name"], lookup["fund_house"].fillna("")))
+    else:
+        _amc_by_fn = {fn: "" for fn in lookup["fund_name"]}
 
     def _search(term: str):
         st.session_state[query_session_key] = (term or "").strip()
@@ -2120,15 +2123,21 @@ def page_category_select():
 
     if not master_df.empty and "fund_name" in master_df.columns and "category" in master_df.columns:
         _m = master_df[master_df["status"] == "ACTIVE"] if "status" in master_df.columns else master_df
+        _lk_cols = ["fund_name", "category"]
+        if "fund_house" in _m.columns:
+            _lk_cols.append("fund_house")
         _fund_lookup = (
-            _m[["fund_name", "category"]]
+            _m[_lk_cols]
             .drop_duplicates(subset=["fund_name"])
             .sort_values("fund_name")
             .reset_index(drop=True)
         )
     elif not holdings.empty:
+        _lk_cols = ["fund_name", "category"]
+        if "fund_house" in holdings.columns:
+            _lk_cols.append("fund_house")
         _fund_lookup = (
-            holdings[["fund_name", "category"]]
+            holdings[_lk_cols]
             .drop_duplicates(subset=["fund_name"])
             .sort_values("fund_name")
             .reset_index(drop=True)
