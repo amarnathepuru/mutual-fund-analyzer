@@ -6,7 +6,8 @@ extract fund metadata, and validate that each fund's portfolio-details page
 actually has holdings data before including it in fund_master_auto.csv.
 
 Usage:
-  python -X utf8 scraper/discover_funds.py                  # all 6 categories
+  python -X utf8 scraper/discover_funds.py                  # all 7 categories (replaces master)
+  python -X utf8 scraper/discover_funds.py --batch2          # Tier 1+2 expansion (merges into master)
   python -X utf8 scraper/discover_funds.py --large-cap-only # Large Cap only (fast validation)
   python -X utf8 scraper/discover_funds.py --validate       # also compare vs fund_master.csv
 
@@ -47,6 +48,21 @@ CATEGORIES = {
     "Multi Cap":      "/mutual-funds/equity/multi-cap/34",
     "Flexi Cap":      "/mutual-funds/equity/flexi-cap/79",
     "ELSS":           "/mutual-funds/equity/elss/38",
+}
+
+# Batch 2 — Tier 1 (index, hybrid, international) + Tier 2 (allocation, sectoral)
+BATCH2_CATEGORIES = {
+    "Large Cap Index":          "/mutual-funds/equity/large-cap-index/99",
+    "Mid Cap Index":            "/mutual-funds/equity/mid-cap-index/100",
+    "Small Cap Index":          "/mutual-funds/equity/small-cap-index/101",
+    "International":            "/mutual-funds/equity/international/50",
+    "Aggressive Hybrid":        "/mutual-funds/hybrid/aggressive-hybrid/68",
+    "Balanced Hybrid":          "/mutual-funds/hybrid/balanced-hybrid/69",
+    "Arbitrage":                "/mutual-funds/hybrid/arbitrage/73",
+    "Dynamic Asset Allocation": "/mutual-funds/hybrid/dynamic-asset-allocation/74",
+    "Multi Asset Allocation":   "/mutual-funds/hybrid/multi-asset-allocation/75",
+    "Sectoral Banking":         "/mutual-funds/equity/sectoral-banking/39",
+    "Sectoral Technology":      "/mutual-funds/equity/sectoral-technology/43",
 }
 
 # Matches /mutual-funds/{slug}/{scheme_id}  (no further path segments)
@@ -318,13 +334,39 @@ def validate_against_existing(auto_df: pd.DataFrame) -> None:
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 
+def _parse_categories_arg() -> dict | None:
+    """--categories 'Large Cap Index,International'"""
+    for i, arg in enumerate(sys.argv):
+        if arg == "--categories" and i + 1 < len(sys.argv):
+            names = [n.strip() for n in sys.argv[i + 1].split(",") if n.strip()]
+            pool = {**CATEGORIES, **BATCH2_CATEGORIES}
+            missing = [n for n in names if n not in pool]
+            if missing:
+                print(f"Unknown categories: {missing}")
+                print(f"Available: {sorted(pool.keys())}")
+                sys.exit(1)
+            return {n: pool[n] for n in names}
+    return None
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
     large_cap_only = "--large-cap-only" in sys.argv
+    batch2_only    = "--batch2" in sys.argv
     run_compare    = "--validate" in sys.argv or large_cap_only
+    merge_existing = batch2_only or "--merge" in sys.argv
 
-    cats_to_run = {"Large Cap": CATEGORIES["Large Cap"]} if large_cap_only else CATEGORIES
+    custom = _parse_categories_arg()
+    if custom:
+        cats_to_run = custom
+        merge_existing = True
+    elif large_cap_only:
+        cats_to_run = {"Large Cap": CATEGORIES["Large Cap"]}
+    elif batch2_only:
+        cats_to_run = BATCH2_CATEGORIES
+    else:
+        cats_to_run = CATEGORIES
 
     active_funds:   list[dict] = []
     invalid_funds:  list[dict] = []
@@ -408,21 +450,46 @@ def main():
     if not active_df.empty:
         active_df = (
             active_df
-            .drop(columns=["holdings_rows"])          # internal column, not needed in CSV
+            .drop(columns=["holdings_rows"], errors="ignore")
             .sort_values(["category", "fund_name"])
             .reset_index(drop=True)
         )
+
+        if merge_existing:
+            master_path = "data/fund_master_auto.csv"
+            try:
+                prev = pd.read_csv(master_path)
+                active_df = (
+                    pd.concat([prev, active_df], ignore_index=True)
+                    .drop_duplicates(subset=["scheme_id"], keep="last")
+                    .sort_values(["category", "fund_name"])
+                    .reset_index(drop=True)
+                )
+                print(f"\n  Merged with existing master -> {len(active_df)} total active funds")
+            except FileNotFoundError:
+                print("\n  No existing fund_master_auto.csv — writing fresh file")
+
         active_df.to_csv("data/fund_master_auto.csv", index=False)
         print(f"\n  Saved {len(active_df)} active funds -> data/fund_master_auto.csv")
 
-        # Category breakdown
         print("\n  Breakdown by category:")
         for cat, grp in active_df.groupby("category"):
-            print(f"    {cat:<15} : {len(grp)} funds")
+            print(f"    {cat:<28} : {len(grp)} funds")
 
     if invalid_funds:
         invalid_df = pd.DataFrame(invalid_funds).sort_values(["category", "fund_name"])
-        invalid_df.to_csv("data/fund_master_invalid.csv", index=False)
+        invalid_path = "data/fund_master_invalid.csv"
+        if merge_existing:
+            try:
+                prev_inv = pd.read_csv(invalid_path)
+                invalid_df = (
+                    pd.concat([prev_inv, invalid_df], ignore_index=True)
+                    .drop_duplicates(subset=["scheme_id"], keep="last")
+                    .sort_values(["category", "fund_name"])
+                )
+            except FileNotFoundError:
+                pass
+        invalid_df.to_csv(invalid_path, index=False)
         print(f"\n  Saved {len(invalid_df)} invalid funds -> data/fund_master_invalid.csv")
         print("  Invalid funds (no portfolio holdings):")
         for _, row in invalid_df.iterrows():

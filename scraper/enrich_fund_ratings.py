@@ -189,6 +189,17 @@ def main():
     df = pd.read_csv(master_path)
     active = df[df["status"] == "ACTIVE"].copy()
 
+    if "--missing-only" in sys.argv:
+        need_cols = ["return_1y", "sharpe_ratio"]
+        mask = pd.Series(False, index=active.index)
+        for col in need_cols:
+            if col in active.columns:
+                mask = mask | active[col].isna()
+            else:
+                mask = pd.Series(True, index=active.index)
+        active = active[mask].copy()
+        print(f"Missing-only mode: {len(active)} funds need enrichment")
+
     print(f"Enriching {len(active)} active funds with ratings and returns...\n")
 
     # Build slug from url column  (url = https://...etmoney.com/mutual-funds/{slug}/portfolio-details/{id})
@@ -231,13 +242,17 @@ def main():
         suffixes=("", "_new")
     )
 
-    # If columns already exist from a previous run, overwrite them
+    # Merge new values without wiping existing data for funds not in this run
     for col in ["return_1y","return_3y","return_5y",
                 "consistency_score","category_rank",
                 "sharpe_ratio","alpha","beta","std_dev"]:
-        if f"{col}_new" in df.columns:
-            df[col] = df[f"{col}_new"]
-            df.drop(columns=[f"{col}_new"], inplace=True)
+        new_col = f"{col}_new"
+        if new_col in df.columns:
+            if col in df.columns:
+                df[col] = df[new_col].combine_first(df[col])
+            else:
+                df[col] = df[new_col]
+            df.drop(columns=[new_col], inplace=True)
 
     df.to_csv(master_path, index=False)
 

@@ -225,76 +225,28 @@ def scrape_fund(fund):
         return pd.DataFrame()
 
 
-# -----------------------------------
-# LOAD FUND MASTER
-# -----------------------------------
+def main():
+    funds_df = pd.read_csv("data/fund_master_auto.csv")
+    funds_df = funds_df[funds_df["status"] == "ACTIVE"].reset_index(drop=True)
+    print(f"\nLoaded {len(funds_df)} funds")
 
-funds_df = pd.read_csv(
-    "data/fund_master_auto.csv"
-)
-# Only scrape funds with valid portfolio links
-funds_df = funds_df[funds_df["status"] == "ACTIVE"].reset_index(drop=True)
+    master_df = pd.DataFrame()
+    for _, fund in funds_df.iterrows():
+        fund_data = scrape_fund(fund)
+        if len(fund_data) > 0:
+            master_df = pd.concat([master_df, fund_data], ignore_index=True)
+        time.sleep(2)
 
-print(f"\nLoaded {len(funds_df)} funds")
+    if len(master_df) == 0:
+        print("\nNo data extracted")
+        return
 
-# -----------------------------------
-# SCRAPE ALL FUNDS
-# -----------------------------------
+    master_df = master_df.drop_duplicates().reset_index(drop=True)
+    output_path = "data/processed/master_holdings.csv"
+    master_df.to_csv(output_path, index=False)
+    print(f"\nTOTAL ROWS: {len(master_df)}")
+    print(f"Saved master holdings to: {output_path}")
 
-master_df = pd.DataFrame()
 
-for _, fund in funds_df.iterrows():
-
-    fund_data = scrape_fund(fund)
-
-    if len(fund_data) > 0:
-
-        master_df = pd.concat(
-            [master_df, fund_data],
-            ignore_index=True
-        )
-
-    # Small delay
-    time.sleep(2)
-
-# -----------------------------------
-# FINAL CLEANUP
-# -----------------------------------
-
-if len(master_df) == 0:
-    print("\nNo data extracted")
-    exit()
-
-master_df = master_df.drop_duplicates()
-
-master_df = master_df.reset_index(drop=True)
-
-# -----------------------------------
-# DISPLAY SAMPLE
-# -----------------------------------
-
-print("\n===================================")
-print("FINAL DATASET SAMPLE")
-print("===================================\n")
-
-print(master_df.head(20))
-
-print("\n===================================")
-print(f"TOTAL ROWS: {len(master_df)}")
-print("===================================\n")
-
-# -----------------------------------
-# SAVE MASTER CSV
-# -----------------------------------
-
-output_path = (
-    "data/processed/master_holdings.csv"
-)
-
-master_df.to_csv(
-    output_path,
-    index=False
-)
-
-print(f"Saved master holdings to:")
-print(output_path)
+if __name__ == "__main__":
+    main()
