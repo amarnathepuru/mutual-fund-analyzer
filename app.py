@@ -13,59 +13,97 @@ try:
 except ImportError:
     _st_searchbox = None
 
-# ── PORTFOLIO PERSISTENCE ─────────────────────────────────────────────────────
+import importlib
 
-_PORTFOLIO_SAVE_PATH = _pathlib.Path("saved_portfolio.json")
+import fundlens_auth as _fl_auth
+
+importlib.reload(_fl_auth)  # always use latest auth module (avoids stale Streamlit import cache)
+
+_FL_RETURN_PAGES = frozenset({
+    "home",
+    "analyse_funds",
+    "category",
+    "explorer",
+    "compare",
+    "stock_explorer",
+    "overlap_drilldown",
+    "portfolio_upload",
+    "portfolio_xray",
+    "account",
+})
+_FL_PORTFOLIO_GATED_PAGES = frozenset({"portfolio_upload", "portfolio_xray"})
+
+
+def _fl_portfolio_gated_pages() -> frozenset[str]:
+    fn = getattr(_fl_auth, "portfolio_gated_pages", None)
+    return fn() if fn is not None else _FL_PORTFOLIO_GATED_PAGES
+
+
+def _fl_is_return_page(page: str) -> bool:
+    return page in _FL_RETURN_PAGES
+
+
+def _fl_set_return_page(page: str) -> None:
+    if page in _FL_RETURN_PAGES:
+        st.session_state["_auth_return_page"] = page
+
+
+def _fl_get_return_page() -> str:
+    p = st.session_state.get("_auth_return_page", "home")
+    return p if p in _FL_RETURN_PAGES else "home"
+
+
+def _fl_open_auth_modal(*, view: str | None = None) -> None:
+    st.session_state.fl_auth_modal_open = True
+    if view in ("login", "register", "forgot"):
+        st.session_state.auth_view = view
+
+
+def _fl_close_auth_modal() -> None:
+    st.session_state.fl_auth_modal_open = False
+
+
+def _fl_auth_modal_is_open() -> bool:
+    return bool(st.session_state.get("fl_auth_modal_open"))
+
+
+def _fl_page_under_auth_modal(page: str) -> str:
+    """Public page to render behind the auth overlay (never a gated route body)."""
+    if page in _fl_portfolio_gated_pages() or page == "auth":
+        return "home"
+    return page if page in _FL_RETURN_PAGES else "home"
+
+
+def _fl_has_auth_tokens() -> bool:
+    fn = getattr(_fl_auth, "has_auth_tokens", None)
+    if fn is not None:
+        return bool(fn())
+    return bool(
+        st.session_state.get("fl_auth_access_token")
+        and st.session_state.get("fl_auth_refresh_token")
+    )
+
+
+def _fl_init_auth() -> None:
+    fn = getattr(_fl_auth, "init_auth", None) or getattr(_fl_auth, "restore_session", None)
+    if fn is not None:
+        fn()
+
+
+# ── PORTFOLIO PERSISTENCE (per-user via Supabase when signed in) ──────────────
 
 def _save_portfolio(df: pd.DataFrame) -> None:
-    """Save portfolio DataFrame to a local JSON file for cross-session persistence."""
-    try:
-        _PORTFOLIO_SAVE_PATH.write_text(
-            _json.dumps({
-                "saved_at": pd.Timestamp.now().isoformat(timespec="seconds"),
-                "records":  df.to_dict(orient="records"),
-                "columns":  list(df.columns),
-            }, ensure_ascii=False, default=str),
-            encoding="utf-8",
-        )
-    except Exception:
-        pass  # best-effort — never crash the app
+    """Save portfolio to the signed-in user's Supabase row."""
+    _fl_auth.save_portfolio(df)
 
 def _load_saved_portfolio() -> "pd.DataFrame | None":
-    """Load portfolio from the local JSON file; returns None if not found."""
-    try:
-        if not _PORTFOLIO_SAVE_PATH.exists():
-            return None
-        data   = _json.loads(_PORTFOLIO_SAVE_PATH.read_text(encoding="utf-8"))
-        df     = pd.DataFrame(data["records"], columns=data.get("columns"))
-        return df if not df.empty else None
-    except Exception:
-        return None
+    return _fl_auth.load_portfolio()
 
 def _saved_portfolio_meta() -> "tuple[int,str] | None":
-    """Return (n_funds, human_date) for the saved portfolio, or None."""
-    try:
-        if not _PORTFOLIO_SAVE_PATH.exists():
-            return None
-        data     = _json.loads(_PORTFOLIO_SAVE_PATH.read_text(encoding="utf-8"))
-        n        = len(data.get("records", []))
-        saved_at = data.get("saved_at", "")
-        ts       = pd.to_datetime(saved_at)
-        try:
-            human = ts.strftime("%-d %b %Y, %-I:%M %p")
-        except ValueError:
-            human = ts.strftime("%d %b %Y, %I:%M %p")
-        return n, human
-    except Exception:
-        return None
+    return _fl_auth.portfolio_meta()
 
 def _saved_portfolio_funds() -> list:
-    """Return list of fund names from the saved portfolio."""
-    df = _load_saved_portfolio()
-    if df is None or df.empty:
-        return []
-    fund_col = next((c for c in df.columns if "fund" in c.lower()), None)
-    return df[fund_col].dropna().tolist() if fund_col else []
+    return _fl_auth.portfolio_fund_names()
 
 def _prefill_manual_entry_state(df: pd.DataFrame) -> None:
     """Pre-populate Streamlit session-state keys for the manual entry widgets."""
@@ -85,7 +123,7 @@ def _prefill_manual_entry_state(df: pd.DataFrame) -> None:
         st.session_state[f"m_units_{safe}"] = float(units) if pd.notna(units) else 0.0
 
 def _clear_manual_entry_state() -> None:
-    """Remove all manual-entry widget keys from session state."""
+    """Remove manual-entry widget keys from session state."""
     for key in list(st.session_state.keys()):
         if key in ("manual_fund_select", "portfolio_entry_mode") or \
            key.startswith("m_amt_") or key.startswith("m_units_"):
@@ -1795,29 +1833,44 @@ button[data-testid="baseButton-primary"]:hover{{background:{a}!important;opacity
 [data-testid="stMetricDelta"]{{color:{bd}!important;}}
 /* Alerts */
 [data-testid="stAlert"]{{background:{al}!important;border-color:{a}!important;color:{hd}!important;}}
-/* Navbar — built with st.columns so theme picker is a native selectbox (single-click) */
-.block-container>[data-testid="stVerticalBlock"]>[data-testid="stHorizontalBlock"]:first-child{{
+/* Navbar — built with st.columns (not auth card row) */
+.block-container:not(:has(.fl-auth-modal-anchor))>[data-testid="stVerticalBlock"]>[data-testid="stHorizontalBlock"]:first-child{{
   background:{nb}!important;border-bottom:1px solid {bdr}!important;
   padding:0 1rem!important;position:sticky!important;top:0!important;
   z-index:999!important;box-shadow:0 1px 4px rgba(0,0,0,.06)!important;
   min-height:58px!important;align-items:center!important;
   gap:0!important;margin:0!important;}}
-.block-container>[data-testid="stVerticalBlock"]>[data-testid="stHorizontalBlock"]:first-child>[data-testid="stColumn"]{{
+.block-container:not(:has(.fl-auth-modal-anchor))>[data-testid="stVerticalBlock"]>[data-testid="stHorizontalBlock"]:first-child>[data-testid="stColumn"]{{
   display:flex!important;align-items:center!important;
   padding:.4rem .6rem!important;min-height:58px!important;}}
-.fl-theme-picker{{position:relative;display:inline-block;}}
-.fl-theme-picker summary{{
+.fl-user-menu{{position:relative;display:inline-block;}}
+.fl-user-menu summary{{
   display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
   border:1px solid {bdr};border-radius:20px;font-size:0.72rem;font-weight:500;
   color:{bd};background:transparent;cursor:pointer;list-style:none;
   user-select:none;white-space:nowrap;}}
-.fl-theme-picker summary::-webkit-details-marker{{display:none;}}
-.fl-theme-picker[open] summary{{border-color:{a};color:{a};}}
-.fl-theme-picker summary:hover{{background:{bdr};border-color:{a};color:{a};}}
+.fl-user-menu summary::-webkit-details-marker{{display:none;}}
+.fl-user-menu[open] summary{{border-color:{a};color:{a};}}
+.fl-user-menu summary:hover{{background:{bdr};border-color:{a};color:{a};}}
+.fl-nav-util{{display:flex;align-items:center;justify-content:flex-end;height:100%;}}
+.fl-user-link{{display:block;padding:6px 8px;border-radius:7px;text-decoration:none;font-size:0.75rem;color:{bd};margin-bottom:1px;}}
+.fl-user-link:hover{{background:{al};color:{a};}}
+.fl-bc-row .stButton>button{{
+  background:transparent!important;border:none!important;box-shadow:none!important;
+  color:{a}!important;font-size:.76rem!important;font-weight:500!important;padding:0!important;}}
+.fl-bc-row .stButton>button:hover{{opacity:1!important;text-decoration:underline!important;}}
 .fl-theme-dropdown{{
   position:absolute;right:0;top:calc(100% + 6px);background:{cd};
-  border:1px solid {bdr};border-radius:10px;padding:8px 6px;min-width:168px;
+  border:1px solid {bdr};border-radius:10px;padding:8px 6px;min-width:220px;
   z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.10);}}
+.fl-menu-header{{padding:6px 8px 8px;}}
+.fl-menu-name{{font-size:0.82rem;font-weight:700;color:{hd};line-height:1.3;}}
+.fl-menu-email{{font-size:0.72rem;color:{sb};margin-top:3px;line-height:1.35;
+  word-break:break-word;}}
+.fl-menu-divider{{height:1px;background:{bdr};margin:6px 4px;}}
+.fl-menu-section-label{{font-size:0.6rem;font-weight:700;color:{sb};text-transform:uppercase;
+  letter-spacing:0.6px;padding:4px 8px 8px;}}
+.fl-menu-actions{{padding:2px 0;}}
 .fl-logo{{font-size:1.05rem;font-weight:800;color:{a};text-decoration:none!important;
   letter-spacing:-.02em;display:flex;align-items:center;gap:.4rem;}}
 .fl-nav-links{{display:flex;height:100%;align-items:center;gap:.05rem;}}
@@ -1921,39 +1974,155 @@ button[data-testid="baseButton-primary"]:hover{{background:{a}!important;opacity
 </style>""", unsafe_allow_html=True)
 
 
-def _fl_render_navbar(t, t_name, active_page):
-    links_html = ""
-    for key, label in [("home", "Home"), ("analyse_funds", "Analyse funds"), ("portfolio_upload", "Analyse your portfolio")]:
-        active_cls = " active" if key == active_page else ""
-        links_html += f'<a href="?nav={key}&theme={t_name}" target="_self" class="fl-nav-link{active_cls}">{label}</a>'
+_FL_AUTH_SNAPSHOT_KEYS = (
+    "fl_auth_access_token",
+    "fl_auth_refresh_token",
+    "fl_auth_uid",
+    "fl_auth_user_id",
+    "fl_auth_email",
+    "fl_auth_last_active",
+    "_fl_auth_backup",
+)
 
+
+def _fl_snapshot_auth() -> dict[str, object]:
+    return {k: st.session_state[k] for k in _FL_AUTH_SNAPSHOT_KEYS if k in st.session_state}
+
+
+def _fl_restore_auth(snap: dict[str, object]) -> None:
+    for k, v in snap.items():
+        st.session_state[k] = v
+
+
+def _fl_persist_auth() -> None:
+    """Save auth to session backup + disk (compatible with older fundlens_auth modules)."""
+    fn = getattr(_fl_auth, "persist_auth_snapshot", None) or getattr(
+        _fl_auth, "_backup_auth_state", None
+    )
+    if fn is not None:
+        fn()
+
+
+def _fl_clear_nav_query_params() -> None:
+    """Remove nav-related keys only (keeps Streamlit session; avoids full query clear)."""
+    for key in ("nav", "reset", "tab", "stock", "cats", "from"):
+        if key in st.query_params:
+            del st.query_params[key]
+
+
+def _fl_go(page: str, *, theme: str | None = None, reset: bool = False) -> None:
+    """In-app navigation without URL reload (keeps auth session)."""
+    if page in _fl_portfolio_gated_pages() and not _fl_auth.is_logged_in():
+        _fl_set_return_page(page)
+        st.session_state["_auth_gated_for"] = page
+        _fl_open_auth_modal()
+        st.rerun()
+        return
+    if reset:
+        if page == "category":
+            st.session_state.selected_categories = []
+            st.session_state.selected_funds = []
+        elif page == "overlap_drilldown":
+            st.session_state.overlap_matrix_selected_funds = []
+            for _k in (
+                "overlap_matrix_category",
+                "overlap_matrix_return_period",
+                "overlap_matrix_min_return",
+                "overlap_matrix_conn_bucket",
+                "overlap_matrix_view_mode",
+            ):
+                st.session_state.pop(_k, None)
+        elif page == "stock_explorer":
+            st.session_state.preselected_stock = ""
+    st.session_state.page = page
+    if theme and theme in _FL_THEMES:
+        st.session_state.fl_theme = theme
+    _fl_persist_auth()
+    st.rerun()
+
+
+def _fl_go_auth(from_page: str | None = None) -> None:
+    """Open auth overlay; return to the page the user came from after sign-in."""
+    origin = from_page or st.session_state.get("page", "home")
+    if origin != "auth":
+        _fl_set_return_page(origin)
+    _fl_open_auth_modal()
+    st.rerun()
+
+
+def _fl_render_navbar(t, t_name, active_page):
     _current_page = st.session_state.get("page", active_page)
+    links_html = ""
+    for key, label in [
+        ("home", "Home"),
+        ("analyse_funds", "Analyse funds"),
+        ("portfolio_upload", "Analyse your portfolio"),
+    ]:
+        active_cls = " active" if key == active_page else ""
+        links_html += (
+            f'<a href="?nav={key}&theme={t_name}" target="_self" '
+            f'class="fl-nav-link{active_cls}">{label}</a>'
+        )
+
     _theme_rows = ""
     for tk, (tc, tname) in _FL_THEME_META.items():
-        _is_sel   = tk == t_name
-        _row_bg   = t["al"] if _is_sel else "transparent"
+        _is_sel = tk == t_name
+        _row_bg = t["al"] if _is_sel else "transparent"
         _name_col = t["a"] if _is_sel else t["body"]
-        _name_wt  = "700" if _is_sel else "500"
-        _check    = f'<span style="margin-left:auto;color:{t["a"]};font-size:0.65rem;">✓</span>' if _is_sel else ""
+        _name_wt = "700" if _is_sel else "500"
+        _check = (
+            f'<span style="margin-left:auto;color:{t["a"]};font-size:0.65rem;">✓</span>'
+            if _is_sel
+            else ""
+        )
         _theme_rows += (
-            f'<a href="?nav={_current_page}&theme={tk}" target="_self" '
+            f'<a href="?theme={tk}" target="_self" '
             f'style="display:flex;align-items:center;gap:9px;padding:6px 8px;'
             f'border-radius:7px;text-decoration:none;background:{_row_bg};margin-bottom:1px;">'
             f'<div style="width:12px;height:12px;border-radius:50%;background:{tc};'
             f'box-shadow:0 0 0 1.5px {t["bdr"]};flex-shrink:0;"></div>'
             f'<span style="font-size:0.75rem;font-weight:{_name_wt};color:{_name_col};">{tname}</span>'
-            f'{_check}</a>'
+            f"{_check}</a>"
         )
-    _theme_picker = (
-        f'<details class="fl-theme-picker">'
-        f'<summary>🎨&nbsp;&nbsp;Theme</summary>'
+
+    if _fl_auth.is_logged_in():
+        _uid = _fl_auth.current_user_id() or "user"
+        _em = _fl_auth.current_email() or ""
+        _summary = f"👤&nbsp;&nbsp;Hi, {_uid}"
+        _hdr_name = f"Hi, {_uid}"
+        _hdr_email = f'<div class="fl-menu-email">{_em}</div>' if _em else ""
+        _actions = (
+            f'<a href="?nav=account&theme={t_name}" target="_self" class="fl-user-link">Account</a>'
+        )
+        _logout_block = (
+            f'<div class="fl-menu-divider"></div>'
+            f'<div class="fl-menu-actions">'
+            f'<a href="?logout=1&theme={t_name}" target="_self" class="fl-user-link">Log out</a>'
+            f"</div>"
+        )
+    else:
+        _summary = "👤&nbsp;&nbsp;Hi, Guest!"
+        _hdr_name = "Hi, Guest!"
+        _hdr_email = ""
+        _actions = (
+            f'<div class="fl-menu-actions">'
+            f'<a href="?nav=auth&from={_current_page}&theme={t_name}" target="_self" class="fl-user-link">'
+            f"Sign in or Register</a></div>"
+        )
+        _logout_block = ""
+
+    _user_menu = (
+        f'<div class="fl-nav-util">'
+        f'<details class="fl-user-menu"><summary>{_summary}</summary>'
         f'<div class="fl-theme-dropdown">'
-        f'<div style="font-size:0.6rem;font-weight:700;color:{t["sub"]};text-transform:uppercase;'
-        f'letter-spacing:0.6px;padding:2px 8px 8px;">Select theme</div>'
-        f'{_theme_rows}</div></details>'
+        f'<div class="fl-menu-header"><div class="fl-menu-name">{_hdr_name}</div>{_hdr_email}</div>'
+        f'<div class="fl-menu-divider"></div>{_actions}'
+        f'<div class="fl-menu-divider"></div>'
+        f'<div class="fl-menu-section-label">Theme</div>{_theme_rows}{_logout_block}'
+        f"</div></details></div>"
     )
 
-    col_l, col_c, col_r = st.columns([2, 10, 1.2])
+    col_l, col_c, col_r = st.columns([2, 8, 2.2])
     with col_l:
         st.markdown(
             f'<a href="?nav=home&theme={t_name}" target="_self" class="fl-logo">📊 FundLens</a>',
@@ -1965,7 +2134,7 @@ def _fl_render_navbar(t, t_name, active_page):
             unsafe_allow_html=True,
         )
     with col_r:
-        st.markdown(_theme_picker, unsafe_allow_html=True)
+        st.markdown(_user_menu, unsafe_allow_html=True)
 
 
 def _fl_render_breadcrumb(crumbs):
@@ -1974,7 +2143,9 @@ def _fl_render_breadcrumb(crumbs):
     parts = []
     for i, (label, nav_key) in enumerate(crumbs):
         if nav_key:
-            parts.append(f'<a href="?nav={nav_key}&theme={_t}" target="_self" class="fl-bc-link">{label}</a>')
+            parts.append(
+                f'<a href="?nav={nav_key}&theme={_t}" target="_self" class="fl-bc-link">{label}</a>'
+            )
         else:
             parts.append(f'<span class="fl-bc-cur">{label}</span>')
         if i < len(crumbs) - 1:
@@ -2014,38 +2185,38 @@ def page_home():
     feats_html = "".join(
         f'<a href="?nav={nav}&theme={t_name}{"&reset=1" if reset else ""}" target="_self" class="fl-feat-link">'
         f'<div class="fl-feat-ico" style="background:{ib};">{ic}</div>'
-        f'<div><div class="fl-feat-t">{ti}</div><div class="fl-feat-d">{de}</div></div>'
-        f'</a>'
+        f"<div><div class=\"fl-feat-t\">{ti}</div><div class=\"fl-feat-d\">{de}</div></div>"
+        f"</a>"
         for nav, ib, ic, ti, de, reset in _feats
     )
 
     st.markdown(
         f'<div class="fl-body">'
-        f'<div>'
+        f"<div>"
         f'<div class="fl-tag"><span class="fl-tag-dot"></span>Mutual fund transparency</div>'
         f'<div class="fl-h1">Do your funds <em>actually</em> diversify your portfolio?</div>'
-        f'<div class="fl-sub">Most investors hold 4–6 mutual funds thinking they\'re diversified. '
-        f'FundLens checks that assumption — by looking inside every fund and showing you what you '
-        f'really own.</div>'
-        f'{feats_html}'
-        f'</div>'
-        f'<div>'
+        f"<div class=\"fl-sub\">Most investors hold 4–6 mutual funds thinking they're diversified. "
+        f"FundLens checks that assumption — by looking inside every fund and showing you what you "
+        f"really own.</div>"
+        f"{feats_html}"
+        f"</div>"
+        f"<div>"
         f'<div class="fl-ask">'
         f'<div class="fl-ask-hdr">'
         f'<span class="fl-ask-label">Ask FundLens</span>'
         f'<span class="fl-ask-badge">Coming Soon</span>'
-        f'</div>'
+        f"</div>"
         f'<div class="fl-ask-q">"Which large cap funds overlap the least?"</div>'
         f'<div class="fl-ask-q">"Am I diversified with HDFC and Mirae?"</div>'
         f'<div class="fl-ask-q">"Which funds cut Reliance this quarter?"</div>'
         f'<div class="fl-ask-input-area">'
         f'<span class="fl-ask-ico">💬</span>'
         f'<input class="fl-ask-inp" placeholder="Ask anything about funds…" disabled />'
-        f'</div>'
+        f"</div>"
         f'<div class="fl-ask-foot">Conversational analysis — coming soon</div>'
-        f'</div>'
-        f'</div>'
-        f'</div>',
+        f"</div>"
+        f"</div>"
+        f"</div>",
         unsafe_allow_html=True,
     )
     st.markdown(
@@ -2090,7 +2261,7 @@ def page_analyse_funds():
         f'<div class="fl-af-title">{ti}</div>'
         f'<div class="fl-af-desc">{de}</div>'
         f'<div class="fl-af-foot">{ft}</div>'
-        f'</a>'
+        f"</a>"
         for hr, ib, ic, ti, de, ft in _cards
     )
 
@@ -2099,7 +2270,7 @@ def page_analyse_funds():
         f'<div class="fl-pg-h1">Analyse funds</div>'
         f'<div class="fl-pg-sub">Choose what you want to explore</div>'
         f'<div class="fl-af-grid">{cards_html}</div>'
-        f'</div>',
+        f"</div>",
         unsafe_allow_html=True,
     )
     st.markdown(
@@ -4921,6 +5092,370 @@ def page_compare():
         """, unsafe_allow_html=True)
 
 
+# ── PAGE: AUTH (Sign in / Register) ───────────────────────────────────────────
+
+def _fl_auth_accent_dark(accent: str, factor: float = 0.58) -> str:
+    h = accent.lstrip("#")
+    if len(h) != 6:
+        return accent
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"#{max(0, int(r * factor)):02x}{max(0, int(g * factor)):02x}{max(0, int(b * factor)):02x}"
+
+
+def _fl_inject_auth_page_css(t: dict, t_name: str) -> None:
+    a = t["a"]
+    bg, bdr, hd, bd, sb, cd, al = (
+        t["bg"], t["bdr"], t["head"], t["body"], t["sub"], t["card"], t["al"],
+    )
+    _scrim = "rgba(0,0,0,0.62)" if t_name == "dark_premium" else "rgba(15,15,20,0.48)"
+    _shadow = (
+        "0 24px 64px rgba(0,0,0,0.55)" if t_name == "dark_premium"
+        else "0 16px 56px rgba(0,0,0,0.14)"
+    )
+    _M = "[data-testid='stHorizontalBlock']:has(.fl-auth-left-panel)"
+    st.markdown(
+        f"""<style>
+html:has(.fl-auth-modal-anchor) {{ overflow: hidden !important;}}
+html:has(.fl-auth-modal-anchor)::before {{
+  content: ""; position: fixed; inset: 0; background: {_scrim}; z-index: 9998;}}
+[data-testid="stMarkdownContainer"]:has(.fl-auth-modal-anchor) {{
+  display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important;}}
+[data-testid="stVerticalBlock"]:has(.fl-auth-modal-anchor) {{
+  height: 0 !important; min-height: 0 !important; overflow: visible !important;
+  margin: 0 !important; padding: 0 !important; border: none !important;}}
+/* Center the auth card on the viewport */
+{_M} {{
+  position: fixed !important; top: 50% !important; left: 50% !important;
+  transform: translate(-50%, -50%) !important; z-index: 10001 !important;
+  width: min(920px, 94vw) !important; max-height: min(88vh, 640px) !important;
+  margin: 0 !important; background: {cd} !important;
+  border: 1px solid {bdr} !important; border-radius: 18px !important;
+  overflow: hidden !important; box-shadow: {_shadow} !important;
+  align-items: stretch !important; gap: 0 !important;}}
+{_M} > [data-testid="stColumn"]:first-child {{
+  background: transparent !important; padding: 0 !important;}}
+{_M} > [data-testid="stColumn"]:last-child {{
+  background: {cd} !important; padding: 2rem 2.25rem 2.25rem !important;
+  position: relative !important;}}
+{_M} > [data-testid="stColumn"]:last-child > div,
+{_M} > [data-testid="stColumn"]:last-child [data-testid="stVerticalBlock"] {{
+  background: {cd} !important;}}
+{_M} > [data-testid="stColumn"]:last-child [data-testid="stMarkdownContainer"]:has(.fl-auth-close-btn) {{
+  position: absolute !important; top: 0.85rem !important; right: 0.85rem !important;
+  z-index: 6 !important; margin: 0 !important; padding: 0 !important; width: auto !important;}}
+{_M} .fl-auth-close-btn {{
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  width: 2rem !important; height: 2rem !important; border-radius: 9999px !important;
+  background: {bg} !important; border: 1px solid {bdr} !important; color: {sb} !important;
+  text-decoration: none !important; cursor: pointer !important;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s !important;}}
+{_M} .fl-auth-close-btn:hover {{
+  background: {al} !important; color: {hd} !important; border-color: {a} !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;}}
+{_M} .fl-auth-close-btn:focus-visible {{
+  outline: 2px solid {a} !important; outline-offset: 2px !important;}}
+/* Left panel — accent gradient + white text */
+{_M} .fl-auth-left-panel,
+{_M} .fl-auth-left-panel h2,
+{_M} .fl-auth-left-panel p,
+{_M} .fl-auth-left-panel span,
+{_M} .fl-auth-left-panel .fl-auth-feat-title {{
+  color: #ffffff !important;}}
+{_M} .fl-auth-left-panel .fl-auth-feat-sub,
+{_M} .fl-auth-left-panel .fl-auth-privacy {{
+  color: rgba(255,255,255,0.82) !important;}}
+/* Right panel — theme tokens */
+{_M} .fl-auth-heading {{
+  color: {hd} !important; font-size: 1.55rem !important; font-weight: 800 !important;
+  margin: 0 0 0.25rem 0 !important; line-height: 1.2 !important;
+  padding-right: 2.25rem !important;}}
+{_M} .fl-auth-sub {{
+  color: {bd} !important; font-size: 0.88rem !important; margin: 0 0 1.35rem 0 !important;}}
+{_M} .fl-auth-footer {{ color: {bd} !important;}}
+{_M} .fl-auth-footer a {{ color: {a} !important;}}
+{_M} .fl-auth-footer a:hover {{ text-decoration: underline !important;}}
+{_M} .fl-auth-pw-row span {{ color: {hd} !important;}}
+{_M} [data-testid="stWidgetLabel"] p,
+{_M} .stTextInput label,
+{_M} .stTextInput label p {{
+  color: {hd} !important; font-weight: 600 !important; font-size: 0.82rem !important;}}
+{_M} .stTextInput input,
+{_M} .stTextInput > div > div {{
+  background: {bg} !important; color: {hd} !important;
+  border-radius: 8px !important; border: 1.5px solid {bdr} !important;}}
+{_M} .stTextInput input {{
+  padding: 0.65rem 0.85rem !important; font-size: 0.88rem !important;}}
+{_M} .stTextInput input::placeholder {{ color: {sb} !important;}}
+{_M} .stCaption, {_M} .stCaption p {{ color: {sb} !important;}}
+{_M} .stButton > button[kind="primary"] {{
+  width: 100% !important; border-radius: 8px !important; font-weight: 700 !important;
+  padding: 0.7rem 1rem !important; margin-top: 0.35rem !important;
+  background: {a} !important; border-color: {a} !important; color: #ffffff !important;}}
+{_M} [data-testid="stAlert"] {{
+  background: {al} !important; border-color: {bdr} !important; color: {hd} !important;
+  margin-top: 0.75rem !important;}}
+{_M} .fl-auth-pw-row {{ margin-bottom: 0 !important;}}
+{_M} .fl-auth-pw-row ~ div [data-testid="stTextInput"],
+{_M} [data-testid="stMarkdownContainer"]:has(.fl-auth-pw-row) {{
+  margin-top: 0 !important; padding-top: 0 !important; margin-bottom: 0 !important;}}
+</style>""",
+        unsafe_allow_html=True,
+    )
+
+
+def _fl_auth_left_panel_html(t: dict) -> str:
+    a = t["a"]
+    a_dark = _fl_auth_accent_dark(a, 0.52)
+    return f"""
+<div class="fl-auth-left-panel" style="background:linear-gradient(165deg,{a} 0%,{a_dark} 100%);
+  min-height:100%;height:100%;padding:2.25rem 2rem;display:flex;flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:2rem;">
+    <div style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.18);
+      display:flex;align-items:center;justify-content:center;font-size:1rem;">📊</div>
+    <span style="font-size:1.05rem;font-weight:800;letter-spacing:-0.02em;">FundLens</span>
+  </div>
+  <h2 style="font-size:1.65rem;font-weight:800;line-height:1.2;margin:0 0 0.65rem;">
+    Your portfolio, clearly seen</h2>
+  <p style="font-size:0.84rem;line-height:1.65;margin:0 0 1.75rem;">
+    Sign in to access your saved portfolio analysis and fund comparisons.</p>
+  <div style="flex:1;display:flex;flex-direction:column;gap:1.1rem;">
+    <div style="display:flex;gap:0.85rem;align-items:flex-start;">
+      <div style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.14);
+        display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.95rem;">📊</div>
+      <div>
+        <div class="fl-auth-feat-title" style="font-size:0.86rem;font-weight:700;margin-bottom:0.15rem;">
+          Analyse funds</div>
+        <div class="fl-auth-feat-sub" style="font-size:0.76rem;line-height:1.5;">
+          Compare expense ratios, returns and risk ratings</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.85rem;align-items:flex-start;">
+      <div style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.14);
+        display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.95rem;">💼</div>
+      <div>
+        <div class="fl-auth-feat-title" style="font-size:0.86rem;font-weight:700;margin-bottom:0.15rem;">
+          Track your portfolio</div>
+        <div class="fl-auth-feat-sub" style="font-size:0.76rem;line-height:1.5;">
+          See all your holdings in one dashboard</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.85rem;align-items:flex-start;">
+      <div style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.14);
+        display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.95rem;">🔒</div>
+      <div>
+        <div class="fl-auth-feat-title" style="font-size:0.86rem;font-weight:700;margin-bottom:0.15rem;">
+          Private by default</div>
+        <div class="fl-auth-feat-sub" style="font-size:0.76rem;line-height:1.5;">
+          Your data is saved only to your account</div>
+      </div>
+    </div>
+  </div>
+  <div class="fl-auth-privacy" style="display:flex;align-items:center;gap:0.45rem;margin-top:1.5rem;
+    font-size:0.72rem;">
+    <span style="width:7px;height:7px;border-radius:50%;background:#4ADE80;display:inline-block;"></span>
+    No data is shared with third parties
+  </div>
+</div>"""
+
+
+def _fl_auth_apply_view_from_url() -> None:
+    av = st.query_params.get("auth_view", "")
+    if av in ("login", "register", "forgot"):
+        st.session_state.auth_view = av
+        _fl_open_auth_modal(view=av)
+        if "auth_view" in st.query_params:
+            del st.query_params["auth_view"]
+
+
+def _fl_auth_view_link(view: str, label: str, t: dict, *, bold: bool = False) -> str:
+    wt = "700" if bold else "600"
+    fs = "0.85rem" if bold else "0.8rem"
+    return (
+        f'<a href="?auth_view={view}" target="_self" style="color:{t["a"]};font-weight:{wt};'
+        f"font-size:{fs};text-decoration:none;white-space:nowrap;\">{label}</a>"
+    )
+
+
+def _fl_auth_close_link(t: dict) -> str:
+    return (
+        '<a href="?auth_close=1" target="_self" class="fl-auth-close-btn" '
+        'aria-label="Close" title="Close">'
+        '<svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">'
+        '<path d="M3.5 3.5L11.5 11.5M11.5 3.5L3.5 11.5" stroke="currentColor" '
+        'stroke-width="1.6" stroke-linecap="round"/></svg></a>'
+    )
+
+
+def _fl_render_auth_modal() -> None:
+    if not _fl_auth_modal_is_open():
+        return
+
+    t_name, t = _fl_get_theme()
+    _fl_inject_auth_page_css(t, t_name)
+
+    _return = _fl_get_return_page()
+    _gated_for = st.session_state.get("_auth_gated_for")
+    if _gated_for in _FL_PORTFOLIO_GATED_PAGES:
+        _return = _gated_for
+
+    if not _fl_auth.supabase_configured():
+        st.error(
+            "Supabase is not configured. Add `SUPABASE_URL` and `SUPABASE_ANON_KEY` "
+            "to Streamlit secrets (see `supabase/README.md`)."
+        )
+        return
+
+    if _fl_auth.is_logged_in():
+        _fl_close_auth_modal()
+        st.session_state.page = _return
+        st.session_state.pop("_auth_gated_for", None)
+        st.rerun()
+
+    _fl_auth_apply_view_from_url()
+    if st.query_params.get("tab") == "register":
+        st.session_state.auth_view = "register"
+    elif "auth_view" not in st.session_state:
+        st.session_state.auth_view = "login"
+
+    st.markdown(
+        '<div class="fl-auth-sentinel fl-auth-modal-anchor" aria-hidden="true"></div>',
+        unsafe_allow_html=True,
+    )
+    _col_l, _col_r = st.columns([2.1, 2.9], gap="small")
+    with _col_l:
+        st.markdown(_fl_auth_left_panel_html(t), unsafe_allow_html=True)
+    with _col_r:
+        _view = st.session_state.auth_view
+        _hd, _bd = t["head"], t["body"]
+        st.markdown(_fl_auth_close_link(t), unsafe_allow_html=True)
+
+        if _view == "login":
+            st.markdown(
+                '<div class="fl-auth-heading">Welcome back</div>'
+                '<div class="fl-auth-sub">Sign in to your FundLens account</div>',
+                unsafe_allow_html=True,
+            )
+            _lu = st.text_input("User ID", key="auth_login_uid", placeholder="At least 8 characters")
+            st.markdown(
+                f'<div class="fl-auth-pw-row" style="display:flex;justify-content:space-between;'
+                f'align-items:center;margin:0.65rem 0 0.35rem;">'
+                f'<span style="font-weight:600;font-size:0.82rem;color:{_hd};">Password</span>'
+                f'{_fl_auth_view_link("forgot", "Forgot password?", t)}'
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+            _lp = st.text_input(
+                "Password",
+                type="password",
+                key="auth_login_pw",
+                label_visibility="collapsed",
+                placeholder="••••••••",
+            )
+            if st.button("Sign in", type="primary", key="auth_login_btn", use_container_width=True):
+                try:
+                    ok, msg = _fl_auth.login(_lu, _lp)
+                except Exception as ex:
+                    ok, msg = False, str(ex)
+                if ok:
+                    _fl_close_auth_modal()
+                    st.session_state.page = _return
+                    st.session_state.pop("_auth_gated_for", None)
+                    st.rerun()
+                else:
+                    st.error(msg)
+            st.markdown(
+                f'<p class="fl-auth-footer" style="text-align:center;margin-top:1.35rem;font-size:0.85rem;">'
+                f"Don't have an account? {_fl_auth_view_link('register', 'Register free', t, bold=True)}"
+                f"</p>",
+                unsafe_allow_html=True,
+            )
+
+        elif _view == "register":
+            st.markdown(
+                '<div class="fl-auth-heading">Create your account</div>'
+                '<div class="fl-auth-sub">Register free — your portfolio stays private to you</div>',
+                unsafe_allow_html=True,
+            )
+            st.caption("User ID is not case-sensitive. Email is used for password reset and future OTP.")
+            _ru = st.text_input("User ID", key="auth_reg_uid", placeholder="e.g. amar_investor")
+            _re = st.text_input("Email", key="auth_reg_email", placeholder="you@example.com")
+            _rp = st.text_input("Password", type="password", key="auth_reg_pw")
+            _rp2 = st.text_input("Confirm password", type="password", key="auth_reg_pw2")
+            if st.button("Create account", type="primary", key="auth_reg_btn", use_container_width=True):
+                if _rp != _rp2:
+                    st.error("Passwords do not match.")
+                else:
+                    try:
+                        ok, msg = _fl_auth.register(_ru, _re, _rp)
+                    except Exception as ex:
+                        ok, msg = False, str(ex)
+                    if ok:
+                        st.success("Account created. Redirecting…")
+                        _fl_close_auth_modal()
+                        st.session_state.page = _return
+                        st.session_state.pop("_auth_gated_for", None)
+                        st.rerun()
+                    else:
+                        st.error(msg)
+            st.markdown(
+                f'<p class="fl-auth-footer" style="text-align:center;margin-top:1.35rem;font-size:0.85rem;">'
+                f"Already have an account? {_fl_auth_view_link('login', 'Sign in', t, bold=True)}"
+                f"</p>",
+                unsafe_allow_html=True,
+            )
+
+        else:
+            st.markdown(
+                '<div class="fl-auth-heading">Reset your password</div>'
+                '<div class="fl-auth-sub">Enter your User ID — we send a reset link to the '
+                "email on your account.</div>",
+                unsafe_allow_html=True,
+            )
+            _fu = st.text_input("User ID", key="auth_forgot_uid")
+            if st.button("Send reset email", type="primary", key="auth_forgot_btn", use_container_width=True):
+                ok, msg = _fl_auth.reset_password_by_user_id(_fu)
+                if ok:
+                    st.success(msg)
+                else:
+                    st.error(msg)
+            st.markdown(
+                f'<p class="fl-auth-footer" style="text-align:center;margin-top:1.35rem;font-size:0.85rem;">'
+                f"Remember your password? {_fl_auth_view_link('login', 'Sign in', t, bold=True)}"
+                f"</p>",
+                unsafe_allow_html=True,
+            )
+
+
+def page_account():
+    t_name, t = _fl_get_theme()
+    _fl_inject_css(t, t_name)
+    _fl_render_navbar(t, t_name, "portfolio_upload")
+    _fl_render_breadcrumb([("Home", "home"), ("Account", None)])
+
+    if not _fl_auth.is_logged_in():
+        _fl_set_return_page("account")
+        _fl_open_auth_modal()
+        return
+
+    st.markdown(
+        f'<h2 style="font-size:1.6rem;font-weight:800;color:{t["head"]};">Account</h2>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(f"**User ID:** `{_fl_auth.current_user_id()}`")
+    st.markdown(f"**Email:** {_fl_auth.current_email() or '—'}")
+
+    if st.button("Send password reset email", key="acct_reset_pw"):
+        ok, msg = _fl_auth.request_password_reset_for_current_user()
+        if ok:
+            st.success(msg)
+        else:
+            st.error(msg)
+
+    if st.button("← Back to portfolio", key="acct_back_pf"):
+        st.session_state.page = "portfolio_upload"
+        st.rerun()
+
+
 # ── PAGE: PORTFOLIO UPLOAD ────────────────────────────────────────────────────
 
 def page_portfolio_upload():
@@ -5007,7 +5542,7 @@ def page_portfolio_upload():
 
         st.markdown(
             f"<div style='text-align:center;font-size:0.7rem;color:{t['sub']};margin-top:1.25rem;'>"
-            "💾 Saved locally on this device · Never uploaded to any server</div>",
+            "💾 Saved to your account · Only you can access this portfolio</div>",
             unsafe_allow_html=True,
         )
         return  # ← stop here; don't render the entry form
@@ -10154,7 +10689,37 @@ def page_overlap_drilldown():
 
 
 def main():
-    # Handle ?nav= query params from sidebar links and internal navigation
+    _nav_from_url = st.query_params.get("nav", "")
+    _theme_from_url = st.query_params.get("theme", "")
+    _needs_auth_snap = bool(
+        _nav_from_url or _theme_from_url or st.query_params.get("auth_view")
+        or st.query_params.get("auth_close")
+    )
+    _auth_snap = _fl_snapshot_auth() if _needs_auth_snap else {}
+
+    # Theme-only URL change (user menu) — no page navigation
+    if _theme_from_url and _theme_from_url in _FL_THEMES and not _nav_from_url:
+        st.session_state.fl_theme = _theme_from_url
+        _fl_restore_auth(_auth_snap)
+        if "theme" in st.query_params:
+            del st.query_params["theme"]
+
+    if st.query_params.get("logout") == "1":
+        _fl_auth.logout()
+        st.session_state.page = "home"
+        st.query_params.clear()
+        st.rerun()
+
+    if st.query_params.get("auth_close") == "1":
+        _fl_close_auth_modal()
+        if "auth_close" in st.query_params:
+            del st.query_params["auth_close"]
+
+    _auth_view_qp = st.query_params.get("auth_view", "")
+    if _auth_view_qp in ("login", "register", "forgot"):
+        _fl_open_auth_modal(view=_auth_view_qp)
+
+    # Handle ?nav= before init_auth so portfolio-page token refresh cannot clear auth first
     nav_target = st.query_params.get("nav", "")
     if nav_target:
         # Persist theme across page navigations
@@ -10185,9 +10750,31 @@ def main():
                     st.session_state.pop(_k, None)
             elif nav_target == "stock_explorer":
                 st.session_state.preselected_stock = ""
+        _fl_restore_auth(_auth_snap)
+        if nav_target in _fl_portfolio_gated_pages() and not _fl_has_auth_tokens():
+            _fl_set_return_page(nav_target)
+            st.session_state["_auth_gated_for"] = nav_target
+            _fl_open_auth_modal()
+            _prev = st.session_state.get("page", "home")
+            nav_target = _fl_page_under_auth_modal(_prev)
+        elif nav_target == "auth":
+            _from = st.query_params.get("from", "")
+            _prev = st.session_state.get("page", "home")
+            if _fl_is_return_page(_from):
+                _fl_set_return_page(_from)
+            elif _prev not in ("auth",):
+                _fl_set_return_page(_prev)
+            _tab = st.query_params.get("tab", "")
+            if _tab == "register":
+                st.session_state.auth_view = "register"
+            _fl_open_auth_modal()
+            nav_target = _from if _fl_is_return_page(_from) else _fl_page_under_auth_modal(_prev)
         st.session_state.page = nav_target
-        st.query_params.clear()
-        st.rerun()
+        _fl_restore_auth(_auth_snap)
+        _fl_persist_auth()
+        _fl_clear_nav_query_params()
+
+    _fl_init_auth()
 
     if "cache_cleared" not in st.session_state:
         st.cache_data.clear()
@@ -10209,9 +10796,30 @@ def main():
     _fl_pages = {
         "home", "analyse_funds", "category", "explorer", "compare",
         "stock_explorer", "overlap_drilldown", "portfolio_upload", "portfolio_xray",
+        "auth", "account",
     }
     if st.session_state.get("page", "home") not in _fl_pages:
         render_sidebar()
+
+    _page = st.session_state.get("page", "home")
+    if _page in _fl_portfolio_gated_pages() and not _fl_has_auth_tokens():
+        _fl_set_return_page(_page)
+        st.session_state["_auth_gated_for"] = _page
+        _fl_open_auth_modal()
+        _page = _fl_page_under_auth_modal(_page)
+        st.session_state.page = _page
+    elif _page == "auth":
+        if _fl_auth.is_logged_in():
+            _dest = st.session_state.get("_auth_gated_for") or _fl_get_return_page()
+            if _dest not in _FL_RETURN_PAGES or _dest == "auth":
+                _dest = "portfolio_upload"
+            st.session_state.page = _dest
+            st.session_state.pop("_auth_gated_for", None)
+            _page = _dest
+        else:
+            _fl_open_auth_modal()
+            _page = _fl_page_under_auth_modal(_fl_get_return_page())
+            st.session_state.page = _page
 
     routes = {
         "home":               page_home,
@@ -10223,8 +10831,12 @@ def main():
         "portfolio_xray":     page_portfolio_xray,
         "stock_explorer":     page_stock_explorer,
         "overlap_drilldown":  page_overlap_drilldown,
+        "account":            page_account,
     }
-    routes.get(st.session_state.page, page_home)()
+    routes.get(_page, page_home)()
+
+    if _fl_auth_modal_is_open():
+        _fl_render_auth_modal()
 
 
 main()
