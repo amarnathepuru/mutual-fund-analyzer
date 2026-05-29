@@ -30,6 +30,12 @@ Thumbs.db
 # Raw scrape artifacts
 data/raw/
 
+# NAV time series (Batch 2+; large local DB)
+data/nav/
+
+# Dated master backups (local only)
+data/backups/
+
 # Secrets / credentials
 *.env
 secrets.json

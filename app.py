@@ -1,3 +1,4 @@
+import html as _html
 import re
 import streamlit as st
 import pandas as pd
@@ -27,11 +28,20 @@ _FL_RETURN_PAGES = frozenset({
     "compare",
     "stock_explorer",
     "overlap_drilldown",
+    "portfolio_hub",
     "portfolio_upload",
     "portfolio_xray",
+    "portfolio_track",
     "account",
 })
-_FL_PORTFOLIO_GATED_PAGES = frozenset({"portfolio_upload", "portfolio_xray"})
+_FL_PORTFOLIO_GATED_PAGES = frozenset({
+    "portfolio_hub",
+    "portfolio_upload",
+    "portfolio_xray",
+    "portfolio_track",
+})
+_FL_PORTFOLIO_SECTION_PAGES = _FL_PORTFOLIO_GATED_PAGES
+_FL_PORTFOLIO_NAV_KEY = "portfolio_hub"
 
 
 def _fl_portfolio_gated_pages() -> frozenset[str]:
@@ -105,29 +115,1703 @@ def _saved_portfolio_meta() -> "tuple[int,str] | None":
 def _saved_portfolio_funds() -> list:
     return _fl_auth.portfolio_fund_names()
 
-def _prefill_manual_entry_state(df: pd.DataFrame) -> None:
-    """Pre-populate Streamlit session-state keys for the manual entry widgets."""
-    fund_col = next((c for c in df.columns if "fund" in c.lower()), None)
-    if fund_col is None:
+
+def _manage_selected_member_ids() -> list[str]:
+    return _fl_auth.get_selected_family_member_ids()
+
+
+def _manage_family_member_id() -> str | None:
+    """Family member id when exactly one account is selected (else None)."""
+    ids = _manage_selected_member_ids()
+    if len(ids) == 1:
+        return ids[0]
+    return None
+
+
+def _manage_selection_label() -> str:
+    ids = _manage_selected_member_ids()
+    members = _fl_auth.list_family_members()
+    if len(ids) == 1:
+        return _fl_auth.family_member_name(ids[0])
+    if len(ids) == len(members):
+        return "All accounts"
+    names = [_fl_auth.family_member_name(mid) for mid in ids]
+    if len(names) <= 3:
+        return " · ".join(names)
+    return f"{len(ids)} accounts"
+
+
+def _account_labels_for_member_ids(member_ids: list[str]) -> set[str]:
+    return {
+        _fl_auth.family_member_name(mid).strip().lower()
+        for mid in member_ids
+        if mid
+    }
+
+
+def _load_all_saved_holdings() -> pd.DataFrame:
+    """All holdings from every saved family portfolio (ignores account filter)."""
+    frames: list[pd.DataFrame] = []
+    for mid in _fl_auth.member_ids_with_portfolio():
+        df = _fl_auth.load_portfolio(mid)
+        if df is None or df.empty:
+            continue
+        frames.append(_normalize_portfolio_df(df, ""))
+    if not frames:
+        return pd.DataFrame(columns=_PORTFOLIO_HOLDING_COLS)
+    return pd.concat(frames, ignore_index=True)
+
+
+def _filter_holdings_by_selected_accounts(df: pd.DataFrame) -> pd.DataFrame:
+    """Keep rows whose account_name matches a selected family account."""
+    selected = _manage_selected_member_ids()
+    if df.empty or not selected:
+        return df
+    all_members = _fl_auth.list_family_members()
+    if len(selected) >= len(all_members):
+        return df
+    labels = _account_labels_for_member_ids(selected)
+    mask = df["account_name"].astype(str).str.strip().str.lower().isin(labels)
+    return df.loc[mask].copy()
+
+
+def _manage_load_portfolio() -> "pd.DataFrame | None":
+    """Holdings for the current account selection (filtered by account_name)."""
+    if not _manage_selected_member_ids():
+        return None
+    all_df = _load_all_saved_holdings()
+    if all_df.empty:
+        return None
+    filtered = _filter_holdings_by_selected_accounts(all_df)
+    return filtered if not filtered.empty else None
+
+
+def _manage_portfolio_meta() -> "tuple[int, str] | None":
+    df = _manage_load_portfolio()
+    if df is None or df.empty:
+        return None
+    latest = ""
+    for mid in _fl_auth.member_ids_with_portfolio():
+        meta = _fl_auth.portfolio_meta(mid)
+        if meta and meta[1] and meta[1] > latest:
+            latest = meta[1]
+    return len(df), latest
+
+
+def _manage_save_portfolio(df: pd.DataFrame) -> None:
+    """
+    Save holdings to the portfolio record for each account_name's family member.
+    Only updates accounts present in the editor — other family portfolios are left unchanged.
+    """
+    norm = _normalize_portfolio_df(df, "")
+    if norm.empty:
         return
-    funds = df[fund_col].dropna().tolist()
-    st.session_state["manual_fund_select"] = funds
-    for _, row in df.iterrows():
-        fname = str(row.get(fund_col, ""))
+    members = _fl_auth.list_family_members()
+    name_to_id = {
+        str(m["account_name"]).strip().lower(): str(m["id"]) for m in members
+    }
+    id_to_name = {mid: name for name, mid in name_to_id.items()}
+    fallback = _manage_family_member_id() or next(iter(name_to_id.values()), None)
+    edited_accounts = set(norm["account_name"].astype(str).str.strip().str.lower())
+
+    buckets: dict[str, list[dict]] = {}
+    for _, row in norm.iterrows():
+        acct = str(row.get("account_name", "")).strip().lower()
+        target = name_to_id.get(acct) or fallback
+        if target:
+            buckets.setdefault(target, []).append(row.to_dict())
+
+    for mid in name_to_id.values():
+        acct_key = id_to_name.get(mid, "")
+        if acct_key not in edited_accounts:
+            continue
+        rows = buckets.get(mid, [])
+        _fl_auth.save_portfolio(
+            pd.DataFrame(rows, columns=_PORTFOLIO_HOLDING_COLS)
+            if rows
+            else pd.DataFrame(columns=_PORTFOLIO_HOLDING_COLS),
+            mid,
+        )
+
+
+def _manage_portfolio_funds() -> list:
+    df = _manage_load_portfolio()
+    if df is None or df.empty:
+        return []
+    return df["fund_name"].dropna().astype(str).tolist()
+
+
+_PORTFOLIO_HOLDING_COLS = [
+    "fund_name",
+    "account_name",
+    "plan_type",
+    "invested_amount",
+    "invested_date",
+    "units",
+    "nav",
+]
+
+_PLAN_TYPE_OPTIONS = ("Direct", "Regular")
+
+
+def _fund_safe_key(name: str) -> str:
+    return re.sub(r"[^\w]", "_", str(name))[:80]
+
+
+_HOLDING_ROW_SEP = "\x1e"
+
+
+def _holding_row_id(fund_name: str, account_name: str) -> str:
+    """Unique editor row key (same fund in two accounts = two rows)."""
+    return f"{str(fund_name).strip()}{_HOLDING_ROW_SEP}{str(account_name).strip()}"
+
+
+def _split_holding_row_id(row_id: str) -> tuple[str, str]:
+    if _HOLDING_ROW_SEP in str(row_id):
+        fund, acct = str(row_id).split(_HOLDING_ROW_SEP, 1)
+        return fund.strip(), acct.strip()
+    return str(row_id).strip(), ""
+
+
+def _row_widget_key(row_id: str) -> str:
+    return _fund_safe_key(str(row_id).replace(_HOLDING_ROW_SEP, "_"))
+
+
+def _portfolio_account_names_for_ids(member_ids: list[str] | None = None) -> list[str]:
+    """Account labels for the current (or given) family-member selection."""
+    ids = member_ids if member_ids is not None else _manage_selected_member_ids()
+    if ids:
+        return [_fl_auth.family_member_name(mid) for mid in ids]
+    return _portfolio_account_names(strict=True)
+
+
+def _portfolio_fund_list() -> list[str]:
+    """Fund names in the manual holdings editor (not a widget key)."""
+    if "fl_portfolio_fund_list" in st.session_state:
+        return list(st.session_state.fl_portfolio_fund_list)
+    if "manual_fund_select" in st.session_state:
+        st.session_state.fl_portfolio_fund_list = list(st.session_state.manual_fund_select)
+        return list(st.session_state.fl_portfolio_fund_list)
+    return []
+
+
+def _set_portfolio_fund_list(funds: list[str]) -> None:
+    st.session_state.fl_portfolio_fund_list = list(funds)
+
+
+def _editor_rows_dict() -> dict[str, dict]:
+    if "fl_editor_rows" not in st.session_state:
+        st.session_state.fl_editor_rows = {}
+    return st.session_state.fl_editor_rows
+
+
+def _default_editor_row(member_label: str, acct_opts: list[str]) -> dict:
+    from datetime import date as _date
+
+    acct = (
+        member_label
+        if member_label in acct_opts
+        else (acct_opts[0] if acct_opts else member_label or "Account")
+    )
+    return {
+        "fund_name": "",
+        "account_name": acct,
+        "plan_type": "Direct",
+        "invested_amount": 0.0,
+        "units": 0.0,
+        "nav": 0.0,
+        "invested_date": _date.today().isoformat(),
+    }
+
+
+def _init_editor_rows_from_df(df: pd.DataFrame, default_account: str) -> list[str]:
+    """Build fl_editor_rows from a holdings dataframe; returns row id list."""
+    norm = _normalize_portfolio_df(df, default_account)
+    rows: dict[str, dict] = {}
+    row_ids: list[str] = []
+    for _, row in norm.iterrows():
+        fname = str(row.get("fund_name", "")).strip()
         if not fname:
             continue
-        safe  = fname.replace(" ", "_").replace("/", "_")
-        amt   = row.get("invested_amount", 0)
-        units = row.get("units", 0.0)
-        st.session_state[f"m_amt_{safe}"]   = int(float(amt))   if pd.notna(amt)   else 0
-        st.session_state[f"m_units_{safe}"] = float(units) if pd.notna(units) else 0.0
+        acct = str(row.get("account_name", "") or default_account).strip()
+        rid = _holding_row_id(fname, acct)
+        row_ids.append(rid)
+        _d = _parse_invested_date(row.get("invested_date"))
+        rows[rid] = {
+            "fund_name": fname,
+            "account_name": acct,
+            "plan_type": _normalize_plan_type(row.get("plan_type")),
+            "invested_amount": float(row.get("invested_amount", 0) or 0),
+            "units": float(row.get("units", 0) or 0),
+            "nav": float(row.get("nav", 0) or 0),
+            "invested_date": _d.isoformat() if _d else "",
+        }
+    st.session_state.fl_editor_rows = rows
+    return row_ids
+
+
+def _snapshot_editor_rows_from_widgets(
+    funds: list[str], default_account: str = ""
+) -> None:
+    """Persist widget values into fl_editor_rows (call only after row widgets render)."""
+    if not funds:
+        return
+    rows = dict(_editor_rows_dict())
+    for row_id in funds:
+        safe = _row_widget_key(row_id)
+        prev = rows.get(row_id, {})
+        fund_name, acct_name = _split_holding_row_id(row_id)
+        acct_key = f"m_acct_{safe}"
+        plan_key = f"m_plan_{safe}"
+        amt_key = f"m_amt_{safe}"
+        date_key = f"m_date_{safe}"
+        units_key = f"m_units_{safe}"
+        nav_key = f"m_nav_{safe}"
+        _d = st.session_state.get(date_key) if date_key in st.session_state else None
+        rows[row_id] = {
+            "fund_name": fund_name or prev.get("fund_name", ""),
+            "account_name": (
+                st.session_state[acct_key]
+                if acct_key in st.session_state
+                else (prev.get("account_name") or acct_name or default_account or "")
+            ),
+            "plan_type": _normalize_plan_type(
+                st.session_state[plan_key]
+                if plan_key in st.session_state
+                else prev.get("plan_type", "Direct")
+            ),
+            "invested_amount": float(
+                st.session_state[amt_key]
+                if amt_key in st.session_state
+                else prev.get("invested_amount", 0)
+            ),
+            "invested_date": (
+                _d.isoformat() if _d else prev.get("invested_date", "")
+            ),
+            "units": float(
+                st.session_state[units_key]
+                if units_key in st.session_state
+                else prev.get("units", 0)
+            ),
+            "nav": float(
+                st.session_state[nav_key]
+                if nav_key in st.session_state
+                else prev.get("nav", 0)
+            ),
+        }
+    st.session_state.fl_editor_rows = rows
+
+
+def _hydrate_editor_widgets_from_rows(
+    funds: list[str], *, only_missing: bool = False
+) -> None:
+    """Push fl_editor_rows into widget session keys (used on load / new fund only)."""
+    rows = _editor_rows_dict()
+    for row_id in funds:
+        row = rows.get(row_id)
+        if not row:
+            continue
+        safe = _row_widget_key(row_id)
+        if not only_missing or f"m_plan_{safe}" not in st.session_state:
+            st.session_state[f"m_plan_{safe}"] = _normalize_plan_type(row.get("plan_type"))
+        if not only_missing or f"m_acct_{safe}" not in st.session_state:
+            st.session_state[f"m_acct_{safe}"] = str(row.get("account_name", ""))
+        if not only_missing or f"m_amt_{safe}" not in st.session_state:
+            st.session_state[f"m_amt_{safe}"] = int(float(row.get("invested_amount", 0) or 0))
+        if not only_missing or f"m_units_{safe}" not in st.session_state:
+            st.session_state[f"m_units_{safe}"] = float(row.get("units", 0) or 0)
+        if not only_missing or f"m_nav_{safe}" not in st.session_state:
+            st.session_state[f"m_nav_{safe}"] = float(row.get("nav", 0) or 0)
+        if not only_missing or f"m_date_{safe}" not in st.session_state:
+            _d = _parse_invested_date(row.get("invested_date"))
+            if _d:
+                st.session_state[f"m_date_{safe}"] = _d
+
+
+def _portfolio_template_csv() -> str:
+    """CSV with an instruction row (line 1) + header + sample rows."""
+    return (
+        "# INSTRUCTIONS — delete this row before upload. "
+        "REQUIRED: fund_name, account_name (must match your FundLens family accounts), "
+        "plan_type (Regular or Direct), invested_amount, invested_date. "
+        "OPTIONAL: units, nav — leave blank to auto-fetch; if you enter units or nav, "
+        "auto-fetch is skipped for that row.\n"
+        "fund_name,account_name,plan_type,invested_amount,invested_date,units,nav\n"
+        "HDFC Large Cap Fund,Amar_Indiv,Direct,50000,2024-01-15,,\n"
+        "ICICI Prudential Bluechip Fund,Amar_Indiv,Regular,30000,2024-06-01,,\n"
+    )
+
+
+def _portfolio_template_df() -> pd.DataFrame:
+    return pd.read_csv(pd.io.common.StringIO(_portfolio_template_csv()), comment="#")
+
+
+def _normalize_plan_type(val) -> str:
+    s = str(val or "").strip().lower()
+    if s in ("direct", "dir", "d"):
+        return "Direct"
+    if s in ("regular", "reg", "r"):
+        return "Regular"
+    return "Direct"
+
+
+def _clean_portfolio_upload_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop instruction rows and blank fund names from uploaded sheets."""
+    if df.empty:
+        return df
+    fund_col = next((c for c in df.columns if "fund" in str(c).lower()), None)
+    if not fund_col:
+        return df
+    labels = df[fund_col].astype(str).str.strip()
+    keep = (
+        labels.str.len().gt(0)
+        & ~labels.str.lower().isin(("fund_name", "nan", "none"))
+        & ~labels.str.match(r"^(#|instruction)", case=False, na=False)
+    )
+    return df.loc[keep].copy()
+
+
+def _apply_nav_units_autofill(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    When units and nav are both empty, NAV/units will be fetched (Track pipeline).
+    If the user provided either field, auto-fetch is not applied for that row.
+    """
+    out = df.copy()
+    for idx in out.index:
+        units = float(out.at[idx, "units"] or 0)
+        nav = float(out.at[idx, "nav"] or 0)
+        if units > 0 or nav > 0:
+            continue
+        # TODO: historical NAV lookup by fund_name + plan_type + invested_date
+    return out
+
+
+def _validate_portfolio_df(df: pd.DataFrame) -> list[str]:
+    errors: list[str] = []
+    for i, row in df.iterrows():
+        n = i + 1
+        if not str(row.get("fund_name", "")).strip():
+            errors.append(f"Row {n}: fund_name is required.")
+        if not str(row.get("account_name", "")).strip():
+            errors.append(f"Row {n}: account_name is required.")
+        if not str(row.get("invested_date", "")).strip():
+            errors.append(f"Row {n}: invested_date is required.")
+        amt = float(row.get("invested_amount") or 0)
+        if amt <= 0:
+            errors.append(f"Row {n}: invested_amount must be greater than 0.")
+        pt = str(row.get("plan_type", "")).strip().lower()
+        if pt and pt not in ("direct", "regular", "dir", "reg", "d", "r"):
+            errors.append(f"Row {n}: plan_type must be Regular or Direct.")
+    return errors
+
+
+def _parse_invested_date(val) -> "date | None":
+    from datetime import date as _date
+
+    if val is None or val == "":
+        return None
+    if isinstance(val, _date):
+        return val
+    try:
+        if pd.isna(val):
+            return None
+    except (TypeError, ValueError):
+        pass
+    try:
+        return pd.to_datetime(val).date()
+    except Exception:
+        return None
+
+
+def _normalize_portfolio_df(df: pd.DataFrame, default_account: str = "") -> pd.DataFrame:
+    if df is None or df.empty:
+        return pd.DataFrame(columns=_PORTFOLIO_HOLDING_COLS)
+    out = df.copy()
+    fund_col = next((c for c in out.columns if "fund" in str(c).lower()), None)
+    if fund_col and fund_col != "fund_name":
+        out = out.rename(columns={fund_col: "fund_name"})
+    _alias_map = {
+        "investment_date": "invested_date",
+        "date": "invested_date",
+        "invest_date": "invested_date",
+        "nav_per_unit": "nav",
+        "purchase_nav": "nav",
+        "nav_at_purchase": "nav",
+        "amount": "invested_amount",
+        "investment": "invested_amount",
+        "folio": "account_name",
+        "account": "account_name",
+        "investment_amount": "invested_amount",
+        "plan": "plan_type",
+        "fund_type": "plan_type",
+        "type": "plan_type",
+    }
+    for col in list(out.columns):
+        key = str(col).lower().strip()
+        if key in _alias_map and _alias_map[key] not in out.columns:
+            out = out.rename(columns={col: _alias_map[key]})
+    for col in _PORTFOLIO_HOLDING_COLS:
+        if col not in out.columns:
+            if col == "fund_name":
+                out[col] = ""
+            elif col == "account_name":
+                out[col] = default_account or ""
+            elif col in ("invested_date", "plan_type"):
+                out[col] = ""
+            else:
+                out[col] = 0
+    if default_account:
+        out["account_name"] = (
+            out["account_name"]
+            .astype(str)
+            .replace({"": pd.NA, "nan": pd.NA, "None": pd.NA})
+            .fillna(default_account)
+        )
+    out["fund_name"] = out["fund_name"].astype(str).str.strip()
+    out["plan_type"] = out["plan_type"].apply(_normalize_plan_type)
+    out["invested_date"] = out["invested_date"].apply(
+        lambda x: _parse_invested_date(x).isoformat() if _parse_invested_date(x) else ""
+    )
+    for ncol in ("invested_amount", "units", "nav"):
+        out[ncol] = pd.to_numeric(out[ncol], errors="coerce").fillna(0)
+    return out[_PORTFOLIO_HOLDING_COLS]
+
+
+def _prefill_manual_entry_state(
+    df: pd.DataFrame, default_account: str = "", *, force: bool = False
+) -> None:
+    """Pre-populate editor row state and widget keys from a holdings dataframe."""
+    norm = _normalize_portfolio_df(df, default_account)
+    if norm.empty:
+        return
+    if force or not _portfolio_fund_list() or not _editor_rows_dict():
+        funds = _init_editor_rows_from_df(norm, default_account)
+        _set_portfolio_fund_list(funds)
+    funds = _portfolio_fund_list()
+    _hydrate_editor_widgets_from_rows(funds)
+    st.session_state.fl_rebuild_edit_df = True
+
 
 def _clear_manual_entry_state() -> None:
     """Remove manual-entry widget keys from session state."""
+    st.session_state.pop("portfolio_staged_df", None)
+    st.session_state.pop("fl_csv_accounts_confirmed", None)
+    st.session_state.pop("fl_editor_remove_fund", None)
+    st.session_state.pop("fl_pending_add_fund", None)
+    st.session_state.pop("fl_pending_add_row", None)
+    st.session_state.pop("fl_add_fund_acct", None)
+    st.session_state.pop("fl_editor_load_holdings", None)
+    st.session_state.pop("fl_show_add_fund_panel", None)
+    st.session_state.pop("fl_editing_funds", None)
+    st.session_state.pop("fl_portfolio_fund_list", None)
+    st.session_state.pop("fl_editor_rows", None)
+    st.session_state.pop("manual_fund_select", None)
+    st.session_state.pop("fl_single_acct_editor_df", None)
+    st.session_state.pop("fl_rebuild_edit_df", None)
     for key in list(st.session_state.keys()):
-        if key in ("manual_fund_select", "portfolio_entry_mode") or \
-           key.startswith("m_amt_") or key.startswith("m_units_"):
+        if key in ("portfolio_entry_mode", "fl_add_fund_pick") or key.startswith(
+            (
+                "m_amt_",
+                "m_units_",
+                "m_nav_",
+                "m_acct_",
+                "m_date_",
+                "m_plan_",
+                "m_del_",
+                "fix_acct__",
+            )
+        ):
             del st.session_state[key]
+
+
+def _rerun_app() -> None:
+    """Rerun the full app (not just a fragment)."""
+    try:
+        st.rerun(scope="app")
+    except TypeError:
+        st.rerun()
+
+
+def _cancel_portfolio_edit() -> None:
+    """Discard unsaved editor changes and return to the portfolio view."""
+    _clear_manual_entry_state()
+    st.session_state.portfolio_page_mode = "view"
+    st.session_state.pop("_portfolio_edit_type", None)
+    st.session_state.pop("portfolio_staged_df", None)
+    _sv = _manage_load_portfolio()
+    if _sv is not None:
+        st.session_state.portfolio_df = _sv
+    _rerun_app()
+
+
+def _portfolio_account_names(*, extra: str = "", strict: bool = False) -> list[str]:
+    """Known family account labels for dropdowns and CSV validation."""
+    names: list[str] = []
+    if _fl_auth.is_logged_in():
+        names = [str(m["account_name"]) for m in _fl_auth.list_family_members()]
+    elif extra:
+        names = [extra]
+    if extra and extra not in names and not strict:
+        names.append(extra)
+    return names or ([extra] if extra else ["Account"])
+
+
+_CSV_ACCT_MAP_PLACEHOLDER = "— Select FundLens account —"
+
+
+def _apply_pending_fund_removal() -> None:
+    """Remove a holding row from the editor — must run before widgets render."""
+    row_id = st.session_state.pop("fl_editor_remove_fund", None)
+    if not row_id:
+        return
+    safe = _row_widget_key(row_id)
+    _set_portfolio_fund_list([r for r in _portfolio_fund_list() if r != row_id])
+    rows = dict(_editor_rows_dict())
+    rows.pop(row_id, None)
+    st.session_state.fl_editor_rows = rows
+    for prefix in ("m_acct_", "m_plan_", "m_amt_", "m_date_", "m_units_", "m_nav_", "m_del_", "m_edit_"):
+        st.session_state.pop(f"{prefix}{safe}", None)
+    _editing = set(st.session_state.get("fl_editing_funds", []))
+    _editing.discard(row_id)
+    st.session_state.fl_editing_funds = list(_editing)
+
+
+def _apply_pending_add_fund(member_label: str, acct_opts: list[str]) -> str | None:
+    """Append one holding row — must run before widgets render. Returns row id added."""
+    row_id = st.session_state.pop("fl_pending_add_row", None)
+    if not row_id:
+        legacy_fund = st.session_state.pop("fl_pending_add_fund", None)
+        if legacy_fund:
+            acct = member_label if member_label in acct_opts else (acct_opts[0] if acct_opts else "")
+            row_id = _holding_row_id(legacy_fund, acct)
+    if not row_id:
+        return None
+    current = _portfolio_fund_list()
+    if row_id not in current:
+        _set_portfolio_fund_list(current + [row_id])
+    rows = dict(_editor_rows_dict())
+    if row_id not in rows:
+        fund_name, acct_name = _split_holding_row_id(row_id)
+        row = _default_editor_row(member_label, acct_opts)
+        row["fund_name"] = fund_name
+        row["account_name"] = acct_name or row["account_name"]
+        rows[row_id] = row
+        st.session_state.fl_editor_rows = rows
+    _editing = set(st.session_state.get("fl_editing_funds", []))
+    _editing.add(row_id)
+    st.session_state.fl_editing_funds = list(_editing)
+    return row_id
+
+
+def _ensure_new_fund_row_defaults(row_id: str, member_label: str, acct_opts: list[str]) -> None:
+    """Default widget state for a row (does not touch existing rows)."""
+    from datetime import date as _date
+
+    safe = _row_widget_key(row_id)
+    fund_name, acct_name = _split_holding_row_id(row_id)
+    if f"m_plan_{safe}" not in st.session_state:
+        st.session_state[f"m_plan_{safe}"] = "Direct"
+    if f"m_acct_{safe}" not in st.session_state:
+        _def_acct = acct_name or (
+            member_label if member_label in acct_opts else (acct_opts[0] if acct_opts else "")
+        )
+        st.session_state[f"m_acct_{safe}"] = _def_acct
+    if f"m_amt_{safe}" not in st.session_state:
+        st.session_state[f"m_amt_{safe}"] = 0
+    if f"m_date_{safe}" not in st.session_state:
+        st.session_state[f"m_date_{safe}"] = _date.today()
+    if f"m_units_{safe}" not in st.session_state:
+        st.session_state[f"m_units_{safe}"] = 0.0
+    if f"m_nav_{safe}" not in st.session_state:
+        st.session_state[f"m_nav_{safe}"] = 0.0
+
+
+def _render_csv_account_setup_gate(t: dict, default_account: str) -> bool:
+    """
+    Step 1 before CSV upload: confirm family account names used in the file.
+    Returns True when the user may proceed to the file uploader.
+    """
+    if st.session_state.get("fl_csv_accounts_confirmed"):
+        return True
+
+    names = _portfolio_account_names(extra=default_account)
+    st.markdown(
+        f'<div style="font-size:0.78rem;font-weight:700;color:{t["sub"]};'
+        f'text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">'
+        f"Step 1 — Set up account names</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"<p style='color:{t['body']};font-size:0.88rem;margin-top:0;'>"
+        "Your CSV <strong>account_name</strong> column must use the names below "
+        "(one row per fund). Fix names in "
+        "<strong>Manage accounts</strong> if needed, then upload.</p>",
+        unsafe_allow_html=True,
+    )
+    chips = "".join(
+        f'<span style="display:inline-block;background:{t["al"]};color:{t["a"]};'
+        f'border:1px solid {t["bdr"]};border-radius:9999px;padding:5px 13px;'
+        f'font-size:0.78rem;font-weight:600;margin:3px 5px 3px 0;">'
+        f"{_html.escape(n)}</span>"
+        for n in names
+    )
+    st.markdown(f'<div style="line-height:2.2;margin:0.75rem 0;">{chips}</div>', unsafe_allow_html=True)
+    if st.button("Continue to CSV upload", type="primary", key="fl_csv_accounts_continue"):
+        st.session_state.fl_csv_accounts_confirmed = True
+        st.rerun()
+    return False
+
+
+def _collect_manual_portfolio_rows(
+    selected_funds: list, default_account: str
+) -> pd.DataFrame:
+    _snapshot_editor_rows_from_widgets(selected_funds, default_account)
+    row_data = _editor_rows_dict()
+    rows = []
+    for row_id in selected_funds:
+        ed = row_data.get(row_id, {})
+        fund_name, acct_name = _split_holding_row_id(row_id)
+        safe = _row_widget_key(row_id)
+        _d = _parse_invested_date(ed.get("invested_date"))
+        if not _d and f"m_date_{safe}" in st.session_state:
+            _d = st.session_state.get(f"m_date_{safe}")
+        rows.append(
+            {
+                "fund_name": ed.get("fund_name") or fund_name,
+                "account_name": (ed.get("account_name") or acct_name or default_account or "").strip(),
+                "plan_type": _normalize_plan_type(ed.get("plan_type")),
+                "invested_amount": ed.get("invested_amount", 0),
+                "invested_date": _d.isoformat() if _d else "",
+                "units": float(ed.get("units", 0.0) or 0),
+                "nav": float(ed.get("nav", 0.0) or 0),
+            }
+        )
+    return _normalize_portfolio_df(pd.DataFrame(rows), default_account)
+
+
+_HOLDINGS_EDIT_DF_COLS = [
+    "fund_name",
+    "plan_type",
+    "invested_amount",
+    "invested_date",
+    "units",
+    "nav",
+]
+
+
+def _holdings_edit_df_empty() -> pd.DataFrame:
+    return pd.DataFrame(columns=_HOLDINGS_EDIT_DF_COLS)
+
+
+def _holdings_edit_df_from_row_ids(row_ids: list[str], member_label: str) -> pd.DataFrame:
+    row_data = _editor_rows_dict()
+    rows: list[dict] = []
+    for rid in row_ids:
+        ed = row_data.get(rid, {})
+        fund, _ = _split_holding_row_id(rid)
+        fname = str(ed.get("fund_name") or fund).strip()
+        if not fname:
+            continue
+        _d = _parse_invested_date(ed.get("invested_date"))
+        rows.append(
+            {
+                "fund_name": fname,
+                "plan_type": _normalize_plan_type(ed.get("plan_type")),
+                "invested_amount": int(float(ed.get("invested_amount", 0) or 0)),
+                "invested_date": _d,
+                "units": float(ed.get("units", 0) or 0),
+                "nav": float(ed.get("nav", 0) or 0),
+            }
+        )
+    return pd.DataFrame(rows, columns=_HOLDINGS_EDIT_DF_COLS) if rows else _holdings_edit_df_empty()
+
+
+def _portfolio_df_from_holdings_edit_df(df: pd.DataFrame, account_name: str) -> pd.DataFrame:
+    if df is None or df.empty:
+        return _normalize_portfolio_df(
+            pd.DataFrame(columns=_PORTFOLIO_HOLDING_COLS), account_name
+        )
+    out = df.copy()
+    out["fund_name"] = out["fund_name"].astype(str).str.strip()
+    out = out[out["fund_name"].str.len() > 0]
+    out["account_name"] = account_name
+    return _normalize_portfolio_df(out, account_name)
+
+
+@st.fragment
+def _render_single_account_holdings_editor(
+    t: dict,
+    member_label: str,
+    all_funds: list,
+    *,
+    save_label: str,
+    save_key: str,
+    subtitle: str,
+    show_cancel: bool,
+) -> None:
+    """Fast single-account editor — one data grid instead of per-field widgets."""
+    from datetime import date as _date
+
+    st.markdown(
+        f'<div style="font-size:0.85rem;font-weight:600;color:{t["head"]};'
+        f'margin-bottom:4px;">{subtitle}</div>',
+        unsafe_allow_html=True,
+    )
+    if st.session_state.pop("fl_rebuild_edit_df", False) or "fl_single_acct_editor_df" not in st.session_state:
+        _row_ids = _portfolio_fund_list()
+        st.session_state.fl_single_acct_editor_df = (
+            _holdings_edit_df_from_row_ids(_row_ids, member_label)
+            if _row_ids
+            else _holdings_edit_df_empty()
+        )
+
+    st.data_editor(
+        st.session_state.get("fl_single_acct_editor_df", _holdings_edit_df_empty()),
+        column_config={
+            "fund_name": st.column_config.TextColumn("Fund", width="large"),
+            "plan_type": st.column_config.SelectboxColumn(
+                "Plan", options=list(_PLAN_TYPE_OPTIONS), required=True
+            ),
+            "invested_amount": st.column_config.NumberColumn(
+                "Invested (₹)", min_value=0, step=1000, format="%d"
+            ),
+            "invested_date": st.column_config.DateColumn("Invested date", required=True),
+            "units": st.column_config.NumberColumn("Units", min_value=0.0, format="%.4f"),
+            "nav": st.column_config.NumberColumn("NAV (₹)", min_value=0.0, format="%.4f"),
+        },
+        num_rows="dynamic",
+        use_container_width=True,
+        hide_index=True,
+        key="fl_single_acct_editor_df",
+    )
+
+    _df = st.session_state.get("fl_single_acct_editor_df", _holdings_edit_df_empty())
+    if not isinstance(_df, pd.DataFrame):
+        _df = _holdings_edit_df_empty()
+    _n_rows = len(_df)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    _tb1, _tb2 = st.columns([1.2, 5])
+    with _tb1:
+        if st.button("➕  Add fund", type="secondary", use_container_width=True, key="fl_btn_add_fund_fast"):
+            st.session_state.fl_show_add_fund_panel = True
+            st.rerun()
+    with _tb2:
+        st.caption(f"{_n_rows} fund(s) for **{member_label}** — edit in the table, then save")
+
+    if st.session_state.get("fl_show_add_fund_panel"):
+        _existing = set(_df["fund_name"].astype(str).str.strip()) if not _df.empty else set()
+        _avail = [f for f in all_funds if f not in _existing]
+        if not _avail:
+            st.warning("All funds from the master list are already in this portfolio.")
+        else:
+            st.selectbox("Choose a fund to add", options=_avail, key="fl_add_fund_pick")
+            _ab1, _ab2 = st.columns(2)
+            with _ab1:
+                if st.button("Add to portfolio", type="primary", key="fl_confirm_add_fund_fast"):
+                    _pick = st.session_state.get("fl_add_fund_pick")
+                    if _pick:
+                        _cur = st.session_state.get(
+                            "fl_single_acct_editor_df", _holdings_edit_df_empty()
+                        )
+                        if not isinstance(_cur, pd.DataFrame):
+                            _cur = _holdings_edit_df_empty()
+                        _new = pd.DataFrame(
+                            [
+                                {
+                                    "fund_name": _pick,
+                                    "plan_type": "Direct",
+                                    "invested_amount": 0,
+                                    "invested_date": _date.today(),
+                                    "units": 0.0,
+                                    "nav": 0.0,
+                                }
+                            ]
+                        )
+                        st.session_state.fl_single_acct_editor_df = pd.concat(
+                            [_cur, _new], ignore_index=True
+                        )
+                        st.session_state.fl_show_add_fund_panel = False
+                        st.rerun()
+            with _ab2:
+                if st.button("Cancel", key="fl_cancel_add_fund_fast"):
+                    st.session_state.fl_show_add_fund_panel = False
+                    st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if show_cancel:
+        _save_col, _cancel_col = st.columns(2)
+    else:
+        _save_col = st.container()
+        _cancel_col = None
+
+    with _save_col:
+        _save_clicked = st.button(
+            save_label, type="primary", use_container_width=True, key=save_key
+        )
+    if _cancel_col is not None:
+        with _cancel_col:
+            if st.button("Cancel", use_container_width=True, key=f"{save_key}_cancel"):
+                _cancel_portfolio_edit()
+                return
+
+    if _save_clicked:
+        _edited = st.session_state.get("fl_single_acct_editor_df", _holdings_edit_df_empty())
+        if not isinstance(_edited, pd.DataFrame):
+            _edited = _holdings_edit_df_empty()
+        _pf = _portfolio_df_from_holdings_edit_df(_edited, member_label)
+        _errs = _validate_portfolio_df(_pf)
+        if _errs:
+            for _e in _errs[:6]:
+                st.error(_e)
+            if len(_errs) > 6:
+                st.error(f"…and {len(_errs) - 6} more issue(s).")
+            return
+        _pf = _apply_nav_units_autofill(_pf)
+        st.session_state.portfolio_df = _pf
+        _manage_save_portfolio(_pf)
+        st.session_state.portfolio_page_mode = "view"
+        st.session_state.pop("_portfolio_edit_type", None)
+        st.session_state.pop("portfolio_staged_df", None)
+        _clear_manual_entry_state()
+        _rerun_app()
+
+
+def _fmt_portfolio_inr(val) -> str:
+    try:
+        v = float(val)
+        if pd.isna(v) or v == 0:
+            return "—"
+        return f"₹{v:,.0f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
+def _fmt_portfolio_num(val, decimals: int = 2) -> str:
+    try:
+        v = float(val)
+        if pd.isna(v) or v == 0:
+            return "—"
+        return f"{v:,.{decimals}f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
+def _portfolio_plan_badge(plan: str, t: dict) -> str:
+    p = (plan or "").strip().lower()
+    if "direct" in p:
+        bg, fg, label = "rgba(16,185,129,0.14)", "#059669", "Direct"
+    elif "regular" in p:
+        bg, fg, label = "rgba(245,158,11,0.16)", "#D97706", "Regular"
+    else:
+        bg, fg, label = t["al"], t["sub"], (plan or "—")
+    return (
+        f'<span style="display:inline-block;background:{bg};color:{fg};'
+        f'border-radius:9999px;padding:3px 10px;font-size:0.68rem;font-weight:700;'
+        f'letter-spacing:0.3px;white-space:nowrap;">{_html.escape(label)}</span>'
+    )
+
+
+def _render_portfolio_holdings_table(
+    df: pd.DataFrame,
+    t: dict,
+    *,
+    member_label: str | None = None,
+    fund_count: int | None = None,
+    saved_at: str | None = None,
+    title_override: str | None = None,
+) -> None:
+    """Styled holdings table for portfolio view mode."""
+    if df is None or df.empty:
+        return
+
+    _norm = _normalize_portfolio_df(df, "")
+    _n = fund_count if fund_count is not None else len(_norm)
+    _total_inv = float(pd.to_numeric(_norm.get("invested_amount"), errors="coerce").fillna(0).sum())
+    _direct_n = int(_norm["plan_type"].astype(str).str.lower().str.contains("direct", na=False).sum())
+    _regular_n = _n - _direct_n
+
+    _hd, _bd, _sb, _cd, _bdr, _a, _al = (
+        t["head"], t["body"], t["sub"], t["card"], t["bdr"], t["a"], t["al"],
+    )
+    _fund_palette = (
+        "#2563EB", "#7C3AED", "#059669", "#D97706", "#DC2626", "#0891B2", "#DB2777",
+    )
+
+    _th = (
+        lambda lbl, align="left": (
+            f'<th style="padding:11px 14px;text-align:{align};font-size:0.68rem;'
+            f'font-weight:700;color:{_sb};text-transform:uppercase;letter-spacing:0.55px;">'
+            f"{lbl}</th>"
+        )
+    )
+    _td = (
+        lambda inner, align="left", extra="": (
+            f'<td style="padding:11px 14px;text-align:{align};vertical-align:middle;{extra}">'
+            f"{inner}</td>"
+        )
+    )
+
+    _rows_html = []
+    for _ri, (_, row) in enumerate(_norm.iterrows()):
+        _fund = str(row.get("fund_name", "") or "")
+        _short = display_name(_fund, 42)
+        _dot = _fund_palette[_ri % len(_fund_palette)]
+        _zebra = _al if _ri % 2 == 0 else "transparent"
+        _fund_cell = (
+            f'<div style="display:flex;align-items:center;gap:10px;min-width:0;">'
+            f'<span style="flex-shrink:0;width:28px;height:28px;border-radius:8px;'
+            f'background:{_dot}18;color:{_dot};font-size:0.72rem;font-weight:800;'
+            f'display:flex;align-items:center;justify-content:center;">{_ri + 1}</span>'
+            f'<div style="min-width:0;">'
+            f'<div style="font-weight:700;font-size:0.82rem;color:{_hd};line-height:1.35;" '
+            f'title="{_html.escape(_fund)}">{_html.escape(_short)}</div>'
+            f'</div></div>'
+        )
+        _acct = _html.escape(str(row.get("account_name", "") or "—"))
+        _plan = _portfolio_plan_badge(str(row.get("plan_type", "")), t)
+        _inv = _fmt_portfolio_inr(row.get("invested_amount"))
+        _date = _html.escape(str(row.get("invested_date", "") or "—"))
+        _units = _fmt_portfolio_num(row.get("units"), 3)
+        _nav = _fmt_portfolio_num(row.get("nav"), 2)
+
+        _muted = f"color:{_sb};font-size:0.8rem;"
+        _amt_style = f"font-weight:700;font-size:0.85rem;color:{_hd};font-variant-numeric:tabular-nums;"
+        _rows_html.append(
+            f'<tr style="background:{_zebra};border-bottom:1px solid {_bdr};">'
+            f"{_td(_fund_cell)}"
+            f"{_td(f'<span style=\"font-size:0.78rem;color:{_bd};\">{_acct}</span>')}"
+            f"{_td(_plan)}"
+            f'{_td(f"<span style=\"{_amt_style}\">{_inv}</span>", "right")}'
+            f'{_td(f"<span style=\"{_muted}\">{_date}</span>", "center")}'
+            f'{_td(f"<span style=\"{_muted}\">{_units}</span>", "right")}'
+            f'{_td(f"<span style=\"{_muted}\">{_nav}</span>", "right")}'
+            f"</tr>"
+        )
+
+    _stats = ""
+    if member_label:
+        _meta = (
+            f'{_n} fund{"s" if _n != 1 else ""} · Last saved {_html.escape(saved_at or "")}'
+            if saved_at
+            else f'{_n} fund{"s" if _n != 1 else ""}'
+        )
+        _stats = (
+            f'<div style="display:flex;flex-wrap:wrap;gap:10px;margin:1rem 0 1.1rem 0;">'
+            f'<div style="flex:1;min-width:140px;background:{_al};border:1px solid {_bdr};'
+            f'border-radius:12px;padding:0.85rem 1rem;">'
+            f'<div style="font-size:0.65rem;font-weight:700;color:{_sb};text-transform:uppercase;'
+            f'letter-spacing:0.5px;margin-bottom:4px;">Total invested</div>'
+            f'<div style="font-size:1.15rem;font-weight:800;color:{_a};">'
+            f"{_fmt_portfolio_inr(_total_inv)}</div></div>"
+            f'<div style="flex:1;min-width:120px;background:{_al};border:1px solid {_bdr};'
+            f'border-radius:12px;padding:0.85rem 1rem;">'
+            f'<div style="font-size:0.65rem;font-weight:700;color:{_sb};text-transform:uppercase;'
+            f'letter-spacing:0.5px;margin-bottom:4px;">Holdings</div>'
+            f'<div style="font-size:1.15rem;font-weight:800;color:{_hd};">{_n}</div></div>'
+            f'<div style="flex:1;min-width:120px;background:{_al};border:1px solid {_bdr};'
+            f'border-radius:12px;padding:0.85rem 1rem;">'
+            f'<div style="font-size:0.65rem;font-weight:700;color:{_sb};text-transform:uppercase;'
+            f'letter-spacing:0.5px;margin-bottom:4px;">Plan mix</div>'
+            f'<div style="font-size:0.9rem;font-weight:700;color:{_hd};">'
+            f'<span style="color:#059669;">{_direct_n} Direct</span>'
+            f'<span style="color:{_sb};font-weight:500;"> · </span>'
+            f'<span style="color:#D97706;">{_regular_n} Regular</span></div></div>'
+            f"</div>"
+        )
+        _title = title_override or f"{_html.escape(member_label or '')}&apos;s portfolio"
+        _header = (
+            f'<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.35rem;">'
+            f'<span style="font-size:1.2rem;">📋</span>'
+            f'<span style="font-size:1.05rem;font-weight:800;color:{_hd};">{_title}</span></div>'
+            f'<div style="font-size:0.75rem;color:{_sb};">{_meta}</div>'
+            f'<div style="height:1px;background:{_bdr};margin:1rem 0 0 0;"></div>'
+        )
+    else:
+        _header = ""
+
+    _foot = (
+        f'<tr style="background:{_al};border-top:2px solid {_bdr};">'
+        f'<td colspan="3" style="padding:12px 14px;font-size:0.78rem;font-weight:700;'
+        f'color:{_sb};text-transform:uppercase;letter-spacing:0.4px;">Portfolio total</td>'
+        f'<td style="padding:12px 14px;text-align:right;font-size:0.95rem;font-weight:800;'
+        f'color:{_a};font-variant-numeric:tabular-nums;">{_fmt_portfolio_inr(_total_inv)}</td>'
+        f'<td colspan="3"></td></tr>'
+    )
+
+    _table = (
+        f'<div style="overflow-x:auto;border-radius:12px;border:1px solid {_bdr};'
+        f'background:{_cd};">'
+        f'<table style="width:100%;border-collapse:collapse;min-width:720px;">'
+        f"<thead><tr style=\"background:{_al};border-bottom:2px solid {_bdr};\">"
+        f"{_th('Fund')}{_th('Account')}{_th('Plan')}"
+        f"{_th('Invested', 'right')}{_th('Date', 'center')}"
+        f"{_th('Units', 'right')}{_th('NAV', 'right')}"
+        f"</tr></thead><tbody>{''.join(_rows_html)}{_foot}</tbody></table></div>"
+    )
+
+    _wrap_open = (
+        f'<div style="background:{_cd};border:1px solid {_bdr};border-radius:16px;'
+        f'padding:1.5rem 1.75rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">'
+        if member_label
+        else ""
+    )
+    _wrap_close = "</div>" if member_label else ""
+
+    st.markdown(
+        f"{_wrap_open}{_header}{_stats}{_table}{_wrap_close}",
+        unsafe_allow_html=True,
+    )
+
+
+def _render_portfolio_holdings_editor(
+    t: dict,
+    member_label: str,
+    all_funds: list,
+    *,
+    save_label: str,
+    save_key: str,
+    subtitle: str,
+    account_options: list[str] | None = None,
+    expand_all_rows: bool = False,
+    show_cancel: bool = False,
+    single_account_edit: bool = False,
+) -> None:
+    """Shared fund row editor (manual entry, edit saved, or post-upload review)."""
+    st.markdown(
+        f'<div style="font-size:0.85rem;font-weight:600;color:{t["head"]};'
+        f'margin-bottom:4px;">{subtitle}</div>',
+        unsafe_allow_html=True,
+    )
+    if single_account_edit and expand_all_rows:
+        _render_single_account_holdings_editor(
+            t,
+            member_label,
+            all_funds,
+            save_label=save_label,
+            save_key=save_key,
+            subtitle=subtitle,
+            show_cancel=show_cancel,
+        )
+        return
+
+    if single_account_edit:
+        account_options = [member_label]
+    _acct_opts = list(account_options or _portfolio_account_names(extra=member_label))
+    _apply_pending_fund_removal()
+    _added_fund = _apply_pending_add_fund(member_label, _acct_opts)
+
+    selected_manual = _portfolio_fund_list()
+
+    if expand_all_rows and selected_manual:
+        st.session_state.fl_editing_funds = list(selected_manual)
+
+    _editing_set = set(st.session_state.get("fl_editing_funds", []))
+
+    if not selected_manual:
+        _tb1, _tb2 = st.columns([1.2, 5])
+        with _tb1:
+            if st.button(
+                "➕  Add fund", type="secondary", use_container_width=True, key="fl_btn_add_fund"
+            ):
+                st.session_state.fl_show_add_fund_panel = True
+                st.rerun()
+        with _tb2:
+            st.caption("Add your first fund below")
+        if st.session_state.get("fl_show_add_fund_panel"):
+            if not all_funds:
+                st.warning("No funds in master list.")
+            else:
+                st.selectbox(
+                    "Choose a fund to add",
+                    options=all_funds,
+                    key="fl_add_fund_pick",
+                    label_visibility="visible",
+                )
+                if len(_acct_opts) > 1 and not single_account_edit:
+                    st.selectbox(
+                        "Account for this holding",
+                        options=_acct_opts,
+                        key="fl_add_fund_acct",
+                    )
+                _ab1, _ab2 = st.columns(2)
+                with _ab1:
+                    if st.button("Add to portfolio", type="primary", key="fl_confirm_add_fund"):
+                        _pick = st.session_state.get("fl_add_fund_pick")
+                        if _pick:
+                            _acct = member_label if single_account_edit else (
+                                st.session_state.get("fl_add_fund_acct")
+                                or (_acct_opts[0] if _acct_opts else member_label)
+                            )
+                            st.session_state.fl_pending_add_row = _holding_row_id(_pick, _acct)
+                            st.session_state.fl_show_add_fund_panel = False
+                            st.rerun()
+                with _ab2:
+                    if st.button("Cancel", key="fl_cancel_add_fund"):
+                        st.session_state.fl_show_add_fund_panel = False
+                        st.rerun()
+        st.info("No funds yet. Click **➕ Add fund** to add your first holding.")
+        return
+
+    # Restore row values Streamlit drops when widgets were not rendered on the prior run.
+    if _editor_rows_dict():
+        _hydrate_editor_widgets_from_rows(selected_manual, only_missing=True)
+    if _added_fund:
+        _ensure_new_fund_row_defaults(_added_fund, member_label, _acct_opts)
+        _hydrate_editor_widgets_from_rows([_added_fund], only_missing=True)
+
+    for _f in selected_manual:
+        _ensure_new_fund_row_defaults(_f, member_label, _acct_opts)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    _ratios = [3.4, 1.05, 1.45, 1.35, 1.35, 1.1, 1.1, 0.55, 0.55]
+    _hc = st.columns(_ratios)
+    _headers = (
+        ("FUND", ""),
+        ("PLAN", "Regular / Direct"),
+        ("ACCOUNT", "your accounts"),
+        ("INVESTED (₹)", "required"),
+        ("INVESTED DATE", "required"),
+        ("UNITS", "optional"),
+        ("NAV (₹)", "optional"),
+        ("", ""),
+        ("", ""),
+    )
+    for _col, (_title, _hint) in zip(_hc, _headers):
+        _hint_html = (
+            f'<div style="font-size:0.62rem;color:{t["sub"]};font-weight:500;">{_hint}</div>'
+            if _hint
+            else ""
+        )
+        _col.markdown(
+            f'<div style="font-size:0.72rem;font-weight:700;color:{t["sub"]};">{_title}</div>'
+            f"{_hint_html}",
+            unsafe_allow_html=True,
+        )
+    st.markdown(
+        f"<div style='height:1px;background:{t['bdr']};margin-bottom:8px;'></div>",
+        unsafe_allow_html=True,
+    )
+
+    for row_id in selected_manual:
+        safe = _row_widget_key(row_id)
+        _fund_name, _row_acct = _split_holding_row_id(row_id)
+        _row_snap = _editor_rows_dict().get(row_id, {})
+        _fund_display = _row_snap.get("fund_name") or _fund_name
+        _row_editing = expand_all_rows or row_id in _editing_set
+        _acct_opts_row = list(_acct_opts)
+        _cur_acct = str(st.session_state.get(f"m_acct_{safe}", "") or "")
+        if _cur_acct and _cur_acct not in _acct_opts_row:
+            _acct_opts_row.append(_cur_acct)
+
+        if not _row_editing:
+            _amt = st.session_state.get(f"m_amt_{safe}", _row_snap.get("invested_amount", 0))
+            _acct = st.session_state.get(
+                f"m_acct_{safe}", _row_snap.get("account_name", _row_acct or member_label)
+            )
+            _plan = st.session_state.get(f"m_plan_{safe}", _row_snap.get("plan_type", "Direct"))
+            _c0, _c1, _c2, _c3 = st.columns([5.5, 0.55, 0.55, 0.3])
+            with _c0:
+                st.markdown(
+                    f'<div style="font-size:0.84rem;color:{t["head"]};padding:8px 0;">'
+                    f"<strong>{display_name(_fund_display, 48)}</strong>"
+                    f'<span style="color:{t["sub"]};font-size:0.75rem;"> · {_html.escape(str(_acct))}'
+                    f" · {_html.escape(str(_plan))} · {_fmt_portfolio_inr(_amt)}</span></div>",
+                    unsafe_allow_html=True,
+                )
+            with _c1:
+                if st.button("✏️", key=f"m_edit_{safe}", help="Edit this fund"):
+                    _snapshot_editor_rows_from_widgets(selected_manual, member_label)
+                    _editing_set.add(row_id)
+                    st.session_state.fl_editing_funds = list(_editing_set)
+                    st.rerun()
+            with _c2:
+                if st.button("🗑", key=f"m_del_{safe}", help="Remove this fund"):
+                    _snapshot_editor_rows_from_widgets(selected_manual, member_label)
+                    st.session_state.fl_editor_remove_fund = row_id
+                    st.rerun()
+            st.markdown(
+                f"<div style='height:1px;background:{t['bdr']};margin:4px 0 10px 0;'></div>",
+                unsafe_allow_html=True,
+            )
+            continue
+
+        c1, c2, c3, c4, c5, c6, c7, c8, c9 = st.columns(_ratios)
+        with c1:
+            st.markdown(
+                f'<div style="font-size:0.84rem;color:{t["head"]};padding-top:8px;'
+                f'line-height:1.35;font-weight:600;">{display_name(_fund_display, 52)}</div>',
+                unsafe_allow_html=True,
+            )
+        with c2:
+            st.selectbox(
+                "plan",
+                options=list(_PLAN_TYPE_OPTIONS),
+                key=f"m_plan_{safe}",
+                label_visibility="collapsed",
+            )
+        with c3:
+            if single_account_edit:
+                st.session_state[f"m_acct_{safe}"] = member_label
+                st.markdown(
+                    f'<div style="font-size:0.78rem;color:{t["sub"]};padding-top:8px;">'
+                    f"{_html.escape(member_label)}</div>",
+                    unsafe_allow_html=True,
+                )
+            else:
+                if f"m_acct_{safe}" not in st.session_state:
+                    _def = member_label if member_label in _acct_opts_row else _acct_opts_row[0]
+                    st.session_state[f"m_acct_{safe}"] = _def
+                st.selectbox(
+                    "acct",
+                    options=_acct_opts_row,
+                    key=f"m_acct_{safe}",
+                    label_visibility="collapsed",
+                )
+        with c4:
+            st.number_input(
+                "amt",
+                min_value=0,
+                step=1000,
+                key=f"m_amt_{safe}",
+                label_visibility="collapsed",
+            )
+        with c5:
+            st.date_input(
+                "date",
+                key=f"m_date_{safe}",
+                label_visibility="collapsed",
+            )
+        with c6:
+            st.number_input(
+                "units",
+                min_value=0.0,
+                step=0.01,
+                format="%.4f",
+                key=f"m_units_{safe}",
+                label_visibility="collapsed",
+            )
+        with c7:
+            st.number_input(
+                "nav",
+                min_value=0.0,
+                step=0.01,
+                format="%.4f",
+                key=f"m_nav_{safe}",
+                label_visibility="collapsed",
+            )
+        with c8:
+            if not expand_all_rows and st.button(
+                "✓", key=f"m_done_{safe}", help="Done editing this row"
+            ):
+                _snapshot_editor_rows_from_widgets(selected_manual, member_label)
+                _editing_set.discard(row_id)
+                st.session_state.fl_editing_funds = list(_editing_set)
+                st.rerun()
+        with c9:
+            if st.button("🗑", key=f"m_del_{safe}_edit", help="Remove this fund"):
+                _snapshot_editor_rows_from_widgets(selected_manual, member_label)
+                st.session_state.fl_editor_remove_fund = row_id
+                st.rerun()
+        st.markdown(
+            f"<div style='height:1px;background:{t['bdr']};margin:4px 0 12px 0;'></div>",
+            unsafe_allow_html=True,
+        )
+
+    _snapshot_editor_rows_from_widgets(selected_manual, member_label)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    _tb1, _tb2 = st.columns([1.2, 5])
+    with _tb1:
+        if st.button("➕  Add fund", type="secondary", use_container_width=True, key="fl_btn_add_fund"):
+            _snapshot_editor_rows_from_widgets(selected_manual, member_label)
+            st.session_state.fl_show_add_fund_panel = True
+            st.rerun()
+    with _tb2:
+        _cap = (
+            f"{len(selected_manual)} fund(s) — edit below, then **Save**"
+            if expand_all_rows
+            else f"{len(selected_manual)} fund(s) — click **✏️** on a row to edit"
+        )
+        st.caption(_cap)
+
+    if st.session_state.get("fl_show_add_fund_panel"):
+        _existing_ids = set(selected_manual)
+        if not all_funds:
+            st.warning("No funds in master list.")
+        else:
+            st.selectbox(
+                "Choose a fund to add",
+                options=all_funds,
+                key="fl_add_fund_pick",
+                label_visibility="visible",
+            )
+            if len(_acct_opts) > 1 and not single_account_edit:
+                st.selectbox(
+                    "Account for this holding",
+                    options=_acct_opts,
+                    key="fl_add_fund_acct",
+                )
+            _ab1, _ab2 = st.columns(2)
+            with _ab1:
+                if st.button("Add to portfolio", type="primary", key="fl_confirm_add_fund"):
+                    _pick = st.session_state.get("fl_add_fund_pick")
+                    if _pick:
+                        _snapshot_editor_rows_from_widgets(selected_manual, member_label)
+                        _acct = member_label if single_account_edit else (
+                            st.session_state.get("fl_add_fund_acct")
+                            or (_acct_opts[0] if _acct_opts else member_label)
+                        )
+                        _new_rid = _holding_row_id(_pick, _acct)
+                        if _new_rid in _existing_ids:
+                            st.warning(
+                                f"**{display_name(_pick, 40)}** is already in the list for **{_acct}**."
+                            )
+                        else:
+                            st.session_state.fl_pending_add_row = _new_rid
+                            st.session_state.fl_show_add_fund_panel = False
+                            st.rerun()
+            with _ab2:
+                if st.button("Cancel", key="fl_cancel_add_fund"):
+                    st.session_state.fl_show_add_fund_panel = False
+                    st.rerun()
+        st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if show_cancel:
+        _save_col, _cancel_col = st.columns(2)
+    else:
+        _save_col = st.container()
+        _cancel_col = None
+
+    with _save_col:
+        _save_clicked = st.button(
+            save_label, type="primary", use_container_width=True, key=save_key
+        )
+    if _cancel_col is not None:
+        with _cancel_col:
+            if st.button(
+                "Cancel",
+                use_container_width=True,
+                key=f"{save_key}_cancel",
+                help="Discard changes and return to your portfolio",
+            ):
+                _cancel_portfolio_edit()
+                return
+
+    if _save_clicked:
+        _pf = _collect_manual_portfolio_rows(selected_manual, member_label)
+        _errs = _validate_portfolio_df(_pf)
+        if _errs:
+            for _e in _errs[:6]:
+                st.error(_e)
+            if len(_errs) > 6:
+                st.error(f"…and {len(_errs) - 6} more issue(s).")
+            return
+        _pf = _apply_nav_units_autofill(_pf)
+        st.session_state.portfolio_df = _pf
+        _manage_save_portfolio(_pf)
+        st.session_state.portfolio_page_mode = "view"
+        st.session_state.pop("_portfolio_edit_type", None)
+        st.session_state.pop("portfolio_staged_df", None)
+        _clear_manual_entry_state()
+        _rerun_app()
+
+
+def _close_family_accounts_dialog() -> None:
+    st.session_state.fl_accounts_dialog_open = False
+    st.session_state.pop("fl_account_edit_id", None)
+    st.session_state.pop("fl_delete_confirm_id", None)
+
+
+@st.dialog("Manage family accounts", on_dismiss=_close_family_accounts_dialog)
+def _manage_family_accounts_dialog() -> None:
+    """List all accounts with rename, delete, and create — opened from Manage portfolio."""
+    if not _fl_auth.is_logged_in():
+        st.warning("Sign in to manage accounts.")
+        return
+
+    _fl_auth.ensure_family_setup()
+    _members = _fl_auth.list_family_members()
+    if not _members:
+        st.info("No family accounts yet.")
+        return
+
+    _active = _fl_auth.get_active_family_member_id()
+    _edit_id = st.session_state.get("fl_account_edit_id")
+    _delete_id = st.session_state.get("fl_delete_confirm_id")
+
+    st.caption(
+        "Each account can have its own portfolio later. Rename or remove below, or add a new account "
+        "(no portfolio required)."
+    )
+
+    for _m in _members:
+        _mid = str(_m["id"])
+        _name = str(_m["account_name"])
+        _viewing = _mid == _active
+
+        if _edit_id == _mid:
+            st.markdown(f"**Rename — {_name}**")
+            _new_name = st.text_input(
+                "Account name",
+                value=_name,
+                key="fl_dialog_rename_input",
+                placeholder="Account name",
+            )
+            _rc1, _rc2 = st.columns(2)
+            with _rc1:
+                if st.button("Save", type="primary", key="fl_dialog_rename_save", use_container_width=True):
+                    _ok, _msg = _fl_auth.rename_family_member(_mid, _new_name)
+                    if _ok:
+                        st.session_state.pop("fl_account_edit_id", None)
+                        st.rerun()
+                    elif _msg:
+                        st.error(_msg)
+            with _rc2:
+                if st.button("Cancel", key="fl_dialog_rename_cancel", use_container_width=True):
+                    st.session_state.pop("fl_account_edit_id", None)
+                    st.rerun()
+            st.divider()
+            continue
+
+        if _delete_id == _mid:
+            st.warning(f"Delete **{_name}** and their saved portfolio? This cannot be undone.")
+            _dc1, _dc2 = st.columns(2)
+            with _dc1:
+                if st.button("Yes, delete", type="primary", key="fl_dialog_delete_confirm", use_container_width=True):
+                    _ok, _msg = _fl_auth.delete_family_member(_mid)
+                    if _ok:
+                        st.session_state.pop("fl_delete_confirm_id", None)
+                        _clear_manual_entry_state()
+                        st.rerun()
+                    elif _msg:
+                        st.error(_msg)
+            with _dc2:
+                if st.button("Cancel", key="fl_dialog_delete_cancel", use_container_width=True):
+                    st.session_state.pop("fl_delete_confirm_id", None)
+                    st.rerun()
+            st.divider()
+            continue
+
+        _row1, _row2, _row3 = st.columns([2.4, 1, 1])
+        with _row1:
+            _badge = " · viewing now" if _viewing else ""
+            st.markdown(f"**{_name}**{_badge}")
+        with _row2:
+            if st.button("Rename", key=f"fl_acc_rename_{_mid}", use_container_width=True):
+                st.session_state.fl_account_edit_id = _mid
+                st.session_state.pop("fl_delete_confirm_id", None)
+                st.rerun()
+        with _row3:
+            if len(_members) > 1:
+                if st.button("Delete", key=f"fl_acc_delete_{_mid}", use_container_width=True):
+                    st.session_state.fl_delete_confirm_id = _mid
+                    st.session_state.pop("fl_account_edit_id", None)
+                    st.rerun()
+        st.divider()
+
+    st.markdown("**Add new account**")
+    _create_name = st.text_input(
+        "New account name",
+        key="fl_dialog_new_member_name",
+        placeholder="e.g. Spouse, Child 1",
+        label_visibility="collapsed",
+    )
+    if st.button("Create account", type="primary", key="fl_dialog_create_member", use_container_width=True):
+        _ok, _msg = _fl_auth.create_family_member(_create_name)
+        if _ok:
+            st.session_state.pop("fl_account_edit_id", None)
+            st.session_state.pop("fl_delete_confirm_id", None)
+            st.rerun()
+        elif _msg:
+            st.error(_msg)
+
+    if st.button("Done", key="fl_dialog_done", use_container_width=True):
+        _close_family_accounts_dialog()
+        st.rerun()
+
+
+def _sync_manage_portfolio_mode_on_selection(picked_ids: list[str]) -> None:
+    """Update view/entry mode after account selection changes."""
+    all_df = _load_all_saved_holdings()
+    if all_df.empty:
+        st.session_state.portfolio_page_mode = "entry"
+        return
+    members = _fl_auth.list_family_members()
+    if len(picked_ids) >= len(members):
+        has_rows = True
+    else:
+        labels = _account_labels_for_member_ids(picked_ids)
+        has_rows = bool(
+            all_df["account_name"].astype(str).str.strip().str.lower().isin(labels).any()
+        )
+    st.session_state.portfolio_page_mode = "view" if has_rows else "entry"
+
+
+def _apply_manage_account_selection(
+    member_ids: list[str],
+    labels: list[str],
+    all_ids: list[str],
+    *,
+    sync_manage_mode: bool = True,
+) -> None:
+    """Update selection state — must run before the multiselect widget is drawn."""
+    st.session_state.fl_manage_member_multiselect = [
+        labels[all_ids.index(mid)] for mid in member_ids if mid in all_ids
+    ]
+    _fl_auth.set_selected_family_member_ids(member_ids)
+    st.session_state.pop("portfolio_df", None)
+    if sync_manage_mode:
+        st.session_state.pop("portfolio_staged_df", None)
+        st.session_state.pop("_portfolio_edit_type", None)
+        _clear_manual_entry_state()
+        _sync_manage_portfolio_mode_on_selection(member_ids)
+
+
+def _portfolio_amount_map_by_fund(
+    portfolio_df: pd.DataFrame,
+    fund_col: str,
+    fund_universe: set[str] | None = None,
+) -> dict[str, float]:
+    """Sum invested_amount by fund_name (same fund in multiple accounts → one combined weight)."""
+    amount_map: dict[str, float] = {}
+    if portfolio_df.empty or "invested_amount" not in portfolio_df.columns:
+        return amount_map
+    for _, row in portfolio_df.iterrows():
+        fund = row.get(fund_col)
+        if fund is None or (isinstance(fund, float) and pd.isna(fund)):
+            continue
+        fund_s = str(fund).strip()
+        if not fund_s or (fund_universe is not None and fund_s not in fund_universe):
+            continue
+        amt = pd.to_numeric(row.get("invested_amount", None), errors="coerce")
+        if pd.notna(amt) and float(amt) > 0:
+            amount_map[fund_s] = amount_map.get(fund_s, 0.0) + float(amt)
+    return amount_map
+
+
+def _render_manage_family_bar(t: dict, *, context: str = "manage") -> None:
+    """Family account multi-select (Manage and Analyse pages)."""
+    if not _fl_auth.is_logged_in():
+        return
+    _fl_auth.init_auth()
+    _fl_auth.ensure_family_setup()
+    _members = _fl_auth.list_family_members()
+
+    st.markdown(
+        f'<div style="font-size:0.78rem;font-weight:700;color:{t["sub"]};'
+        f'text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">'
+        f"Family accounts</div>",
+        unsafe_allow_html=True,
+    )
+
+    if not _members:
+        _err = st.session_state.get("fl_family_last_error")
+        st.warning(
+            _err
+            or "Could not load your family accounts from the cloud. "
+            "Run supabase/migrate_family_members_f1.sql in Supabase, then refresh this page."
+        )
+        if st.button("Retry loading accounts", key="fl_retry_family_setup", use_container_width=True):
+            st.session_state.pop("fl_family_last_error", None)
+            _fl_auth.refresh_auth_session()
+            _fl_auth.ensure_family_setup()
+            st.rerun()
+        st.markdown("<div style='height:0.75rem;'></div>", unsafe_allow_html=True)
+        return
+
+    _ids = [str(m["id"]) for m in _members]
+    _labels = [str(m["account_name"]) for m in _members]
+    _selected_ids = _fl_auth.get_selected_family_member_ids()
+
+    # Apply pending selection before multiselect is instantiated (Streamlit constraint).
+    _sync_manage = context == "manage"
+    _pending = st.session_state.pop("fl_manage_selection_pending", None)
+    if _pending == "all":
+        _apply_manage_account_selection(_ids, _labels, _ids, sync_manage_mode=_sync_manage)
+    elif _pending == "one":
+        _one = st.session_state.pop("fl_manage_selection_one_id", _ids[0])
+        _apply_manage_account_selection([_one], _labels, _ids, sync_manage_mode=_sync_manage)
+
+    if "fl_manage_member_multiselect" not in st.session_state:
+        st.session_state.fl_manage_member_multiselect = [
+            _labels[_ids.index(mid)] for mid in _selected_ids if mid in _ids
+        ] or [_labels[0]]
+
+    _sel_col, _all_col, _mgr_col = st.columns([3.6, 0.75, 1.35])
+    with _all_col:
+        if st.button(
+            "All",
+            key="fl_select_all_accounts",
+            use_container_width=True,
+            help="Select every family account",
+        ):
+            st.session_state.fl_manage_selection_pending = "all"
+            st.rerun()
+    with _sel_col:
+        _picked_labels = st.multiselect(
+            "Accounts",
+            options=_labels,
+            key="fl_manage_member_multiselect",
+            label_visibility="collapsed",
+            placeholder="Choose one or more accounts…",
+            help="Select one account, several, or use Select all for the combined portfolio",
+        )
+    with _mgr_col:
+        if st.button(
+            "Manage accounts",
+            key="fl_manage_accounts_btn",
+            use_container_width=True,
+            help="Rename, delete, or add family accounts",
+        ):
+            st.session_state.fl_accounts_dialog_open = True
+            st.session_state.pop("fl_account_edit_id", None)
+            st.session_state.pop("fl_delete_confirm_id", None)
+
+    _picked_ids = [_ids[_labels.index(lbl)] for lbl in _picked_labels if lbl in _labels]
+    if not _picked_ids:
+        st.warning("Select at least one account to continue.")
+        st.session_state.fl_manage_selection_pending = "one"
+        st.session_state.fl_manage_selection_one_id = (
+            _selected_ids[0] if _selected_ids else _ids[0]
+        )
+        st.rerun()
+
+    _prev_ids = list(st.session_state.get("fl_selected_family_member_ids") or [])
+    if sorted(_picked_ids) != sorted(_prev_ids):
+        _fl_auth.set_selected_family_member_ids(_picked_ids)
+        st.session_state.pop("portfolio_df", None)
+        if context == "manage":
+            st.session_state.pop("portfolio_staged_df", None)
+            st.session_state.pop("_portfolio_edit_type", None)
+            _clear_manual_entry_state()
+            _sync_manage_portfolio_mode_on_selection(_picked_ids)
+        st.rerun()
+
+    if st.session_state.get("fl_accounts_dialog_open"):
+        _manage_family_accounts_dialog()
+
+    _n = len(_picked_ids)
+    if context == "analyse":
+        if _n == 1:
+            _hint = "One account — analysis uses this member's holdings."
+        elif _n == len(_ids):
+            _hint = "All accounts — analysis combines every saved portfolio (duplicate funds add up invested amounts)."
+        else:
+            _hint = (
+                f"{_n} accounts — combined analysis; same fund in multiple accounts "
+                "has invested amounts summed."
+            )
+    elif _n == 1:
+        _hint = "One account selected — view, edit, or upload a portfolio for this member."
+    elif _n == len(_ids):
+        _hint = "All accounts selected — combined view and analyse across every saved portfolio."
+    else:
+        _hint = f"{_n} accounts selected — combined view and analyse; pick one account to edit or upload."
+    st.caption(_hint)
+    st.markdown("<div style='height:0.75rem;'></div>", unsafe_allow_html=True)
+
 
 st.set_page_config(
     page_title="FundLens — Investment Intelligence",
@@ -559,11 +2243,65 @@ def load_holdings():
 
 
 @st.cache_data(ttl=3600)
-def load_master():
+def _cached_all_fund_names() -> list[str]:
+    holdings = load_holdings()
+    if holdings.empty or "fund_name" not in holdings.columns:
+        return []
+    return sorted(holdings["fund_name"].dropna().astype(str).unique().tolist())
+
+
+@st.cache_data(ttl=3600)
+def load_scheme_map():
+    """ET scheme_id → MFAPI mf_scheme_code (Batch 4 sidecar)."""
     try:
-        return pd.read_csv("data/fund_master_auto.csv")
+        return pd.read_csv("data/fund_scheme_map.csv")
     except Exception:
         return pd.DataFrame()
+
+
+@st.cache_data(ttl=3600)
+def load_master():
+    """ET master + scheme map join; adds has_holdings / has_nav / mf_scheme_code."""
+    try:
+        master = pd.read_csv("data/fund_master_auto.csv")
+    except Exception:
+        return pd.DataFrame()
+    if master.empty:
+        return master
+
+    holdings = load_holdings()
+    hold_names: set[str] = set()
+    if not holdings.empty and "fund_name" in holdings.columns:
+        hold_names = set(holdings["fund_name"].dropna().astype(str))
+    master = master.copy()
+    master["has_holdings"] = master["fund_name"].astype(str).isin(hold_names)
+
+    smap = load_scheme_map()
+    if not smap.empty and "scheme_id" in smap.columns:
+        map_cols = [c for c in ("scheme_id", "mf_scheme_code", "isin") if c in smap.columns]
+        smap = smap[map_cols].drop_duplicates(subset=["scheme_id"], keep="first")
+        master = master.merge(smap, on="scheme_id", how="left")
+        codes = pd.to_numeric(master["mf_scheme_code"], errors="coerce")
+        master["has_nav"] = codes.notna()
+    else:
+        master["mf_scheme_code"] = pd.NA
+        master["has_nav"] = False
+
+    return master
+
+
+def master_for_analyze(master_df: pd.DataFrame | None = None) -> pd.DataFrame:
+    """ACTIVE ET funds with scraped holdings (Analyze / Compare scope)."""
+    if master_df is None:
+        master_df = load_master()
+    if master_df.empty:
+        return master_df
+    out = master_df.copy()
+    if "status" in out.columns:
+        out = out[out["status"].astype(str).str.upper() == "ACTIVE"]
+    if "has_holdings" in out.columns:
+        out = out[out["has_holdings"]]
+    return out.reset_index(drop=True)
 
 
 @st.cache_data(ttl=3600)
@@ -2056,9 +3794,12 @@ def _fl_render_navbar(t, t_name, active_page):
     for key, label in [
         ("home", "Home"),
         ("analyse_funds", "Analyse funds"),
-        ("portfolio_upload", "Analyse your portfolio"),
+        (_FL_PORTFOLIO_NAV_KEY, "My Portfolio"),
     ]:
-        active_cls = " active" if key == active_page else ""
+        if key == _FL_PORTFOLIO_NAV_KEY:
+            active_cls = " active" if active_page in _FL_PORTFOLIO_SECTION_PAGES else ""
+        else:
+            active_cls = " active" if key == active_page else ""
         links_html += (
             f'<a href="?nav={key}&theme={t_name}" target="_self" '
             f'class="fl-nav-link{active_cls}">{label}</a>'
@@ -2178,8 +3919,8 @@ def page_home():
         ("overlap_drilldown", "rgba(249,115,22,0.12)", "🔗", "See which funds in a category are just copies of each other",
          f"The overlap matrix maps every fund pair in a category. We found two large cap funds "
          f"sharing {int(max_sim)}% of holdings — charging different expense ratios.", True),
-        ("portfolio_upload", "rgba(37,99,235,0.12)", "📊", "Analyze your own portfolio",
-         "Upload your fund list and see overlap, holdings, and concentration across everything you hold.",
+        (_FL_PORTFOLIO_NAV_KEY, "rgba(37,99,235,0.12)", "📊", "My portfolio",
+         "Manage your fund list, analyse overlap and hidden exposure, or track performance over time.",
          False),
     ]
     feats_html = "".join(
@@ -2293,7 +4034,7 @@ def page_category_select():
         fund_counts = holdings.groupby("category")["fund_name"].nunique().to_dict()
 
     if not master_df.empty and "fund_name" in master_df.columns and "category" in master_df.columns:
-        _m = master_df[master_df["status"] == "ACTIVE"] if "status" in master_df.columns else master_df
+        _m = master_for_analyze(master_df)
         _lk_cols = ["fund_name", "category"]
         if "fund_house" in _m.columns:
             _lk_cols.append("fund_house")
@@ -5429,7 +7170,7 @@ def _fl_render_auth_modal() -> None:
 def page_account():
     t_name, t = _fl_get_theme()
     _fl_inject_css(t, t_name)
-    _fl_render_navbar(t, t_name, "portfolio_upload")
+    _fl_render_navbar(t, t_name, "account")
     _fl_render_breadcrumb([("Home", "home"), ("Account", None)])
 
     if not _fl_auth.is_logged_in():
@@ -5452,92 +7193,214 @@ def page_account():
             st.error(msg)
 
     if st.button("← Back to portfolio", key="acct_back_pf"):
-        st.session_state.page = "portfolio_upload"
+        st.session_state.page = _FL_PORTFOLIO_NAV_KEY
         st.rerun()
 
 
-# ── PAGE: PORTFOLIO UPLOAD ────────────────────────────────────────────────────
+# ── PAGE: MY PORTFOLIO (hub) ──────────────────────────────────────────────────
+
+def page_portfolio_hub():
+    t_name, t = _fl_get_theme()
+    _fl_inject_css(t, t_name)
+    _fl_render_navbar(t, t_name, _FL_PORTFOLIO_NAV_KEY)
+    _fl_render_breadcrumb([("Home", "home"), ("My Portfolio", None)])
+
+    _meta = _saved_portfolio_meta()
+    if _meta:
+        _n, _ts = _meta
+        _summary = (
+            f'<p style="color:{t["body"]};font-size:0.88rem;margin:0 0 1.5rem;">'
+            f"<strong style=\"color:{t['head']};\">{_n} fund{'s' if _n != 1 else ''}</strong> saved"
+            f" &nbsp;·&nbsp; Last updated {_ts}</p>"
+        )
+    else:
+        _summary = (
+            f'<p style="color:{t["body"]};font-size:0.88rem;margin:0 0 1.5rem;">'
+            f"No portfolio saved yet — start with <strong style=\"color:{t['head']};\">"
+            f"Manage my portfolio</strong> to add your funds.</p>"
+        )
+
+    _cards = [
+        (
+            f"?nav=portfolio_upload&theme={t_name}",
+            "rgba(37,99,235,0.12)",
+            "📋",
+            "Manage my portfolio",
+            "Upload or edit your fund list — the source of truth for analyse and track.",
+            "CSV / XLSX or manual entry",
+        ),
+        (
+            f"?nav=portfolio_xray&theme={t_name}",
+            "rgba(124,58,237,0.12)",
+            "📊",
+            "Analyse my portfolio",
+            "Overlap, hidden stock exposure, sector concentration, and redundancy across your holdings.",
+            "X-Ray insights",
+        ),
+        (
+            f"?nav=portfolio_track&theme={t_name}",
+            "rgba(16,185,129,0.12)",
+            "📈",
+            "Track my portfolio",
+            "Monitor performance and changes over time (early access).",
+            "Coming soon",
+        ),
+    ]
+    cards_html = "".join(
+        f'<a href="{hr}" target="_self" class="fl-af-card">'
+        f'<span class="fl-af-arr">→</span>'
+        f'<div class="fl-af-ico" style="background:{ib};">{ic}</div>'
+        f'<div class="fl-af-title">{ti}</div>'
+        f'<div class="fl-af-desc">{de}</div>'
+        f'<div class="fl-af-foot">{ft}</div>'
+        f"</a>"
+        for hr, ib, ic, ti, de, ft in _cards
+    )
+
+    st.markdown(
+        f'<div class="fl-pg-body">'
+        f'<div class="fl-pg-h1">My Portfolio</div>'
+        f'<div class="fl-pg-sub">Manage your holdings, run analysis, or track over time</div>'
+        f"{_summary}"
+        f'<div class="fl-af-grid">{cards_html}</div>'
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+
+# ── PAGE: PORTFOLIO UPLOAD (manage) ───────────────────────────────────────────
 
 def page_portfolio_upload():
     import difflib
     t_name, t = _fl_get_theme()
     _fl_inject_css(t, t_name)
     _fl_render_navbar(t, t_name, "portfolio_upload")
-    _fl_render_breadcrumb([("Home", "home"), ("Analyse Your Portfolio", None)])
+    _fl_render_breadcrumb([
+        ("Home", "home"),
+        ("My Portfolio", _FL_PORTFOLIO_NAV_KEY),
+        ("Manage my portfolio", None),
+    ])
 
     st.markdown(
         f'<h2 style="font-size:1.6rem;font-weight:800;color:{t["head"]};'
-        f'margin-bottom:0.25rem;">Analyse Your MF Portfolio</h2>',
+        f'margin-bottom:0.25rem;">Manage my portfolio</h2>',
         unsafe_allow_html=True,
     )
     st.markdown(
-        f"<p style='color:{t['body']};margin-top:0;margin-bottom:1.5rem;'>"
-        "Upload your portfolio or build it manually — then get hidden exposure, overlap and concentration insights.</p>",
+        f"<p style='color:{t['body']};margin-top:0;margin-bottom:1rem;'>"
+        "Upload your portfolio or build it manually — your saved funds are used for analyse and track.</p>",
         unsafe_allow_html=True,
     )
 
-    holdings  = load_holdings()
-    all_funds = sorted(holdings["fund_name"].unique().tolist())
-    fund_set  = set(all_funds)
+    if _fl_auth.is_logged_in() and not st.session_state.get("fl_portfolio_cache_warmed"):
+        _fl_auth.preload_portfolio_cache()
+        st.session_state.fl_portfolio_cache_warmed = True
+
+    _render_manage_family_bar(t)
+    _selected_ids = _manage_selected_member_ids()
+    _single_mid = _manage_family_member_id()
+    _member_label = _manage_selection_label()
+    _sv_df_peek = _manage_load_portfolio()
+    _has_portfolio = _sv_df_peek is not None and not _sv_df_peek.empty
+    _multi_select = len(_selected_ids) > 1
+
+    all_funds = _cached_all_fund_names()
+    fund_set = set(all_funds)
 
     # ── Page mode: "view" shows saved portfolio, "entry" shows upload form ──
-    _sv_meta   = _saved_portfolio_meta()
-    _pmode     = st.session_state.get(
-        "portfolio_page_mode",
-        "view" if _sv_meta is not None else "entry",
-    )
+    _sv_meta = _manage_portfolio_meta()
+    _pmode = st.session_state.get("portfolio_page_mode")
+    if _pmode is None:
+        _pmode = "view" if _sv_meta is not None else "entry"
+    elif _pmode == "view" and (not _has_portfolio or _sv_meta is None):
+        _pmode = "entry"
+        st.session_state.portfolio_page_mode = "entry"
+    elif (
+        _has_portfolio
+        and _pmode == "entry"
+        and "_portfolio_edit_type" not in st.session_state
+        and not st.session_state.get("portfolio_staged_df")
+    ):
+        _pmode = "view"
+        st.session_state.portfolio_page_mode = "view"
+        _sv_meta = _manage_portfolio_meta()
 
     # ════════════════════════════════════════════════════════════════════════
     # VIEW MODE — show saved portfolio with Analyse / Edit options
     # ════════════════════════════════════════════════════════════════════════
-    if _pmode == "view" and _sv_meta is not None:
+    if _pmode == "view" and _has_portfolio and _sv_meta is not None:
         _sv_n, _sv_ts = _sv_meta
-        _sv_funds     = _saved_portfolio_funds()
+        _sv_df = _sv_df_peek if _sv_df_peek is not None else _manage_load_portfolio()
+        _labels_in_view: set[str] = set()
+        if _sv_df is not None and not _sv_df.empty:
+            _labels_in_view = set(
+                _sv_df["account_name"].astype(str).str.strip().str.lower()
+            )
+        _missing_sel = [
+            mid
+            for mid in _selected_ids
+            if _fl_auth.family_member_name(mid).strip().lower() not in _labels_in_view
+        ]
+        if _missing_sel:
+            _missing_names = ", ".join(
+                _fl_auth.family_member_name(mid) for mid in _missing_sel
+            )
+            st.caption(
+                f"No holdings tagged to **{_missing_names}** in your saved data "
+                f"(not shown in the table below)."
+            )
 
-        fund_chips = "".join(
-            f'<span style="display:inline-block;background:{t["al"]};color:{t["a"]};'
-            f'border:1px solid {t["a"]}44;border-radius:9999px;padding:5px 13px;'
-            f'font-size:0.78rem;font-weight:600;margin:3px 5px 3px 0;">'
-            f'{display_name(f)}</span>'
-            for f in _sv_funds
+        _title = (
+            f"{_html.escape(_member_label)}&apos;s portfolio"
+            if len(_selected_ids) == 1
+            else f"Combined portfolio — {_html.escape(_member_label)}"
         )
-
-        st.markdown(
-            f'<div style="background:{t["card"]};border:1px solid {t["bdr"]};'
-            f'border-radius:16px;padding:1.5rem 1.75rem;margin-bottom:1.5rem;">'
-            # Header
-            f'<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">'
-            f'<span style="font-size:1.15rem;">📋</span>'
-            f'<span style="font-size:1rem;font-weight:800;color:{t["head"]};">Your Saved Portfolio</span>'
-            f'</div>'
-            f'<div style="font-size:0.75rem;color:{t["sub"]};margin-bottom:1rem;">'
-            f'{_sv_n} fund{"s" if _sv_n != 1 else ""} &nbsp;·&nbsp; Last saved {_sv_ts}</div>'
-            # Divider
-            f'<div style="height:1px;background:{t["bdr"]};margin-bottom:1rem;"></div>'
-            # Fund chips
-            f'<div style="line-height:2.2;margin-bottom:1rem;">{fund_chips}</div>'
-            f'<div style="height:1px;background:{t["bdr"]};margin-top:0.5rem;"></div>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
+        if _sv_df is not None and not _sv_df.empty:
+            _render_portfolio_holdings_table(
+                _sv_df,
+                t,
+                member_label=_member_label,
+                fund_count=_sv_n,
+                saved_at=_sv_ts,
+                title_override=_title,
+            )
+        else:
+            st.info("No holdings found for the selected account(s).")
+        st.markdown("<div style='height:0.75rem;'></div>", unsafe_allow_html=True)
 
         _ca, _cb = st.columns(2, gap="medium")
         with _ca:
             if st.button("▶  Analyse My Portfolio", type="primary",
                          use_container_width=True, key="sv_analyse"):
-                _sv_df = _load_saved_portfolio()
+                _sv_df = _manage_load_portfolio()
                 if _sv_df is not None:
                     st.session_state.portfolio_df = _sv_df
                 st.session_state.page = "portfolio_xray"
                 st.rerun()
         with _cb:
-            if st.button("✏️  Edit / Change Portfolio",
-                         use_container_width=True, key="sv_edit"):
-                _sv_df_edit = _load_saved_portfolio()
+            _edit_disabled = _multi_select
+            if st.button(
+                "✏️  Edit / Change Portfolio",
+                use_container_width=True,
+                key="sv_edit",
+                disabled=_edit_disabled,
+                help="Select a single account to edit its portfolio"
+                if _edit_disabled
+                else None,
+            ):
+                _edit_mid = _single_mid
+                _edit_label = (
+                    _fl_auth.family_member_name(_edit_mid) if _edit_mid else _member_label
+                )
+                _sv_df_edit = _manage_load_portfolio()
                 if _sv_df_edit is not None:
-                    _prefill_manual_entry_state(_sv_df_edit)
+                    _prefill_manual_entry_state(_sv_df_edit, _edit_label, force=True)
                 st.session_state["_portfolio_edit_type"] = "edit"
                 st.session_state.portfolio_page_mode = "entry"
+                st.session_state.portfolio_entry_mode = "✏️  Enter Manually"
+                st.session_state.fl_editor_load_holdings = True
+                if _edit_mid:
+                    _fl_auth.set_selected_family_member_ids([_edit_mid])
                 st.rerun()
 
         st.markdown(
@@ -5551,6 +7414,69 @@ def page_portfolio_upload():
     # ENTRY MODE — upload or manually enter portfolio
     # ════════════════════════════════════════════════════════════════════════
 
+    if _multi_select and not _single_mid:
+        if _has_portfolio:
+            st.info(
+                f"**{_member_label}** are selected. To upload or edit holdings, "
+                "select **one** account from the list above (or use **All** only for combined view)."
+            )
+        else:
+            st.info(
+                f"No portfolio saved for the selected accounts ({_member_label}). "
+                "Select **one** account to upload or enter a portfolio."
+            )
+        if _has_portfolio and st.button("← View combined portfolio", key="multi_back_to_view"):
+            st.session_state.portfolio_page_mode = "view"
+            st.rerun()
+        return
+
+    _entry_label = _fl_auth.family_member_name(_single_mid) if _single_mid else _member_label
+
+    if not _has_portfolio:
+        st.info(
+            f"No portfolio saved for **{_fl_auth.family_member_name(_single_mid or _selected_ids[0])}** yet. "
+            "Upload a CSV or enter holdings manually below."
+        )
+
+    _staged_df = st.session_state.get("portfolio_staged_df")
+    _edit_type = st.session_state.get("_portfolio_edit_type", "fresh")
+    _is_editing = _edit_type == "edit" and _has_portfolio and _sv_meta is not None
+
+    # Post-upload review (new or edit)
+    if _staged_df is not None:
+        if st.button("← Back to saved portfolio", key="back_staged_to_view"):
+            st.session_state.pop("portfolio_staged_df", None)
+            _clear_manual_entry_state()
+            st.session_state.portfolio_page_mode = "view"
+            st.rerun()
+        st.markdown(
+            f'<div style="background:{t["al"]};border:1px solid {t["bdr"]};border-radius:10px;'
+            f'padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:{t["body"]};">'
+            f"Review your uploaded holdings below. Adjust any field, then save.</div>",
+            unsafe_allow_html=True,
+        )
+        if st.button("← Back to file upload", key="back_from_staged_upload"):
+            st.session_state.pop("portfolio_staged_df", None)
+            _clear_manual_entry_state()
+            st.rerun()
+        _render_portfolio_holdings_editor(
+            t,
+            _entry_label,
+            all_funds,
+            save_label="💾  Save Changes" if _is_editing else "💾  Save Portfolio",
+            save_key="staged_save",
+            subtitle=f"{_entry_label} — review and save holdings",
+            account_options=_portfolio_account_names(extra=_entry_label),
+            expand_all_rows=True,
+        )
+        if _fl_auth.is_logged_in():
+            st.markdown(
+                f"<div style='text-align:center;font-size:0.72rem;color:{t['sub']};margin-top:1.5rem;'>"
+                f"💾 Saved to your account in the cloud · Only you can access this portfolio</div>",
+                unsafe_allow_html=True,
+            )
+        return
+
     # Back link (always shown when a saved portfolio exists)
     if _sv_meta is not None:
         if st.button("← Back to saved portfolio", key="back_to_saved"):
@@ -5558,15 +7484,73 @@ def page_portfolio_upload():
             st.rerun()
         st.markdown("<br>", unsafe_allow_html=True)
 
-    # Edit type: "edit" = pre-populated editing, "fresh" = blank start
-    _edit_type = st.session_state.get("_portfolio_edit_type", "fresh")
+    # ── Edit existing portfolio: full-width holdings editor (manual default) ──
+    if _is_editing:
+        if st.session_state.pop("fl_editor_load_holdings", False):
+            _sv_df_edit = _manage_load_portfolio()
+            if _sv_df_edit is not None:
+                _prefill_manual_entry_state(_sv_df_edit, _entry_label, force=True)
+            if "portfolio_entry_mode" not in st.session_state:
+                st.session_state.portfolio_entry_mode = "✏️  Enter Manually"
 
-    col_up, col_info = st.columns([3, 2], gap="large")
+        st.markdown(
+            f'<div style="background:{t["al"]};border:1px solid {t["bdr"]};border-radius:10px;'
+            f'padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:{t["body"]};">'
+            f"Editing <strong>{_html.escape(_entry_label)}</strong></div>",
+            unsafe_allow_html=True,
+        )
+        _ec1, _ec2, _ec3 = st.columns([1.2, 1.2, 2])
+        with _ec1:
+            entry_mode = st.radio(
+                "Update method",
+                ["✏️  Enter Manually", "📁  Upload CSV / XLSX"],
+                horizontal=True,
+                key="portfolio_entry_mode",
+                label_visibility="collapsed",
+            )
+        with _ec2:
+            if st.button(
+                "🔄  Clear all",
+                key="btn_edit_clear_fresh",
+                use_container_width=True,
+                help="Remove all funds from the editor and start over (manual entry only).",
+            ):
+                _clear_manual_entry_state()
+                st.session_state["_portfolio_edit_type"] = "fresh"
+                st.rerun()
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        if entry_mode == "✏️  Enter Manually":
+            _render_portfolio_holdings_editor(
+                t,
+                _entry_label,
+                all_funds,
+                save_label="💾  Save Changes",
+                save_key="edit_save",
+                subtitle=f"{_entry_label} — your current holdings",
+                expand_all_rows=True,
+                show_cancel=True,
+                single_account_edit=True,
+            )
+        if _fl_auth.is_logged_in():
+            st.markdown(
+                f"<div style='text-align:center;font-size:0.72rem;color:{t['sub']};margin-top:1.5rem;'>"
+                f"💾 Saved to your account in the cloud</div>",
+                unsafe_allow_html=True,
+            )
+        if entry_mode == "✏️  Enter Manually":
+            return
+
+    if _is_editing:
+        col_up = st.container()
+        col_info = None
+    else:
+        col_up, col_info = st.columns([2.2, 1], gap="large")
 
     with col_up:
 
-        # ── When a saved portfolio exists, offer Edit vs Start-fresh choice ──
-        if _sv_meta is not None:
+        # ── When a saved portfolio exists, offer Edit vs Start-fresh (first visit only) ──
+        if _sv_meta is not None and not _is_editing:
             st.markdown(
                 f'<div style="font-size:0.78rem;font-weight:700;color:{t["sub"]};'
                 f'text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.6rem;">'
@@ -5577,225 +7561,231 @@ def page_portfolio_upload():
             with _ec1:
                 if st.button(
                     "✏️  Edit existing portfolio",
-                    type="primary" if _edit_type == "edit" else "secondary",
+                    type="secondary",
                     use_container_width=True, key="btn_edit_existing",
                 ):
-                    if _edit_type != "edit":
-                        _sv_df_re = _load_saved_portfolio()
-                        if _sv_df_re is not None:
-                            _prefill_manual_entry_state(_sv_df_re)
-                        st.session_state["_portfolio_edit_type"] = "edit"
-                        st.rerun()
+                    _sv_df_re = _manage_load_portfolio()
+                    if _sv_df_re is not None:
+                        _prefill_manual_entry_state(_sv_df_re, _entry_label, force=True)
+                    st.session_state["_portfolio_edit_type"] = "edit"
+                    st.session_state.portfolio_entry_mode = "✏️  Enter Manually"
+                    st.session_state.fl_editor_load_holdings = True
+                    st.rerun()
             with _ec2:
                 if st.button(
                     "🔄  Clear & start fresh",
-                    type="primary" if _edit_type == "fresh" else "secondary",
+                    type="secondary",
                     use_container_width=True, key="btn_fresh",
                 ):
-                    if _edit_type != "fresh":
-                        _clear_manual_entry_state()
-                        st.session_state["_portfolio_edit_type"] = "fresh"
-                        st.rerun()
+                    _clear_manual_entry_state()
+                    st.session_state["_portfolio_edit_type"] = "fresh"
+                    st.rerun()
             st.markdown("<br>", unsafe_allow_html=True)
 
-        # ════════════════════════════════════════════════════════════════════
-        # SUB-MODE A: Edit existing — manual form pre-populated from saved data
-        # ════════════════════════════════════════════════════════════════════
-        if _edit_type == "edit" and _sv_meta is not None:
-            st.markdown(
-                f'<div style="font-size:0.85rem;font-weight:600;color:{t["head"]};'
-                f'margin-bottom:4px;">Your portfolio — add, remove or update funds and amounts</div>',
-                unsafe_allow_html=True,
-            )
-            selected_manual = st.multiselect(
-                "Funds",
-                options=all_funds,
-                key="manual_fund_select",
-                label_visibility="collapsed",
-                placeholder="Start typing to add a fund…",
-            )
-            if selected_manual:
-                st.markdown("<br>", unsafe_allow_html=True)
-                h1, h2, h3 = st.columns([4, 3, 2])
-                h1.markdown(f"<div style='font-size:0.78rem;font-weight:700;color:{t['sub']};'>FUND</div>", unsafe_allow_html=True)
-                h2.markdown(f"<div style='font-size:0.78rem;font-weight:700;color:{t['sub']};'>INVESTED AMOUNT (₹)</div>", unsafe_allow_html=True)
-                h3.markdown(f"<div style='font-size:0.78rem;font-weight:700;color:{t['sub']};'>UNITS (optional)</div>", unsafe_allow_html=True)
-                st.markdown(f"<div style='height:1px;background:{t['bdr']};margin-bottom:4px;'></div>", unsafe_allow_html=True)
-
-                manual_rows = []
-                for fund in selected_manual:
-                    safe_key = fund.replace(" ", "_").replace("/", "_")
-                    c1, c2, c3 = st.columns([4, 3, 2])
-                    with c1:
-                        st.markdown(
-                            f'<div style="font-size:0.82rem;color:{t["head"]};padding-top:6px;'
-                            f'line-height:1.3;">{display_name(fund)}</div>',
-                            unsafe_allow_html=True,
-                        )
-                    with c2:
-                        amt = st.number_input(
-                            "amt", min_value=0, step=1000,
-                            key=f"m_amt_{safe_key}",
-                            label_visibility="collapsed",
-                        )
-                    with c3:
-                        units = st.number_input(
-                            "units", min_value=0.0, step=1.0, format="%.2f",
-                            key=f"m_units_{safe_key}",
-                            label_visibility="collapsed",
-                        )
-                    manual_rows.append({"fund_name": fund, "invested_amount": amt, "units": units})
-
-                st.markdown("<br>", unsafe_allow_html=True)
-                if st.button("💾  Save Changes", type="primary",
-                             use_container_width=True, key="edit_save"):
-                    _pf = pd.DataFrame(manual_rows)
-                    st.session_state.portfolio_df = _pf
-                    _save_portfolio(_pf)
-                    st.session_state.portfolio_page_mode = "view"
-                    st.session_state.pop("_portfolio_edit_type", None)
-                    st.rerun()
-            else:
-                st.info("All funds removed. Add funds above or switch to 'Clear & start fresh' to upload a new CSV.")
-
-        # ════════════════════════════════════════════════════════════════════
-        # SUB-MODE B: Start fresh — normal upload / manual entry
-        # ════════════════════════════════════════════════════════════════════
-        else:
-            # ── Entry mode selector ───────────────────────────────────────
+        if not _is_editing:
+            _radio_label = "How would you like to add your portfolio?"
             entry_mode = st.radio(
-                "How would you like to add your portfolio?",
-                ["📁  Upload CSV / XLSX", "✏️  Enter Manually"],
+                _radio_label,
+                ["✏️  Enter Manually", "📁  Upload CSV / XLSX"],
                 horizontal=True,
                 key="portfolio_entry_mode",
             )
             st.markdown("<br>", unsafe_allow_html=True)
 
-            # ── Manual entry ──────────────────────────────────────────────
-            if entry_mode == "✏️  Enter Manually":
-                st.markdown(
-                    f"<div style='font-size:0.85rem;font-weight:600;color:{t['head']};margin-bottom:4px;'>"
-                    "Select your funds (search by name or AMC)</div>",
-                    unsafe_allow_html=True,
+        if entry_mode == "✏️  Enter Manually" and not _is_editing:
+            _render_portfolio_holdings_editor(
+                t,
+                _entry_label,
+                all_funds,
+                save_label="💾  Save Portfolio",
+                save_key="manual_go",
+                subtitle=f"{_entry_label} — add funds with account, date, amount, units & NAV",
+                account_options=_portfolio_account_names(extra=_entry_label),
+            )
+
+        # ── File upload (new portfolio or edit via CSV) ───────────────
+        elif entry_mode == "📁  Upload CSV / XLSX":
+            _valid_accounts = _portfolio_account_names(extra=_entry_label, strict=True)
+            if _is_editing:
+                st.info(
+                    f"Upload a CSV or XLSX to update **{_html.escape(_entry_label)}**. "
+                    f"Use **{_html.escape(_entry_label)}** in the **account_name** column. "
+                    "Review the rows, then click **Save Changes**."
                 )
-                selected_manual = st.multiselect(
-                    "Funds",
-                    options=all_funds,
-                    key="manual_fund_select",
-                    label_visibility="collapsed",
-                    placeholder="Start typing a fund name…",
-                )
-                if selected_manual:
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    h1, h2, h3 = st.columns([4, 3, 2])
-                    h1.markdown(f"<div style='font-size:0.78rem;font-weight:700;color:{t['sub']};'>FUND</div>", unsafe_allow_html=True)
-                    h2.markdown(f"<div style='font-size:0.78rem;font-weight:700;color:{t['sub']};'>INVESTED AMOUNT (₹)</div>", unsafe_allow_html=True)
-                    h3.markdown(f"<div style='font-size:0.78rem;font-weight:700;color:{t['sub']};'>UNITS (optional)</div>", unsafe_allow_html=True)
-                    st.markdown(f"<div style='height:1px;background:{t['bdr']};margin-bottom:4px;'></div>", unsafe_allow_html=True)
-
-                    manual_rows = []
-                    for fund in selected_manual:
-                        safe_key = fund.replace(" ", "_").replace("/", "_")
-                        c1, c2, c3 = st.columns([4, 3, 2])
-                        with c1:
-                            st.markdown(
-                                f'<div style="font-size:0.82rem;color:{t["head"]};padding-top:6px;'
-                                f'line-height:1.3;">{display_name(fund)}</div>',
-                                unsafe_allow_html=True,
-                            )
-                        with c2:
-                            amt = st.number_input(
-                                "amt", min_value=0, step=1000,
-                                key=f"m_amt_{safe_key}",
-                                label_visibility="collapsed",
-                            )
-                        with c3:
-                            units = st.number_input(
-                                "units", min_value=0.0, step=1.0, format="%.2f",
-                                key=f"m_units_{safe_key}",
-                                label_visibility="collapsed",
-                            )
-                        manual_rows.append({"fund_name": fund, "invested_amount": amt, "units": units})
-
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    if st.button("💾  Save Portfolio", type="primary",
-                                 use_container_width=True, key="manual_go"):
-                        _pf = pd.DataFrame(manual_rows)
-                        st.session_state.portfolio_df = _pf
-                        _save_portfolio(_pf)
-                        st.session_state.portfolio_page_mode = "view"
-                        st.session_state.pop("_portfolio_edit_type", None)
-                        st.rerun()
-                else:
-                    st.info("Start typing above to search and add funds from our database.")
-
-            # ── File upload ───────────────────────────────────────────────
             else:
-                template = pd.DataFrame({
-                    "fund_name":       ["HDFC Large Cap Fund", "ICICI Prudential Bluechip Fund"],
-                    "invested_amount": [50000, 30000],
-                    "units":           [100.50, 80.20],
-                })
+                _acct_hint = ", ".join(_valid_accounts) if _valid_accounts else _entry_label
+                st.info(
+                    f"Each row needs an **account_name** — use any of your FundLens accounts: "
+                    f"**{_html.escape(_acct_hint)}**. "
+                    "**Save replaces** holdings for each account in the file (does not append). "
+                    "Review, then save."
+                )
+            if _fl_auth.is_logged_in() and not _render_csv_account_setup_gate(t, _entry_label):
+                pass
+            else:
+                if st.session_state.get("fl_csv_accounts_confirmed"):
+                    if st.button("← Change account names", key="fl_csv_accounts_back"):
+                        st.session_state.pop("fl_csv_accounts_confirmed", None)
+                        st.rerun()
+                    st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
+
                 st.download_button(
                     "⬇️  Download CSV Template",
-                    template.to_csv(index=False),
+                    _portfolio_template_csv(),
                     file_name="portfolio_template.csv",
                     mime="text/csv",
                     use_container_width=True,
+                )
+                st.caption(
+                    f"Use these account_name values in your file: {', '.join(_valid_accounts)}"
                 )
                 st.markdown("<br>", unsafe_allow_html=True)
 
                 uploaded = st.file_uploader(
                     "Drop your portfolio CSV or XLSX here",
                     type=["csv", "xlsx"],
-                    help="Expected columns: fund_name, invested_amount (optional), units (optional)",
+                    help=(
+                        "Row 1 in template = instructions. Required: fund_name, account_name "
+                        "(must match your family accounts), plan_type (Regular|Direct), "
+                        "invested_amount, invested_date. Optional units/nav (auto-fetch if blank)."
+                    ),
                 )
 
                 if uploaded:
                     try:
                         portfolio_df = (
-                            pd.read_csv(uploaded)
+                            pd.read_csv(uploaded, comment="#")
                             if uploaded.name.endswith(".csv")
                             else pd.read_excel(uploaded)
                         )
+                        portfolio_df = _clean_portfolio_upload_df(portfolio_df)
                         fund_col = next(
-                            (c for c in portfolio_df.columns if "fund" in c.lower()), None
+                            (c for c in portfolio_df.columns if "fund" in str(c).lower()), None
+                        )
+                        acct_col = next(
+                            (
+                                c
+                                for c in portfolio_df.columns
+                                if str(c).lower() in ("account_name", "account", "folio")
+                            ),
+                            None,
                         )
                         if not fund_col:
                             st.error("Could not find a 'fund_name' column in your file.")
+                        elif not acct_col:
+                            st.error(
+                                "Could not find an 'account_name' column. "
+                                f"Use one of: {', '.join(_valid_accounts)}"
+                            )
                         else:
-                            portfolio_df[fund_col] = portfolio_df[fund_col].astype(str).str.strip()
-                            user_funds = portfolio_df[fund_col].dropna().unique().tolist()
-                            matched   = [f for f in user_funds if f in fund_set]
-                            unmatched = [f for f in user_funds if f not in fund_set]
+                            portfolio_df[fund_col] = (
+                                portfolio_df[fund_col].astype(str).str.strip()
+                            )
+                            portfolio_df[acct_col] = (
+                                portfolio_df[acct_col].astype(str).str.strip()
+                            )
+                            _valid_lower = {n.lower(): n for n in _valid_accounts}
+                            _matched_accts = []
+                            _unmatched_accts = []
+                            for _a in portfolio_df[acct_col].dropna().unique():
+                                if not _a or _a.lower() in ("nan", "none", "account_name"):
+                                    continue
+                                if _a.lower() in _valid_lower:
+                                    _matched_accts.append(_a)
+                                else:
+                                    _unmatched_accts.append(_a)
 
-                            # ── Matched funds summary ─────────────────────────
                             st.markdown(
                                 f"<div style='font-size:1rem;font-weight:700;color:{t['head']};"
                                 f"margin-bottom:0.5rem;'>Validation Results</div>",
                                 unsafe_allow_html=True,
                             )
+
+                            if _matched_accts:
+                                _achips = "".join(
+                                    f'<span style="display:inline-block;background:rgba(16,185,129,0.15);'
+                                    f'color:#34D399;border-radius:6px;padding:3px 10px;'
+                                    f'font-size:0.75rem;font-weight:600;margin:3px 4px 3px 0;">'
+                                    f"✓ {_html.escape(a)}</span>"
+                                    for a in _matched_accts
+                                )
+                                st.markdown(
+                                    f'<div style="margin-bottom:0.5rem;"><span style="font-size:0.72rem;'
+                                    f'font-weight:700;color:{t["sub"]};">ACCOUNTS</span><br>{_achips}</div>',
+                                    unsafe_allow_html=True,
+                                )
+
+                            acct_corrections: dict[str, str] = {}
+                            if _unmatched_accts:
+                                st.markdown(
+                                    f'<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);'
+                                    f'border-radius:10px;padding:0.9rem 1rem;margin-bottom:0.75rem;">'
+                                    f'<div style="font-weight:700;color:#FCA5A5;font-size:0.85rem;'
+                                    f'margin-bottom:0.6rem;">'
+                                    f'{len(_unmatched_accts)} account name(s) not recognised &mdash; '
+                                    f'map each to your FundLens account</div></div>',
+                                    unsafe_allow_html=True,
+                                )
+                                st.caption(
+                                    "Map each CSV name to an existing FundLens account. "
+                                    "Your family account list is not changed."
+                                )
+                                for _acct in _unmatched_accts:
+                                    _map_opts = [_CSV_ACCT_MAP_PLACEHOLDER] + list(_valid_accounts)
+                                    _ac1, _ac2 = st.columns([2, 3])
+                                    with _ac1:
+                                        st.markdown(
+                                            f'<div style="font-size:0.72rem;color:{t["sub"]};'
+                                            f'padding-top:10px;">In CSV file</div>'
+                                            f'<div style="font-size:0.78rem;color:#DC2626;font-weight:600;'
+                                            f'word-break:break-word;">{_html.escape(_acct)}</div>',
+                                            unsafe_allow_html=True,
+                                        )
+                                    with _ac2:
+                                        st.markdown(
+                                            f'<div style="font-size:0.72rem;color:{t["sub"]};'
+                                            f'margin-bottom:2px;">Map to FundLens account</div>',
+                                            unsafe_allow_html=True,
+                                        )
+                                        st.selectbox(
+                                            f"fix_acct_{_acct}",
+                                            options=_map_opts,
+                                            index=0,
+                                            key=f"fix_acct__{_acct}",
+                                            label_visibility="collapsed",
+                                        )
+                                    st.markdown(
+                                        "<div style='height:1px;background:rgba(239,68,68,0.2);"
+                                        "margin:2px 0;'></div>",
+                                        unsafe_allow_html=True,
+                                    )
+
+                            user_funds = portfolio_df[fund_col].dropna().unique().tolist()
+                            matched = [f for f in user_funds if f in fund_set]
+                            unmatched = [f for f in user_funds if f not in fund_set]
+
                             if matched:
                                 chips = "".join(
                                     f'<span style="display:inline-block;background:rgba(16,185,129,0.15);'
                                     f'color:#34D399;border-radius:6px;padding:3px 10px;'
                                     f'font-size:0.75rem;font-weight:600;margin:3px 4px 3px 0;">'
-                                    f'✓ {f}</span>'
+                                    f"✓ {f}</span>"
                                     for f in matched
                                 )
                                 st.markdown(
-                                    f'<div style="margin-bottom:0.75rem;">{chips}</div>',
+                                    f'<div style="margin-bottom:0.75rem;"><span style="font-size:0.72rem;'
+                                    f'font-weight:700;color:{t["sub"]};">FUNDS</span><br>{chips}</div>',
                                     unsafe_allow_html=True,
                                 )
 
-                            # ── Interactive correction for unmatched ──────────
-                            corrections = {}
+                            corrections: dict[str, str] = {}
                             if unmatched:
                                 st.markdown(
                                     f'<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);'
                                     f'border-radius:10px;padding:0.9rem 1rem;margin-bottom:0.75rem;">'
                                     f'<div style="font-weight:700;color:#FCA5A5;font-size:0.85rem;'
-                                    f'margin-bottom:0.6rem;">❌ {len(unmatched)} fund(s) not recognised — '
+                                    f'margin-bottom:0.6rem;">'
+                                    f'{len(unmatched)} fund(s) not recognised &mdash; '
                                     f'select the correct name or skip</div></div>',
                                     unsafe_allow_html=True,
                                 )
@@ -5803,12 +7793,15 @@ def page_portfolio_upload():
                                     suggestions = difflib.get_close_matches(
                                         fund, all_funds, n=5, cutoff=0.35
                                     )
-                                    ordered = suggestions + [f for f in all_funds if f not in suggestions]
+                                    ordered = suggestions + [
+                                        f for f in all_funds if f not in suggestions
+                                    ]
                                     c_label, c_pick = st.columns([2, 3])
                                     with c_label:
                                         st.markdown(
                                             f'<div style="font-size:0.78rem;color:#DC2626;font-weight:600;'
-                                            f'padding-top:8px;word-break:break-word;">✗ {fund}</div>',
+                                            f'padding-top:8px;word-break:break-word;">'
+                                            f'{_html.escape(str(fund))}</div>',
                                             unsafe_allow_html=True,
                                         )
                                     with c_pick:
@@ -5824,64 +7817,123 @@ def page_portfolio_upload():
                                         if choice != skip_label:
                                             corrections[fund] = choice
                                     st.markdown(
-                                        "<div style='height:1px;background:rgba(239,68,68,0.2);margin:2px 0;'></div>",
+                                        "<div style='height:1px;background:rgba(239,68,68,0.2);"
+                                        "margin:2px 0;'></div>",
                                         unsafe_allow_html=True,
                                     )
 
-                            # ── Summary + save button ─────────────────────────
                             st.markdown("<br>", unsafe_allow_html=True)
-                            n_corrected = len(corrections)
-                            n_skipped   = len(unmatched) - n_corrected
-                            total_ready = len(matched) + n_corrected
+                            for _acct in _unmatched_accts:
+                                _choice = st.session_state.get(
+                                    f"fix_acct__{_acct}", _CSV_ACCT_MAP_PLACEHOLDER
+                                )
+                                if (
+                                    _choice
+                                    and _choice != _CSV_ACCT_MAP_PLACEHOLDER
+                                    and _choice in _valid_accounts
+                                ):
+                                    acct_corrections[_acct] = _choice
 
-                            if total_ready > 0:
-                                if unmatched:
-                                    parts = []
-                                    if matched:
-                                        parts.append(f"{len(matched)} matched")
-                                    if n_corrected:
-                                        parts.append(f"{n_corrected} corrected")
-                                    if n_skipped:
-                                        parts.append(f"{n_skipped} skipped")
-                                    st.caption(f"Ready to save: {' · '.join(parts)} → {total_ready} fund(s) will be used.")
-                                if st.button("💾  Save Portfolio", type="primary",
-                                             use_container_width=True, key="upload_go"):
+                            n_corrected = len(corrections)
+                            n_skipped = len(unmatched) - n_corrected
+                            total_ready = len(matched) + n_corrected
+                            accts_ready = len(_unmatched_accts) == 0 or all(
+                                _a in acct_corrections for _a in _unmatched_accts
+                            )
+
+                            if total_ready > 0 and accts_ready:
+                                parts = []
+                                if _matched_accts:
+                                    parts.append(f"{len(_matched_accts)} accounts OK")
+                                if acct_corrections:
+                                    parts.append(f"{len(acct_corrections)} accounts mapped")
+                                if matched:
+                                    parts.append(f"{len(matched)} funds matched")
+                                if n_corrected:
+                                    parts.append(f"{n_corrected} funds corrected")
+                                if n_skipped:
+                                    parts.append(f"{n_skipped} funds skipped")
+                                st.caption(
+                                    f"Ready to review: {' · '.join(parts)} → {total_ready} row(s)"
+                                )
+                                if st.button(
+                                    "✏️  Review & edit holdings",
+                                    type="primary",
+                                    use_container_width=True,
+                                    key="upload_review",
+                                ):
                                     final_df = portfolio_df.copy()
+                                    for orig, fixed in acct_corrections.items():
+                                        final_df.loc[
+                                            final_df[acct_col] == orig, acct_col
+                                        ] = fixed
                                     for orig, fixed in corrections.items():
-                                        final_df.loc[final_df[fund_col] == orig, fund_col] = fixed
-                                    skipped_funds = [f for f in unmatched if f not in corrections]
-                                    final_df = final_df[~final_df[fund_col].isin(skipped_funds)]
-                                    st.session_state.portfolio_df = final_df
-                                    _save_portfolio(final_df)
-                                    st.session_state.portfolio_page_mode = "view"
-                                    st.session_state.pop("_portfolio_edit_type", None)
+                                        final_df.loc[
+                                            final_df[fund_col] == orig, fund_col
+                                        ] = fixed
+                                    skipped_funds = [
+                                        f for f in unmatched if f not in corrections
+                                    ]
+                                    final_df = final_df[
+                                        ~final_df[fund_col].isin(skipped_funds)
+                                    ]
+                                    if fund_col != "fund_name":
+                                        final_df = final_df.rename(
+                                            columns={fund_col: "fund_name"}
+                                        )
+                                    if acct_col != "account_name":
+                                        final_df = final_df.rename(
+                                            columns={acct_col: "account_name"}
+                                        )
+                                    final_df = _normalize_portfolio_df(
+                                        final_df, _entry_label
+                                    )
+                                    st.session_state.portfolio_staged_df = final_df
+                                    _prefill_manual_entry_state(final_df, _entry_label)
                                     st.rerun()
+                            elif not accts_ready:
+                                st.error(
+                                    "Map every unknown account name to a FundLens account "
+                                    "before continuing."
+                                )
                             else:
                                 st.error(
-                                    "No funds are ready for analysis. "
-                                    "Please correct the fund names above or use the CSV template as a reference."
+                                    "No funds are ready. Correct fund names above or "
+                                    "use the CSV template as a reference."
                                 )
 
                     except Exception as e:
                         st.error(f"Could not read file: {e}")
 
+        if _fl_auth.is_logged_in():
+            _save_note = (
+                "💾 Saved to your account in the cloud · Only you can access this portfolio"
+            )
+        else:
+            _save_note = (
+                "💾 Portfolio is saved locally on this device for your next visit. "
+                "Sign in to sync across devices."
+            )
         st.markdown(
             f"<div style='text-align:center;font-size:0.72rem;color:{t['sub']};margin-top:1.5rem;'>"
-            "💾 Portfolio is saved locally on this device for your next visit. "
-            "Never uploaded to any server.</div>",
+            f"{_save_note}</div>",
             unsafe_allow_html=True,
         )
 
-    with col_info:
-        st.markdown('<div class="section-title">What you\'ll discover</div>', unsafe_allow_html=True)
-        for icon, title, desc in [
-            ("🏦", "Hidden Stock Exposure",   "See exactly which stocks you indirectly own and in what proportions across all funds."),
-            ("🔍", "Duplicate Fund Detection", "Identify funds with near-identical portfolios that add no real diversification."),
-            ("📊", "Sector Concentration",    "Find if you're over-exposed to a single sector like BFSI or IT across your portfolio."),
-            ("🔗", "Portfolio Overlap Score",  "A single score showing how truly diversified your combined fund portfolio is."),
-            ("📈", "Allocation Trends",       "See how fund managers have been adjusting stock weights over 3M, 6M and 1Y periods."),
-        ]:
-            st.markdown(f"""
+    if _is_editing:
+        return
+
+    if col_info is not None:
+        with col_info:
+            st.markdown('<div class="section-title">What you\'ll discover</div>', unsafe_allow_html=True)
+            for icon, title, desc in [
+                ("🏦", "Hidden Stock Exposure",   "See exactly which stocks you indirectly own and in what proportions across all funds."),
+                ("🔍", "Duplicate Fund Detection", "Identify funds with near-identical portfolios that add no real diversification."),
+                ("📊", "Sector Concentration",    "Find if you're over-exposed to a single sector like BFSI or IT across your portfolio."),
+                ("🔗", "Portfolio Overlap Score",  "A single score showing how truly diversified your combined fund portfolio is."),
+                ("📈", "Allocation Trends",       "See how fund managers have been adjusting stock weights over 3M, 6M and 1Y periods."),
+            ]:
+                st.markdown(f"""
             <div style="display:flex;gap:0.75rem;margin-bottom:1rem;align-items:flex-start;">
                 <div style="font-size:1.5rem;flex-shrink:0;">{icon}</div>
                 <div>
@@ -5891,13 +7943,15 @@ def page_portfolio_upload():
             </div>
             """, unsafe_allow_html=True)
 
-        st.markdown(f"""
+            st.markdown(f"""
         <div style="background:{t['al']};border:1px solid {t['bdr']};border-radius:10px;padding:1rem;margin-top:0.5rem;">
             <div style="font-size:0.8rem;font-weight:700;color:{t['a']};margin-bottom:0.5rem;">📌 Expected CSV Format</div>
             <div style="font-family:monospace;font-size:0.72rem;color:{t['body']};line-height:1.8;">
-                fund_name, invested_amount, units<br>
-                HDFC Large Cap Fund, 50000, 100.5<br>
-                ICICI Prudential Bluechip Fund, 30000, 80.2
+                Line 1: instructions (delete before upload)<br>
+                fund_name, account_name, plan_type,<br>
+                invested_amount, invested_date, units, nav<br>
+                <span style="color:{t['sub']};">Required · plan_type = Regular | Direct ·
+                leave units/nav blank for auto-fetch</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -6724,11 +8778,83 @@ def _render_fund_performance_tab(
 
 # ── PAGE: PORTFOLIO X-RAY ─────────────────────────────────────────────────────
 
+def page_portfolio_track():
+    t_name, t = _fl_get_theme()
+    _fl_inject_css(t, t_name)
+    _fl_render_navbar(t, t_name, "portfolio_track")
+    _fl_render_breadcrumb([
+        ("Home", "home"),
+        ("My Portfolio", _FL_PORTFOLIO_NAV_KEY),
+        ("Track my portfolio", None),
+    ])
+    _hd, _bd, _sb, _cd, _bdr, _a, _al = (
+        t["head"], t["body"], t["sub"], t["card"], t["bdr"], t["a"], t["al"],
+    )
+
+    st.markdown(
+        f'<h2 style="font-size:1.6rem;font-weight:800;color:{_hd};margin-bottom:0.25rem;">'
+        f"Track my portfolio</h2>",
+        unsafe_allow_html=True,
+    )
+
+    _meta = _saved_portfolio_meta()
+    if _meta is None:
+        st.markdown(
+            f"<p style='color:{_bd};margin-top:0;margin-bottom:1.25rem;'>"
+            "Add your funds in Manage before you can track performance here.</p>",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f'<a href="?nav=portfolio_upload&theme={t_name}" target="_self" '
+            f'style="color:{_a};font-weight:600;text-decoration:none;">→ Manage my portfolio</a>',
+            unsafe_allow_html=True,
+        )
+        return
+
+    _n, _ts = _meta
+    _funds = _saved_portfolio_funds()
+    fund_chips = "".join(
+        f'<span style="display:inline-block;background:{_al};color:{_a};'
+        f'border:1px solid {_a}44;border-radius:9999px;padding:5px 13px;'
+        f'font-size:0.78rem;font-weight:600;margin:3px 5px 3px 0;">'
+        f"{display_name(f)}</span>"
+        for f in _funds
+    )
+    st.markdown(
+        f'<div style="background:{_cd};border:1px solid {_bdr};border-radius:16px;'
+        f'padding:1.5rem 1.75rem;margin-bottom:1.25rem;">'
+        f'<div style="font-size:0.75rem;color:{_sb};margin-bottom:0.75rem;">'
+        f"{_n} fund{'s' if _n != 1 else ''} &nbsp;·&nbsp; Last saved {_ts}</div>"
+        f'<div style="line-height:2.2;">{fund_chips}</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<div style="background:{_al};border:1px solid {_bdr};border-radius:12px;'
+        f'padding:1.25rem 1.5rem;color:{_bd};font-size:0.88rem;line-height:1.65;">'
+        f"<strong style=\"color:{_hd};\">Coming soon</strong> — NAV-based performance, "
+        f"allocation drift, and alerts when your underlying holdings change. "
+        f'Use <a href="?nav=portfolio_xray&theme={t_name}" target="_self" '
+        f'style="color:{_a};font-weight:600;text-decoration:none;">Analyse my portfolio</a> '
+        f"for overlap and concentration today.</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<p style="margin-top:1.25rem;">'
+        f'<a href="?nav={_FL_PORTFOLIO_NAV_KEY}&theme={t_name}" target="_self" '
+        f'style="color:{_a};font-weight:600;text-decoration:none;">← Back to My Portfolio</a></p>',
+        unsafe_allow_html=True,
+    )
+
+
 def page_portfolio_xray():
     t_name, t = _fl_get_theme()
     _fl_inject_css(t, t_name)
-    _fl_render_navbar(t, t_name, "portfolio_upload")
-    _fl_render_breadcrumb([("Home", "home"), ("Analyse Your Portfolio", "portfolio_upload"), ("Portfolio X-Ray", None)])
+    _fl_render_navbar(t, t_name, "portfolio_xray")
+    _fl_render_breadcrumb([
+        ("Home", "home"),
+        ("My Portfolio", _FL_PORTFOLIO_NAV_KEY),
+        ("Analyse my portfolio", None),
+    ])
     _hd = t["head"]; _bd = t["body"]; _sb = t["sub"]
     _cd = t["card"]; _bdr = t["bdr"]; _a = t["a"]; _al = t["al"]
     _is_dark = t_name == "dark_premium"
@@ -6740,19 +8866,37 @@ def page_portfolio_xray():
     _cg = _bdr
     _ct = dict(color=_sb, size=11)
 
-    portfolio_df = st.session_state.get("portfolio_df", pd.DataFrame())
+    _analyse_scope = ""
+    if _fl_auth.is_logged_in():
+        if not st.session_state.get("fl_portfolio_cache_warmed"):
+            _fl_auth.preload_portfolio_cache()
+            st.session_state.fl_portfolio_cache_warmed = True
+        _render_manage_family_bar(t, context="analyse")
+        _analyse_scope = _manage_selection_label()
+
+    portfolio_df = pd.DataFrame()
+    if _fl_auth.is_logged_in() and _manage_selected_member_ids():
+        _loaded = _manage_load_portfolio()
+        if _loaded is not None and not _loaded.empty:
+            portfolio_df = _loaded
+            st.session_state.portfolio_df = _loaded
+
     if portfolio_df.empty:
-        _sv = _load_saved_portfolio()
-        if _sv is not None:
-            st.session_state.portfolio_df = _sv
-            portfolio_df = _sv
+        _fallback = st.session_state.get("portfolio_df", pd.DataFrame())
+        if isinstance(_fallback, pd.DataFrame) and not _fallback.empty:
+            portfolio_df = _fallback
         else:
-            st.warning("No portfolio data. Please upload your portfolio first.")
-            t_name_up = st.session_state.get("fl_theme", "warm_light")
-            if st.button("Go to upload page"):
-                st.session_state.page = "portfolio_upload"
-                st.rerun()
-            return
+            _sv = _load_saved_portfolio()
+            if _sv is not None and not _sv.empty:
+                st.session_state.portfolio_df = _sv
+                portfolio_df = _sv
+
+    if portfolio_df.empty:
+        st.warning("No portfolio data for the selected account(s). Add holdings in Manage first.")
+        if st.button("Go to Manage my portfolio"):
+            st.session_state.page = "portfolio_upload"
+            st.rerun()
+        return
 
     holdings   = load_holdings()
     similarity = load_similarity()
@@ -6764,9 +8908,10 @@ def page_portfolio_xray():
         st.error("Could not find a 'fund_name' column in your file.")
         return
 
-    user_funds    = portfolio_df[fund_col].dropna().unique().tolist()
+    user_funds    = portfolio_df[fund_col].dropna().astype(str).str.strip().unique().tolist()
     matched_funds = [f for f in user_funds if f in holdings["fund_name"].values]
     unmatched     = [f for f in user_funds if f not in matched_funds]
+    _matched_set  = set(matched_funds)
 
     if unmatched:
         st.info(f"⚠️  Not found in our database (excluded): {', '.join(unmatched)}")
@@ -6774,15 +8919,17 @@ def page_portfolio_xray():
         st.error("None of your funds matched our database. Please check fund names match those on ETMoney.")
         return
 
-    # ── Invested amount weighting ─────────────────────────────────────────────
+    _n_rows = len(portfolio_df)
+    _n_unique_funds = portfolio_df[fund_col].dropna().astype(str).str.strip().nunique()
+    if _n_rows > _n_unique_funds and "invested_amount" in portfolio_df.columns:
+        st.caption(
+            f"Same fund held in more than one selected account: **{_n_rows} holding rows** "
+            f"→ **{len(matched_funds)} funds** for analysis (invested amounts combined)."
+        )
+
+    # ── Invested amount weighting (summed per fund across accounts) ───────────
     has_amounts  = "invested_amount" in portfolio_df.columns
-    amount_map   = {}
-    if has_amounts:
-        for _, row in portfolio_df.iterrows():
-            fund = row.get(fund_col)
-            amt  = pd.to_numeric(row.get("invested_amount", None), errors="coerce")
-            if fund in matched_funds and pd.notna(amt) and amt > 0:
-                amount_map[fund] = float(amt)
+    amount_map   = _portfolio_amount_map_by_fund(portfolio_df, fund_col, _matched_set)
     if not amount_map:
         amount_map = {f: 1.0 for f in matched_funds}
     total_invested = sum(amount_map.values())
@@ -6819,11 +8966,16 @@ def page_portfolio_xray():
             wtd_er = sum(er * wt for er, wt in zip(er_df["expense_ratio"], wts)) / wt_sum if wt_sum else None
 
     # ── Summary header ────────────────────────────────────────────────────────
+    _scope_html = (
+        f" · <span style='color:{_sb};'>{_html.escape(_analyse_scope)}</span>"
+        if _analyse_scope
+        else ""
+    )
     st.markdown(
         f"<div style='font-size:1.55rem;font-weight:800;color:{_hd};letter-spacing:-0.02em;margin-bottom:0.15rem;'>"
         f"Analyse Your Portfolio</div>"
         f"<p style='color:{_bd};margin-top:0;margin-bottom:1.5rem;font-size:0.88rem;'>"
-        f"{len(matched_funds)} funds analysed · {n_unique} unique stocks · {n_secs} sectors</p>",
+        f"{len(matched_funds)} funds analysed{_scope_html} · {n_unique} unique stocks · {n_secs} sectors</p>",
         unsafe_allow_html=True,
     )
 
@@ -10795,7 +12947,8 @@ def main():
     # All FL pages use the top navbar — skip the sidebar everywhere
     _fl_pages = {
         "home", "analyse_funds", "category", "explorer", "compare",
-        "stock_explorer", "overlap_drilldown", "portfolio_upload", "portfolio_xray",
+        "stock_explorer", "overlap_drilldown",
+        "portfolio_hub", "portfolio_upload", "portfolio_xray", "portfolio_track",
         "auth", "account",
     }
     if st.session_state.get("page", "home") not in _fl_pages:
@@ -10812,7 +12965,7 @@ def main():
         if _fl_auth.is_logged_in():
             _dest = st.session_state.get("_auth_gated_for") or _fl_get_return_page()
             if _dest not in _FL_RETURN_PAGES or _dest == "auth":
-                _dest = "portfolio_upload"
+                _dest = _FL_PORTFOLIO_NAV_KEY
             st.session_state.page = _dest
             st.session_state.pop("_auth_gated_for", None)
             _page = _dest
@@ -10827,8 +12980,10 @@ def main():
         "category":           page_category_select,
         "explorer":           page_fund_explorer,
         "compare":            page_compare,
+        "portfolio_hub":      page_portfolio_hub,
         "portfolio_upload":   page_portfolio_upload,
         "portfolio_xray":     page_portfolio_xray,
+        "portfolio_track":    page_portfolio_track,
         "stock_explorer":     page_stock_explorer,
         "overlap_drilldown":  page_overlap_drilldown,
         "account":            page_account,

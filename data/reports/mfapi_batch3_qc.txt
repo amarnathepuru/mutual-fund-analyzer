@@ -1,0 +1,28 @@
+MFApi Batch 3 — ET ↔ MFAPI match QC
+Generated: 2026-05-29T10:56:05.707469+00:00
+
+ET ACTIVE funds: 509
+  excluded index (no MFAPI match): 117
+  in match scope: 392
+MFAPI NAV universe: 881
+min_auto_score: 95
+ambiguity_gap: 3
+
+Match status counts (all rows):
+  auto_ok: 296
+  excluded_index: 117
+  approved: 94
+  review: 2
+
+In-scope only (excludes excluded_index):
+  auto_ok: 296
+  approved: 94
+  review: 2
+  excluded_index list: C:\Users\Amar Epuru\Desktop\GitRepo\mutual-fund-analyzer\data\reports\et_mfapi_excluded_index.csv
+
+MF schemes with auto_ok/approved mapping: 385
+MF schemes not linked to any ET ACTIVE: 496
+
+Report: C:\Users\Amar Epuru\Desktop\GitRepo\mutual-fund-analyzer\data\reports\et_mfapi_match_report.csv
+
+Next: streamlit run scripts/review_et_mfapi_app.py → export overrides → apply_et_mfapi_map.py

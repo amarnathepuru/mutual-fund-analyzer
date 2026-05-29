@@ -1,0 +1,219 @@
+scheme_id,decision,mf_scheme_code,computed_score,et_fund_name,mf_scheme_name,decided_at,notes
+43622,approved,151471.0,90.41,Navi ELSS Tax Saver Nifty 50 Index Fund,NAVI ELSS TAX SAVER NIFTY 50 INDEX FUND - DIRECT PLAN GROWTH,2026-05-29T05:55:55.573763+00:00,
+1292,rejected,,,Aditya Birla Sun Life Nifty 50 Index Fund,,2026-05-29T08:50:05.172875+00:00,no MFAPI link
+44513,rejected,,,Axis BSE Sensex Index Fund,,2026-05-29T08:50:10.926352+00:00,no MFAPI link
+42323,rejected,,,Axis Nifty 50 Index Fund,,2026-05-29T08:50:17.403436+00:00,no MFAPI link
+45481,rejected,,,Bajaj Finserv Nifty 50 Index Fund,,2026-05-29T08:50:20.800392+00:00,no MFAPI link
+42529,rejected,,,Bandhan Nifty 100 Index Fund,,2026-05-29T08:50:24.895061+00:00,no MFAPI link
+45213,rejected,,,Bandhan Nifty Alpha Low Volatility 30 Index Fund,,2026-05-29T08:50:29.979604+00:00,no MFAPI link
+42986,rejected,,,Bandhan Nifty100 Low Volatility 30 Index Fund,,2026-05-29T08:50:35.057012+00:00,no MFAPI link
+45225,rejected,,,DSP BSE Sensex Next 30 Index Fund,,2026-05-29T08:50:40.291354+00:00,no MFAPI link
+39611,rejected,,,DSP Nifty 50 Index Fund,,2026-05-29T08:50:45.158553+00:00,no MFAPI link
+44852,rejected,,,DSP Nifty Top 10 Equal Weight Index Fund,,2026-05-29T08:50:51.802207+00:00,no MFAPI link
+29701,rejected,,,Edelweiss Nifty 50 Index Fund,,2026-05-29T08:50:57.250751+00:00,no MFAPI link
+43246,rejected,,,Edelweiss Nifty Next 50 Index Fund,,2026-05-29T08:51:00.754743+00:00,no MFAPI link
+1219,rejected,,,HDFC BSE Sensex Index Fund,,2026-05-29T08:51:04.814229+00:00,no MFAPI link
+42264,rejected,,,HDFC NIFTY Next 50 Index Fund,,2026-05-29T08:51:08.635398+00:00,no MFAPI link
+42103,rejected,,,HDFC NIFTY50 Equal Weight Index Fund,,2026-05-29T08:51:13.216567+00:00,no MFAPI link
+1218,rejected,,,HDFC Nifty 50 Index Fund,,2026-05-29T08:51:16.384191+00:00,no MFAPI link
+45269,rejected,,,HDFC Nifty100 Quality 30 Index Fund,,2026-05-29T08:51:20.866943+00:00,no MFAPI link
+41445,rejected,,,HSBC Nifty Next 50 Index Fund,,2026-05-29T08:51:26.694310+00:00,no MFAPI link
+1088,rejected,,,ICICI Prudential Nifty 50 Index Fund,,2026-05-29T08:51:32.361338+00:00,no MFAPI link
+45586,rejected,,,ICICI Prudential Nifty Top 15 Equal Weight Index Fund,,2026-05-29T08:51:36.066651+00:00,no MFAPI link
+44433,rejected,,,ICICI Prudential Nifty50 Value 20 Index Fund,,2026-05-29T08:51:42.841211+00:00,no MFAPI link
+44709,rejected,,,Kotak NIFTY 100 Low Volatility 30 Index Fund,,2026-05-29T08:51:52.958129+00:00,no MFAPI link
+45157,rejected,,,Kotak Nifty 50 Equal Weight Index Fund,,2026-05-29T08:51:57.282628+00:00,no MFAPI link
+41793,rejected,,,Kotak Nifty Next 50 Index Fund,,2026-05-29T08:52:00.907407+00:00,no MFAPI link
+1326,rejected,,,LIC MF BSE Sensex Index Fund,,2026-05-29T08:52:05.039972+00:00,no MFAPI link
+11114,rejected,,,LIC MF Nifty Next 50 Index Fund,,2026-05-29T08:52:09.458486+00:00,no MFAPI link
+40943,rejected,,,Motilal Oswal Nifty 50 Index Fund,,2026-05-29T08:52:12.726518+00:00,no MFAPI link
+44129,rejected,,,Navi BSE Sensex Index Fund,,2026-05-29T08:52:16.284068+00:00,no MFAPI link
+42401,rejected,,,Navi Nifty Next 50 Index Fund,,2026-05-29T08:52:19.530928+00:00,no MFAPI link
+11147,rejected,,,Nippon India Index Fund - Nifty 50 Plan,,2026-05-29T08:52:25.899402+00:00,no MFAPI link
+41757,rejected,,,Nippon India Nifty 50 Value 20 Index Fund,,2026-05-29T08:52:30.976953+00:00,no MFAPI link
+43931,rejected,,,SBI BSE Sensex Index Fund,,2026-05-29T08:52:36.123294+00:00,no MFAPI link
+41958,rejected,,,SBI Nifty Next 50 Index Fund,,2026-05-29T08:52:39.870573+00:00,no MFAPI link
+44438,rejected,,,SBI Nifty50 Equal Weight Index Fund,,2026-05-29T08:52:44.473281+00:00,no MFAPI link
+1397,rejected,,,Tata BSE Sensex Index Fund,,2026-05-29T08:52:50.274812+00:00,no MFAPI link
+42492,rejected,,,UTI BSE Sensex Index Fund,,2026-05-29T08:52:54.319327+00:00,no MFAPI link
+32438,rejected,,,UTI Nifty 50 Index Fund,,2026-05-29T08:52:58.251500+00:00,no MFAPI link
+36974,rejected,,,UTI Nifty Next 50 Index Fund,,2026-05-29T08:53:02.668662+00:00,no MFAPI link
+42611,rejected,,,Axis Nifty Midcap 50 Index Fund,,2026-05-29T08:53:28.551866+00:00,no MFAPI link
+45009,rejected,,,Baroda BNP Paribas Nifty Midcap 150 Index Fund,,2026-05-29T08:53:37.634918+00:00,no MFAPI link
+42763,rejected,,,DSP Nifty Midcap 150 Quality 50 Index Fund,,2026-05-29T08:53:44.608945+00:00,no MFAPI link
+43881,rejected,,,HDFC NIFTY Midcap 150 Index Fund,,2026-05-29T08:53:53.143170+00:00,no MFAPI link
+45389,rejected,,,Kotak Nifty Midcap 150 Index Fund,,2026-05-29T08:53:58.321769+00:00,no MFAPI link
+44804,rejected,,,Kotak Nifty Midcap 50 Index Fund,,2026-05-29T08:54:02.435004+00:00,no MFAPI link
+40718,rejected,,,Motilal Oswal Nifty Midcap 150 Index Fund,,2026-05-29T08:54:05.559352+00:00,no MFAPI link
+42575,rejected,,,Navi Nifty Midcap 150 Index Fund,,2026-05-29T08:54:09.046967+00:00,no MFAPI link
+43027,rejected,,,SBI Nifty Midcap 150 Index Fund,,2026-05-29T08:54:12.344104+00:00,no MFAPI link
+43097,rejected,,,Tata Nifty Midcap 150 Momentum 50 Index Fund,,2026-05-29T08:54:15.726968+00:00,no MFAPI link
+42707,rejected,,,UTI Nifty Midcap 150 Quality 50 Index Fund,,2026-05-29T08:54:19.627505+00:00,no MFAPI link
+41855,rejected,,,Aditya Birla Sun Life Nifty Smallcap 50 Index Fund,,2026-05-29T08:56:10.505892+00:00,no MFAPI link
+44322,rejected,,,Bandhan Nifty Smallcap 250 Index Fund,,2026-05-29T08:56:14.626264+00:00,no MFAPI link
+44306,rejected,,,DSP Nifty Smallcap250 Quality 50 Index Fund,,2026-05-29T08:56:18.416188+00:00,no MFAPI link
+43890,rejected,,,HDFC NIFTY Smallcap 250 Index Fund,,2026-05-29T08:56:21.984277+00:00,no MFAPI link
+45221,rejected,,,Kotak Nifty Smallcap 250 Index Fund,,2026-05-29T08:56:27.702250+00:00,no MFAPI link
+43981,rejected,,,Motilal Oswal Nifty Microcap 250 Index Fund,,2026-05-29T08:56:31.988852+00:00,no MFAPI link
+45369,rejected,,,Navi Nifty Smallcap250 Momentum Quality 100 Index Fund,,2026-05-29T08:56:35.701136+00:00,no MFAPI link
+41597,rejected,,,Nippon India Nifty Smallcap 250 Index Fund,,2026-05-29T08:56:39.349515+00:00,no MFAPI link
+43023,rejected,,,SBI Nifty Smallcap 250 Index Fund,,2026-05-29T08:56:43.134077+00:00,no MFAPI link
+44873,rejected,,,Nippon India Nifty 500 Equal Weight Index Fund,,2026-05-29T08:56:46.803549+00:00,no MFAPI link
+40720,rejected,,,Motilal Oswal Nifty Smallcap 250 Index Fund,,2026-05-29T08:56:50.931017+00:00,no MFAPI link
+43762,rejected,,,Kotak Nifty Smallcap 50 Index Fund,,2026-05-29T08:56:54.620621+00:00,no MFAPI link
+42252,rejected,,,ICICI Prudential Nifty Smallcap 250 Index Fund,,2026-05-29T08:56:58.219098+00:00,no MFAPI link
+43250,rejected,,,Edelweiss Nifty Smallcap 250 Index Fund,,2026-05-29T08:57:01.536811+00:00,no MFAPI link
+45982,rejected,,,DSP Nifty Smallcap 250 Index Fund,,2026-05-29T08:57:04.981791+00:00,no MFAPI link
+42571,rejected,,,Axis Nifty Smallcap 50 Index Fund,,2026-05-29T08:57:08.551413+00:00,no MFAPI link
+45267,rejected,,,UTI Nifty Midsmallcap 400 Momentum Quality 100 Index Fund,,2026-05-29T08:58:25.261781+00:00,no MFAPI link
+45083,rejected,,,UTI Nifty Midcap 150 Index Fund,,2026-05-29T08:58:28.677491+00:00,no MFAPI link
+45570,rejected,,,Tata Nifty Midcap 150 Index Fund,,2026-05-29T08:58:32.332919+00:00,no MFAPI link
+41761,rejected,,,Nippon India Nifty Midcap 150 Index Fund,,2026-05-29T08:58:35.579194+00:00,no MFAPI link
+45980,rejected,,,Navi Nifty MidSmallcap 400 Index Fund,,2026-05-29T08:58:39.699234+00:00,no MFAPI link
+45568,rejected,,,Motilal Oswal BSE 1000 Index Fund,,2026-05-29T08:58:43.030540+00:00,no MFAPI link
+44931,rejected,,,Kotak Nifty Midcap 150 Momentum 50 Index Fund,,2026-05-29T08:58:46.159593+00:00,no MFAPI link
+42356,rejected,,,ICICI Prudential Nifty Midcap 150 Index Fund,,2026-05-29T08:58:49.852037+00:00,no MFAPI link
+43254,rejected,,,Edelweiss Nifty Midcap150 Momentum 50 Index Fund,,2026-05-29T08:58:53.145624+00:00,no MFAPI link
+45975,rejected,,,DSP Nifty Midcap 150 Index Fund,,2026-05-29T08:58:56.220461+00:00,no MFAPI link
+44890,rejected,,,Bandhan Nifty Midcap 150 Index Fund,,2026-05-29T08:59:02.034161+00:00,no MFAPI link
+41851,rejected,,,Aditya Birla Sun Life Nifty Midcap 150 Index Fund,,2026-05-29T08:59:05.618020+00:00,no MFAPI link
+45085,rejected,,,UTI Nifty Alpha Low-Volatility 30 Index Fund,,2026-05-29T08:59:51.852488+00:00,no MFAPI link
+43929,rejected,,,UTI NIFTY50 Equal Weight Index Fund,,2026-05-29T08:59:55.453740+00:00,no MFAPI link
+45823,rejected,,,Tata Nifty Next 50 Index Fund,,2026-05-29T08:59:59.023349+00:00,no MFAPI link
+32325,rejected,,,Sundaram Nifty 100 Equal Weight Fund,,2026-05-29T09:00:20.145257+00:00,no MFAPI link
+45694,rejected,,,SBI Nifty100 Low Volatility 30 Index Fund,,2026-05-29T09:00:24.584761+00:00,no MFAPI link
+1016,rejected,,,SBI Nifty Index Fund,,2026-05-29T09:00:28.142187+00:00,no MFAPI link
+42855,rejected,,,Nippon India Nifty Alpha Low Volatility 30 Index Fund,,2026-05-29T09:00:31.870394+00:00,no MFAPI link
+11152,rejected,,,Nippon India Index Fund BSE Sensex Plan,,2026-05-29T09:00:36.385845+00:00,no MFAPI link
+45545,rejected,,,Nippon India BSE Sensex Next 30 Index Fund,,2026-05-29T09:00:39.314809+00:00,no MFAPI link
+42041,rejected,,,Navi Nifty 50 Index Fund,,2026-05-29T09:00:42.418511+00:00,no MFAPI link
+40941,rejected,,,Motilal Oswal Nifty Next 50 Index Fund,,2026-05-29T09:00:45.529482+00:00,no MFAPI link
+44977,rejected,,,Mirae Asset Nifty 50 Index Fund,,2026-05-29T09:00:48.203434+00:00,no MFAPI link
+1325,rejected,,,LIC MF Nifty 50 Index Fund,,2026-05-29T09:00:51.014683+00:00,no MFAPI link
+45449,rejected,,,Kotak Nifty Top 10 Equal Weight Index Fund,,2026-05-29T09:00:54.797059+00:00,no MFAPI link
+41983,rejected,,,Kotak Nifty 50 Index Fund,,2026-05-29T09:00:57.952923+00:00,no MFAPI link
+45153,rejected,,,Kotak Nifty 100 Equal Weight Index Fund,,2026-05-29T09:01:02.001427+00:00,no MFAPI link
+45261,rejected,,,Kotak BSE Sensex Index Fund,,2026-05-29T09:01:05.553771+00:00,no MFAPI link
+42990,rejected,,,ICICI Prudential Nifty50 Equal Weight Index Fund,,2026-05-29T09:01:08.792383+00:00,no MFAPI link
+10863,rejected,,,ICICI Prudential Nifty Next 50 Index Fund,,2026-05-29T09:01:11.834912+00:00,no MFAPI link
+35134,rejected,,,ICICI Prudential BSE Sensex Index Fund,,2026-05-29T09:01:15.544261+00:00,no MFAPI link
+41441,rejected,,,HSBC Nifty 50 Index Fund,,2026-05-29T09:01:18.685479+00:00,no MFAPI link
+45393,rejected,,,HDFC Nifty Top 20 Equal Weight Index Fund,,2026-05-29T09:01:21.932960+00:00,no MFAPI link
+42545,rejected,,,HDFC Nifty 100 Index Fund,,2026-05-29T09:01:25.294190+00:00,no MFAPI link
+44764,rejected,,,HDFC NIFTY100 Low Volatility 30 Index Fund,,2026-05-29T09:01:28.178758+00:00,no MFAPI link
+42547,rejected,,,HDFC NIFTY 100 Equal Weight Index Fund,,2026-05-29T09:01:31.049134+00:00,no MFAPI link
+32500,rejected,,,Franklin India NSE Nifty 50 Index,,2026-05-29T09:01:34.253012+00:00,no MFAPI link
+44668,rejected,,,Edelweiss Nifty Alpha Low Volatility 30 Index Fund,,2026-05-29T09:01:37.358947+00:00,no MFAPI link
+32926,rejected,,,Edelweiss Nifty 100 Quality 30 Index Fund,,2026-05-29T09:01:40.521252+00:00,no MFAPI link
+39641,rejected,,,DSP Nifty Next 50 Index Fund,,2026-05-29T09:01:43.407601+00:00,no MFAPI link
+35180,rejected,,,DSP Nifty 50 Equal Weight Index Fund,,2026-05-29T09:01:46.334091+00:00,no MFAPI link
+44350,rejected,,,Baroda BNP Paribas NIFTY 50 Index Fund,,2026-05-29T09:01:49.468958+00:00,no MFAPI link
+45338,rejected,,,Bandhan Nifty Next 50 Index Fund,,2026-05-29T09:01:52.113926+00:00,no MFAPI link
+10787,rejected,,,Bandhan Nifty 50 Index Fund,,2026-05-29T09:01:55.390730+00:00,no MFAPI link
+45461,rejected,,,Bajaj Finserv Nifty Next 50 Index Fund,,2026-05-29T09:01:58.333331+00:00,no MFAPI link
+42409,rejected,,,Axis Nifty Next 50 Index Fund,,2026-05-29T09:02:01.277536+00:00,no MFAPI link
+40769,rejected,,,Axis Nifty 100 Index Fund,,2026-05-29T09:02:04.107848+00:00,no MFAPI link
+42525,rejected,,,Aditya Birla Sun Life Nifty Next 50 Index Fund,,2026-05-29T09:02:07.684333+00:00,no MFAPI link
+41971,rejected,,,Aditya Birla Sun Life Nifty 50 Equal Weight Index Fund,,2026-05-29T09:02:10.812432+00:00,no MFAPI link
+33762,approved,140382.0,85.9,,Bandhan Aggressive Hybrid Fund-Direct Plan Growth,2026-05-29T09:39:28.099089+00:00,bulk_grid
+33105,approved,139527.0,92.24,,BANK OF INDIA MID & SMALL CAP EQUITY & DEBT FUND - DIRECT PLAN GROWTH,2026-05-29T09:39:28.100906+00:00,bulk_grid
+11660,approved,151122.0,89.4,,HSBC Aggressive Hybrid Fund - Direct Growth,2026-05-29T09:39:28.103615+00:00,bulk_grid
+2605,approved,118794.0,84.47,,Nippon India Aggressive Hybrid Fund  - Direct Plan Growth Plan,2026-05-29T09:39:28.105919+00:00,bulk_grid
+36872,approved,143614.0,84.7,,BANK OF INDIA Arbitrage Fund Direct Plan Growth,2026-05-29T09:39:28.110750+00:00,bulk_grid
+41483,approved,148401.0,88.79,,Mirae Asset Arbitrage Fund Direct Growth,2026-05-29T09:39:28.115124+00:00,bulk_grid
+11236,approved,118585.0,79.23,,Nippon India Arbitrage Fund - Direct Plan Growth Plan - Growth Option,2026-05-29T09:39:28.117149+00:00,bulk_grid
+45931,approved,153979.0,88.12,,Old Bridge Arbitrage Fund Direct Growth,2026-05-29T09:39:28.119729+00:00,bulk_grid
+44196,approved,152109.0,83.97,,Parag Parikh Arbitrage Fund - Direct Plan Growth,2026-05-29T09:39:28.121792+00:00,bulk_grid
+3494,rejected,,,,,2026-05-29T09:39:28.124146+00:00,bulk_grid no link
+44888,approved,152849.0,86.54,,WhiteOak Capital Arbitrage Fund Direct Plan Growth,2026-05-29T09:39:28.128526+00:00,bulk_grid
+44207,approved,152132.0,89.57,,WhiteOak Capital Balanced Hybrid Fund Direct Plan Growth,2026-05-29T09:39:28.130404+00:00,bulk_grid
+27860,approved,131355.0,86.54,,BANDHAN Balanced Advantage Fund Direct Plan Growth,2026-05-29T09:39:28.133033+00:00,bulk_grid
+24276,approved,127850.0,89.57,,BANK OF INDIA BALANCED ADVANTAGE FUND DIRECT PLAN  GROWTH,2026-05-29T09:39:28.135289+00:00,bulk_grid
+42897,approved,150481.0,94.44,,Franklin India Balanced Advantage Fund- Growth- Direct,2026-05-29T09:39:28.137789+00:00,bulk_grid
+32508,approved,118968.0,92.4,,HDFC Balanced Advantage Fund - Growth Plan - Direct Plan,2026-05-29T09:39:28.139444+00:00,bulk_grid
+11662,rejected,,,,,2026-05-29T09:39:28.140977+00:00,bulk_grid no link
+33424,approved,139872.0,97.06,,Motilal Oswal Balanced Advantage Fund  (MOFDYNAMIC) - Direct Plan - Grow,2026-05-29T09:39:28.143919+00:00,bulk_grid
+2328,approved,118736.0,85.0,,Nippon India Balanced Advantage Fund - Direct Plan Growth Plan - Growth,2026-05-29T09:39:28.146152+00:00,bulk_grid
+44532,approved,152468.0,91.55,,Parag Parikh Dynamic Asset Allocation Fund - Direct Plan Growth,2026-05-29T09:39:28.148767+00:00,bulk_grid
+43447,approved,151267.0,90.81,,WhiteOak Capital Balanced Advantage Fund Direct Plan Growth,2026-05-29T09:39:28.151925+00:00,bulk_grid
+32517,approved,119060.0,98.37,,HDFC ELSS Tax saver - Growth Option - Direct Plan,2026-05-29T09:39:28.157446+00:00,bulk_grid
+2922,approved,120079.0,94.0,,HSBC Tax Saver Equity Fund - Growth Direct,2026-05-29T09:39:28.161787+00:00,bulk_grid
+2749,approved,119773.0,88.12,,Kotak ELSS Tax Saver Fund-Growth - Direct,2026-05-29T09:39:28.166867+00:00,bulk_grid
+2630,approved,118803.0,82.73,,Nippon India ELSS Tax Saver Fund - Direct Plan Growth Plan - Growth Opti,2026-05-29T09:39:28.170952+00:00,bulk_grid
+40581,approved,147481.0,92.05,,Parag Parikh ELSS Tax Saver Fund- Direct Growth,2026-05-29T09:39:28.172832+00:00,bulk_grid
+31868,approved,149570.0,84.7,,Sundaram ELSS Tax Saver Fund Direct Plan Growth,2026-05-29T09:39:28.174672+00:00,bulk_grid
+42929,approved,150587.0,89.12,,WhiteOak Capital ELSS Tax Saver Fund Direct Plan Growth,2026-05-29T09:39:28.177223+00:00,bulk_grid
+1674,approved,118275.0,97.27,,CANARA ROBECO FLEXICAP FUND - DIRECT PLAN - GROWTH OPTION,2026-05-29T09:39:28.179882+00:00,bulk_grid
+45662,approved,153738.0,88.79,,CAPITALMIND FLEXI CAP FUND DIRECT GROWTH,2026-05-29T09:39:28.182258+00:00,bulk_grid
+10258,approved,120166.0,83.1,,Kotak Flexicap Fund - Growth - Direct,2026-05-29T09:39:28.186200+00:00,bulk_grid
+42082,approved,149094.0,79.23,,Nippon India Flexi Cap Fund - Direct Plan - Growth Plan - Growth Option,2026-05-29T09:39:28.187952+00:00,bulk_grid
+45827,approved,153872.0,92.5,,THE WEALTH COMPANY FLEXI CAP FUND - DIRECT GROWTH,2026-05-29T09:39:28.191106+00:00,bulk_grid
+27208,approved,130860.0,76.4,,Nippon India Japan Equity Fund- Direct Plan- Growth Plan- Growth Option,2026-05-29T09:39:28.196111+00:00,bulk_grid
+39932,approved,146772.0,81.88,,HSBC Large & Mid Cap Fund - Direct Growth,2026-05-29T09:39:28.199848+00:00,bulk_grid
+40809,approved,147704.0,88.7,,Motilal Oswal Large and Midcap Fund - Direct Plan Growth,2026-05-29T09:39:28.202440+00:00,bulk_grid
+31961,approved,118678.0,86.0,,Nippon India Vision Large & Mid Cap Fund - Direct Plan Growth Plan - Gro,2026-05-29T09:39:28.204148+00:00,bulk_grid
+44448,approved,152382.0,99.23,,PGIM India Large and Midcap Fund - Direct Plan - Growth Option,2026-05-29T09:39:28.205764+00:00,bulk_grid
+3959,approved,119566.0,98.52,,Sundaram Large and Midcap Fund Direct Plan - Growth,2026-05-29T09:39:28.207567+00:00,bulk_grid
+44298,approved,152226.0,88.65,,Whiteoak Capital Large & Mid Cap Fund Direct Plan Growth,2026-05-29T09:39:28.211023+00:00,bulk_grid
+41987,approved,148980.0,84.7,,BANK OF INDIA Large Cap Fund Direct Plan Growth,2026-05-29T09:39:28.213613+00:00,bulk_grid
+7298,rejected,,,,,2026-05-29T09:39:28.217950+00:00,bulk_grid no link
+32273,approved,120152.0,84.1,,Kotak Large Cap  Fund - Growth - Direct,2026-05-29T09:39:28.219788+00:00,bulk_grid
+44427,approved,152354.0,81.4,,Motilal Oswal Large Cap Direct Plan Growth,2026-05-29T09:39:28.221496+00:00,bulk_grid
+5077,approved,118632.0,79.23,,Nippon India Large Cap Fund - Direct Plan Growth Plan - Growth Option,2026-05-29T09:39:28.223077+00:00,bulk_grid
+43155,approved,150797.0,86.54,,WhiteOak Capital Large Cap Fund Direct Plan Growth,2026-05-29T09:39:28.228788+00:00,bulk_grid
+45717,approved,153728.0,83.24,,Bank of India Mid Cap Fund - Direct Plan Growth,2026-05-29T09:39:28.230484+00:00,bulk_grid
+3066,approved,150212.0,98.52,,BARODA BNP PARIBAS Mid Cap Fund - Direct Plan - Growth Option,2026-05-29T09:39:28.232180+00:00,bulk_grid
+2151,approved,149154.0,88.79,,HSBC Mid Cap Fund - Direct - Growth,2026-05-29T09:39:28.234059+00:00,bulk_grid
+4087,approved,120403.0,96.3,,Invesco India Midcap Fund - Direct Plan - Growth Option,2026-05-29T09:39:28.235808+00:00,bulk_grid
+33825,approved,152002.0,91.08,,LIC MF Mid Cap Fund-Direct Plan-Growth,2026-05-29T09:39:28.237489+00:00,bulk_grid
+40523,approved,147445.0,78.66,,Mirae Asset Midcap Fund- Direct Growth Option,2026-05-29T09:39:28.239166+00:00,bulk_grid
+31962,approved,118668.0,82.73,,Nippon India Growth Mid Cap Fund - Direct Plan Growth Plan - Growth Opti,2026-05-29T09:39:28.241200+00:00,bulk_grid
+42925,approved,150584.0,85.3,,WhiteOak Capital Mid Cap Fund Direct Plan Growth,2026-05-29T09:39:28.245393+00:00,bulk_grid
+43473,approved,151307.0,97.5,,Aditya Birla Sun Life Multi Asset Allocation Fund-Direct Growth,2026-05-29T09:39:28.246956+00:00,bulk_grid
+44688,approved,152639.0,95.42,,Bajaj Finserv Multi Asset Allocation Fund - Direct Growth,2026-05-29T09:39:28.248625+00:00,bulk_grid
+2632,rejected,,,,,2026-05-29T09:39:28.250595+00:00,bulk_grid no link
+44405,approved,152314.0,89.12,,Sundaram Multi Asset Allocation Fund Direct Plan Growth,2026-05-29T09:39:28.252813+00:00,bulk_grid
+45960,approved,153999.0,96.79,,The Wealth Company Multi Asset Allocation Fund - Direct Growth,2026-05-29T09:39:28.254555+00:00,bulk_grid
+43907,approved,151745.0,92.24,,WhiteOak Capital Multi Asset Allocation Fund Direct Plan Growth,2026-05-29T09:39:28.256516+00:00,bulk_grid
+41932,approved,148921.0,93.7,,Aditya Birla Sun Life Multi-Cap Fund-Direct Growth,2026-05-29T09:39:28.258595+00:00,bulk_grid
+44697,approved,152651.0,84.7,,Motilal Oswal Multi Cap Fund-Direct Plan Growth,2026-05-29T09:39:28.263325+00:00,bulk_grid
+2455,approved,118650.0,79.23,,Nippon India Multi Cap Fund - Direct Plan Growth Plan - Growth Option,2026-05-29T09:39:28.265024+00:00,bulk_grid
+44143,approved,152071.0,86.54,,WhiteOak Capital Multi Cap Fund Direct Plan Growth,2026-05-29T09:39:28.268641+00:00,bulk_grid
+45279,approved,153266.0,90.0,,HSBC Financial Services Fund - Direct Growth,2026-05-29T09:39:28.270853+00:00,bulk_grid
+41656,approved,148623.0,97.04,,Mirae Asset Banking and Financial Services Fund Direct Growth,2026-05-29T09:39:28.273159+00:00,bulk_grid
+1546,approved,118589.0,88.6,,Nippon India Banking & Financial Services Fund - Direct Plan Growth Plan,2026-05-29T09:39:28.275830+00:00,bulk_grid
+44409,approved,152321.0,97.27,,WhiteOak Capital Banking & Financial Services Fund - Direct Growth,2026-05-29T09:39:28.277971+00:00,bulk_grid
+44935,approved,152915.0,89.12,,WhiteOak Capital Digital Bharat Fund Direct Plan Growth,2026-05-29T09:39:28.280429+00:00,bulk_grid
+41035,approved,147946.0,79.84,,BANDHAN SMALL CAP FUND - DIRECT PLAN GROWTH,2026-05-29T09:39:28.282603+00:00,bulk_grid
+38760,approved,145678.0,84.67,,BANK OF INDIA Small Cap Fund Direct Plan Growth,2026-05-29T09:39:28.284284+00:00,bulk_grid
+25651,approved,120069.0,94.4,,HSBC Small Cap Equity Fund - Growth Direct,2026-05-29T09:39:28.286306+00:00,bulk_grid
+2412,approved,120164.0,84.07,,Kotak-Small Cap Fund - Growth - Direct,2026-05-29T09:39:28.288275+00:00,bulk_grid
+11077,approved,118778.0,79.23,,Nippon India Small Cap Fund - Direct Plan Growth Plan - Growth Option,2026-05-29T09:39:28.290262+00:00,bulk_grid
+32489,approved,120847.0,100.0,,quant ELSS Tax Saver Fund - Growth Option - Direct Plan,2026-05-29T10:10:59.539161+00:00,bulk_grid
+38316,approved,145110.0,100.0,,Axis Large & Mid Cap Fund - Direct Plan - Growth,2026-05-29T10:10:59.555790+00:00,bulk_grid
+4678,approved,140175.0,100.0,,Edelweiss Large & Mid Cap Fund - Direct Plan - Growth Option,2026-05-29T10:10:59.602262+00:00,bulk_grid
+44859,approved,152821.0,93.7,,ITI Large & Midcap Fund - Direct Plan - Growth,2026-05-29T10:10:59.624008+00:00,bulk_grid
+28921,approved,133710.0,100.0,,LIC MF Large & Mid Cap Fund-Direct Plan-Growth,2026-05-29T10:10:59.634542+00:00,bulk_grid
+40868,approved,147840.0,100.0,,Mahindra Manulife Large & Mid Cap Fund - Direct Plan -Growth,2026-05-29T10:10:59.641041+00:00,bulk_grid
+45550,approved,153534.0,100.0,,Samco Large & Mid Cap Fund - Direct Plan - Growth Option,2026-05-29T10:10:59.689896+00:00,bulk_grid
+31881,approved,119202.0,100.0,,Tata Large & MId Cap Fund -Direct Plan- Growth Option,2026-05-29T10:10:59.721181+00:00,bulk_grid
+32037,approved,120665.0,100.0,,UTI Large & Mid Cap Fund - Direct Plan - Growth Option,2026-05-29T10:10:59.722754+00:00,bulk_grid
+40856,approved,147750.0,100.0,,Union Large & Midcap Fund - Direct Plan - Growth Option,2026-05-29T10:10:59.737016+00:00,bulk_grid
+1286,approved,119620.0,99.6,,Aditya Birla Sun Life Midcap Fund - Growth - Direct Plan,2026-05-29T10:10:59.750520+00:00,bulk_grid
+31894,approved,118533.0,100.0,,Franklin India Mid Cap Fund - Direct - Growth,2026-05-29T10:10:59.753551+00:00,bulk_grid
+44540,approved,152474.0,100.0,,Quantum Multi Asset Allocation Fund - Direct Plan Growth Option,2026-05-29T10:10:59.757648+00:00,bulk_grid
+42348,approved,149383.0,82.0,,Axis Multicap Fund - Direct Growth,2026-05-29T10:10:59.758616+00:00,bulk_grid
+44194,approved,152107.0,100.0,,QUANTUM SMALL CAP FUND - DIRECT PLAN GROWTH OPTION,2026-05-29T10:10:59.768799+00:00,bulk_grid
+44057,approved,151885.0,100.0,,UTI Balanced Advantage Fund - Direct Plan - Growth Option,2026-05-29T10:18:26.086796+00:00,bulk_grid
+1328,approved,120030.0,83.08,,HSBC Large Cap Fund - Direct Growth,2026-05-29T10:18:26.146574+00:00,bulk_grid
+42946,rejected,,,,,2026-05-29T10:32:59.203220+00:00,bulk_grid no link
+32026,rejected,,,,,2026-05-29T10:32:59.204232+00:00,bulk_grid no link
+44614,rejected,,,,,2026-05-29T10:32:59.205117+00:00,bulk_grid no link
+32529,rejected,,,,,2026-05-29T10:32:59.207825+00:00,bulk_grid no link
+1898,approved,120046.0,83.08,HSBC Flexi Cap Fund,HSBC Flexi Cap Fund - Direct Growth,2026-05-29T10:42:06.949645+00:00,manual_rework_review9
+1960,approved,120726.0,70.38,UTI Mid Cap Fund,UTI Mid Cap Fund-Growth Option- Direct,2026-05-29T10:42:07.061282+00:00,manual_rework_review9
+26816,approved,151138.0,83.08,HSBC Arbitrage Fund,HSBC Arbitrage Fund - Direct Growth,2026-05-29T10:42:07.168728+00:00,manual_rework_review9
+32397,approved,149601.0,66.88,Sundaram Aggressive Hybrid Fund,Sundaram Aggressive Hybrid Fund (Formerly Known as Principal Hybrid Equity Fund)- Direct Plan - Growth Option,2026-05-29T10:42:07.305021+00:00,manual_rework_review9
+41570,approved,148507.0,62.27,Sundaram Large Cap Fund,Sundaram Large Cap Fund (Formerly Known as Sundaram Blue Chip Fund)Direct Plan - Growth,2026-05-29T10:42:07.424789+00:00,manual_rework_review9
+45843,approved,153891.0,92.5,The Wealth Company Arbitrage Fund,THE WEALTH COMPANY ARBITRAGE FUND DIRECT GROWTH,2026-05-29T10:42:07.557458+00:00,manual_rework_review9
+45869,approved,154269.0,57.83,Samco Small Cap Fund,The Wealth Company Small Cap Fund- Direct-Growth,2026-05-29T10:42:07.667786+00:00,manual_rework_review9

@@ -1,0 +1,386 @@
+scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,notes
+1233,119581,INF903J01MJ3,Sundaram Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.666299+00:00,auto_ok from match report
+1247,119528,INF209K01YY7,Aditya Birla Sun Life Large Cap Fund,100.0,auto,2026-05-29T10:42:17.663993+00:00,auto_ok from match report
+1286,119620,INF209K01Q30,,99.6,manual,2026-05-29T10:10:59.750520+00:00,bulk_grid
+1318,120334,INF109K015K4,ICICI Prudential Multi Asset Fund,100.0,auto,2026-05-29T10:42:17.667028+00:00,auto_ok from match report
+1328,120030,INF336L01CM7,,83.08,manual,2026-05-29T10:18:26.146574+00:00,bulk_grid
+1360,138312,INF663L01GR4,PGIM India Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664935+00:00,auto_ok from match report
+1386,119250,INF740K01PR3,DSP Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664303+00:00,auto_ok from match report
+1546,118589,INF204K01XO1,,88.6,manual,2026-05-29T09:39:28.275830+00:00,bulk_grid
+1657,119354,INF955L01AG0,Baroda BNP Paribas Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.667977+00:00,auto_ok from match report
+1674,118275,INF760K01EF0,,97.27,manual,2026-05-29T09:39:28.179882+00:00,bulk_grid
+1883,138386,INF663L01GX2,PGIM India Aggressive Hybrid Equity Fund,100.0,auto,2026-05-29T10:42:17.656549+00:00,auto_ok from match report
+1898,120046,INF336L01DH5,HSBC Flexi Cap Fund,83.08,manual,2026-05-29T10:42:06.949645+00:00,manual_rework_review9
+1960,120726,INF789F01UA6,UTI Mid Cap Fund,70.38,manual,2026-05-29T10:42:07.061282+00:00,manual_rework_review9
+1963,120733,INF789F01SN3,UTI Banking and Financial Services Fund,100.0,auto,2026-05-29T10:42:17.672929+00:00,auto_ok from match report
+2151,149154,nan,,88.79,manual,2026-05-29T09:39:28.234059+00:00,bulk_grid
+2156,150187,INF251K01HN7,Baroda BNP Paribas Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664199+00:00,auto_ok from match report
+2178,120158,INF174K01LF9,Kotak Large & Midcap Fund,100.0,auto,2026-05-29T10:42:17.663459+00:00,auto_ok from match report
+2257,120381,INF109K011N7,ICICI Prudential Midcap Fund,100.0,auto,2026-05-29T10:42:17.665833+00:00,auto_ok from match report
+2328,118736,INF204K01G94,,85.0,manual,2026-05-29T09:39:28.146152+00:00,bulk_grid
+2412,120164,INF174K01KT2,,84.07,manual,2026-05-29T09:39:28.288275+00:00,bulk_grid
+2414,119589,INF903J01NK9,Sundaram Small Cap Fund,100.0,auto,2026-05-29T10:42:17.675040+00:00,auto_ok from match report
+2420,118510,INF090I01IN1,Franklin India Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663100+00:00,auto_ok from match report
+2455,118650,INF204K01XF9,,79.23,manual,2026-05-29T09:39:28.265024+00:00,bulk_grid
+2460,118278,INF760K01EI4,Canara Robeco Large and Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662948+00:00,auto_ok from match report
+2477,119716,INF200K01TP4,SBI Midcap Fund,100.0,auto,2026-05-29T10:42:17.666247+00:00,auto_ok from match report
+2483,119062,INF179K01XZ1,HDFC Hybrid Equity Fund,100.0,auto,2026-05-29T10:42:17.655690+00:00,auto_ok from match report
+2605,118794,INF204K01B08,,84.47,manual,2026-05-29T09:39:28.105919+00:00,bulk_grid
+2611,118419,INF194K01V89,Bandhan Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662794+00:00,auto_ok from match report
+2630,118803,INF204K01L55,,82.73,manual,2026-05-29T09:39:28.170952+00:00,bulk_grid
+2671,119718,INF200K01UG1,SBI Flexicap Fund,100.0,auto,2026-05-29T10:42:17.662223+00:00,auto_ok from match report
+2694,119771,INF174K01LC6,Kotak Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657582+00:00,auto_ok from match report
+2698,118424,INF194K01W62,Bandhan Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661157+00:00,auto_ok from match report
+2749,119773,INF174K01LI3,,88.12,manual,2026-05-29T09:39:28.166867+00:00,bulk_grid
+2811,150159,INF251K01HF3,Baroda BNP Paribas ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659794+00:00,auto_ok from match report
+2825,119843,INF200K01TZ3,SBI Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667565+00:00,auto_ok from match report
+2829,118525,INF090I01IQ4,Franklin India Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674244+00:00,auto_ok from match report
+2893,119598,INF200K01QX4,SBI Large Cap Fund,100.0,auto,2026-05-29T10:42:17.665091+00:00,auto_ok from match report
+2922,120079,INF336L01EE0,,94.0,manual,2026-05-29T09:39:28.161787+00:00,bulk_grid
+3066,150212,INF251K01HQ0,,98.52,manual,2026-05-29T09:39:28.232180+00:00,bulk_grid
+3207,118479,INF194K01Z44,Bandhan Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664148+00:00,auto_ok from match report
+3253,120482,INF192K01BN6,JM Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657528+00:00,auto_ok from match report
+3271,120795,INF789FB1RG6,UTI Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.658106+00:00,auto_ok from match report
+3532,119071,INF740K01PX1,DSP Midcap Fund,100.0,auto,2026-05-29T10:42:17.665575+00:00,auto_ok from match report
+3709,120364,INF109K016O4,ICICI Prudential Equity Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657357+00:00,auto_ok from match report
+3713,120377,INF109K012B0,ICICI Prudential Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658727+00:00,auto_ok from match report
+3720,120416,INF205K01NT8,Invesco India ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660159+00:00,auto_ok from match report
+3778,118474,INF194K01Y60,Bandhan Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657035+00:00,auto_ok from match report
+3792,119242,INF740K01OK1,DSP ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659899+00:00,auto_ok from match report
+3918,120826,INF966L01648,Quant Large and Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663678+00:00,auto_ok from match report
+3959,119566,INF903J01PR9,,98.52,manual,2026-05-29T09:39:28.207567+00:00,bulk_grid
+4077,119775,INF174K01LT0,Kotak Midcap Fund,100.0,auto,2026-05-29T10:42:17.665987+00:00,auto_ok from match report
+4087,120403,INF205K01MV6,,96.3,manual,2026-05-29T09:39:28.235808+00:00,bulk_grid
+4647,120401,INF205K01KR8,Invesco India Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657461+00:00,auto_ok from match report
+4678,140175,INF843K01AL0,,100.0,manual,2026-05-29T10:10:59.602262+00:00,bulk_grid
+4813,119556,INF209K01WN4,Aditya Birla Sun Life Small Cap Fund,100.0,auto,2026-05-29T10:42:17.673753+00:00,auto_ok from match report
+4874,118989,INF179K01XQ0,HDFC Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.665730+00:00,auto_ok from match report
+4876,119212,INF740K01QD1,DSP Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674135+00:00,auto_ok from match report
+5050,119076,INF740K01PI2,DSP Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661316+00:00,auto_ok from match report
+5077,118632,INF204K01XI3,,79.23,manual,2026-05-29T09:39:28.223077+00:00,bulk_grid
+5153,120357,INF205K01MA0,Invesco India Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663356+00:00,auto_ok from match report
+5373,120333,INF205K01LN5,Invesco India Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658830+00:00,auto_ok from match report
+5453,120591,INF109K015M0,ICICI Prudential Smallcap Fund,100.0,auto,2026-05-29T10:42:17.674401+00:00,auto_ok from match report
+5841,118931,INF179K01UU8,HDFC Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657306+00:00,auto_ok from match report
+6034,140228,INF843K01AO4,Edelweiss Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.665626+00:00,auto_ok from match report
+6190,118559,INF090I01IZ5,Franklin Asian Equity Fund,100.0,auto,2026-05-29T10:42:17.662486+00:00,auto_ok from match report
+6465,120413,INF205K01MS2,Invesco India Multicap Fund,100.0,auto,2026-05-29T10:42:17.668447+00:00,auto_ok from match report
+6469,120494,INF192K01CE3,JM ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660211+00:00,auto_ok from match report
+6550,118825,INF769K01AX2,Mirae Asset Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664884+00:00,auto_ok from match report
+6558,130503,INF179KA1RW5,HDFC Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674296+00:00,auto_ok from match report
+7010,119544,INF209K01UN8,Aditya Birla Sun Life ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659526+00:00,auto_ok from match report
+7386,119597,INF903J01NB8,Sundaram Financial Services Opportunities Fund,100.0,auto,2026-05-29T10:42:17.672738+00:00,auto_ok from match report
+7599,120385,INF205K01KY4,Invesco India Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671773+00:00,auto_ok from match report
+8044,120244,INF109K013J1,ICICI Prudential Banking and Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671327+00:00,auto_ok from match report
+8402,120492,INF192K01CC7,JM Flexicap Fund,100.0,auto,2026-05-29T10:42:17.661747+00:00,auto_ok from match report
+8576,120843,INF966L01911,Quant Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662170+00:00,auto_ok from match report
+8734,119350,INF761K01652,Bank of India Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662845+00:00,auto_ok from match report
+9467,120760,INF789F01VE6,UTI Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667719+00:00,auto_ok from match report
+9741,118473,INF194K01Y29,Bandhan ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659689+00:00,auto_ok from match report
+9806,119351,INF761K01884,Bank of India ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659741+00:00,auto_ok from match report
+9834,118620,INF754K01CA8,Edelweiss ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659952+00:00,auto_ok from match report
+9918,118285,INF760K01EL8,Canara Robeco ELSS Tax Saver,100.0,auto,2026-05-29T10:42:17.659847+00:00,auto_ok from match report
+10108,118617,INF754K01BW4,Edelweiss Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664356+00:00,auto_ok from match report
+10234,120392,INF205K01LB0,Invesco India Largecap Fund,100.0,auto,2026-05-29T10:42:17.664670+00:00,auto_ok from match report
+10250,119526,INF209K01VP1,Aditya Birla Sun Life Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.656874+00:00,auto_ok from match report
+10258,120166,INF174K01LS2,,83.1,manual,2026-05-29T09:39:28.186200+00:00,bulk_grid
+10265,125497,INF200K01T51,SBI Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674988+00:00,auto_ok from match report
+10269,118615,INF754K01BS2,Edelweiss Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658573+00:00,auto_ok from match report
+10271,118624,INF754K01CE0,Edelweiss Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655509+00:00,auto_ok from match report
+10434,120465,INF846K01DP8,Axis Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664045+00:00,auto_ok from match report
+10480,120503,INF846K01EW2,Axis ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659583+00:00,auto_ok from match report
+10842,118834,INF769K01BI1,Mirae Asset Large & Midcap Fund,100.0,auto,2026-05-29T10:42:17.663625+00:00,auto_ok from match report
+10960,118269,INF760K01FR2,Canara Robeco Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664251+00:00,auto_ok from match report
+10970,120524,INF846K01EV4,Axis Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666509+00:00,auto_ok from match report
+11077,118778,INF204K01K15,,79.23,manual,2026-05-29T09:39:28.290262+00:00,bulk_grid
+11236,118585,INF204K01XZ7,,79.23,manual,2026-05-29T09:39:28.117149+00:00,bulk_grid
+11431,148026,nan,Sundaram Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659304+00:00,auto_ok from match report
+11656,120505,INF846K01EH3,Axis Midcap Fund,100.0,auto,2026-05-29T10:42:17.665409+00:00,auto_ok from match report
+11660,151122,INF917K01LE4,,89.4,manual,2026-05-29T09:39:28.103615+00:00,bulk_grid
+12396,119292,INF582M01633,Union Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662382+00:00,auto_ok from match report
+13091,119307,INF582M01765,Union ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660845+00:00,auto_ok from match report
+14514,119333,INF955L01971,Baroda BNP Paribas Banking and Financial Services Fund,100.0,auto,2026-05-29T10:42:17.670799+00:00,auto_ok from match report
+14566,120186,INF109K01Z71,ICICI Prudential US Bluechip Equity Fund,100.0,auto,2026-05-29T10:42:17.662537+00:00,auto_ok from match report
+17056,120578,INF200K01RV6,SBI Technology Opportunities Fund,100.0,auto,2026-05-29T10:42:17.673570+00:00,auto_ok from match report
+19230,122639,INF879O01027,Parag Parikh Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662118+00:00,auto_ok from match report
+21857,125354,INF846K01K35,Axis Small Cap Fund,100.0,auto,2026-05-29T10:42:17.673826+00:00,auto_ok from match report
+21889,125307,INF663L01DV3,PGIM India Midcap Fund,100.0,auto,2026-05-29T10:42:17.666143+00:00,auto_ok from match report
+22046,125597,INF209K014W1,Aditya Birla Sun Life Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.669728+00:00,auto_ok from match report
+22958,126393,INF740K01K81,DSP Dynamic Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.658523+00:00,auto_ok from match report
+23600,127042,INF247L01445,Motilal Oswal Midcap Fund,100.0,auto,2026-05-29T10:42:17.666091+00:00,auto_ok from match report
+24276,127850,INF761K01BO6,,89.57,manual,2026-05-29T09:39:28.135289+00:00,bulk_grid
+25643,129046,INF247L01502,Motilal Oswal Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661961+00:00,auto_ok from match report
+25651,120069,nan,,94.4,manual,2026-05-29T09:39:28.286306+00:00,bulk_grid
+26378,129649,INF582M01BU9,Union Small Cap Fund,100.0,auto,2026-05-29T10:42:17.675215+00:00,auto_ok from match report
+26662,130206,INF754K01EA4,Edelweiss Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657199+00:00,auto_ok from match report
+26816,151138,INF917K01QR5,HSBC Arbitrage Fund,83.08,manual,2026-05-29T10:42:07.168728+00:00,manual_rework_review9
+27105,130773,INF846K01PZ1,Axis Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.656930+00:00,auto_ok from match report
+27208,130860,INF204KA1SI1,,76.4,manual,2026-05-29T09:39:28.196111+00:00,bulk_grid
+27390,138875,INF223J013N7,PGIM India Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657793+00:00,auto_ok from match report
+27860,131355,INF194KA1UH1,,86.54,manual,2026-05-29T09:39:28.133033+00:00,bulk_grid
+28004,132756,INF277K01I86,Tata ELSS Fund,100.0,auto,2026-05-29T10:42:17.660741+00:00,auto_ok from match report
+28150,133035,INF174K01F00,Kotak Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656113+00:00,auto_ok from match report
+28670,133386,INF247L01569,Motilal Oswal ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660423+00:00,auto_ok from match report
+28768,140353,INF843K01KK1,Edelweiss Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661368+00:00,auto_ok from match report
+28921,133710,INF767K01NE9,,100.0,manual,2026-05-29T10:10:59.634542+00:00,bulk_grid
+28968,133859,INF200KA1507,SBI Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.672675+00:00,auto_ok from match report
+28978,133839,INF663L01FF1,PGIM India Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662066+00:00,auto_ok from match report
+29210,134017,INF767K01NK6,LIC MF Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.672484+00:00,auto_ok from match report
+30101,134813,INF769K01DH9,Mirae Asset Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656357+00:00,auto_ok from match report
+30664,135601,INF663L01FN5,PGIM India ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660474+00:00,auto_ok from match report
+30815,135781,INF769K01DM9,Mirae Asset ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660371+00:00,auto_ok from match report
+30853,135793,INF277K01Z10,Tata Banking and Financial Services Fund,100.0,auto,2026-05-29T10:42:17.672831+00:00,auto_ok from match report
+30865,135800,INF277K01Z77,Tata Digital India Fund,100.0,auto,2026-05-29T10:42:17.673682+00:00,auto_ok from match report
+31780,147927,nan,Sundaram Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.658003+00:00,auto_ok from match report
+31802,120656,INF789F01US8,UTI Large Cap Fund,100.0,auto,2026-05-29T10:42:17.665251+00:00,auto_ok from match report
+31807,119436,INF209K01VH8,Aditya Birla Sun Life Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662639+00:00,auto_ok from match report
+31845,120828,INF966L01689,Quant Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674883+00:00,auto_ok from match report
+31854,118272,INF760K01EZ8,Canara Robeco Equity Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655236+00:00,auto_ok from match report
+31865,120599,INF109K014O9,ICICI Prudential Multicap Fund,100.0,auto,2026-05-29T10:42:17.668335+00:00,auto_ok from match report
+31868,149570,INF173K01HZ7,,84.7,manual,2026-05-29T09:39:28.174672+00:00,bulk_grid
+31881,119202,INF277K01MK8,,100.0,manual,2026-05-29T10:10:59.721181+00:00,bulk_grid
+31882,119178,INF277K01PY2,Tata Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.666351+00:00,auto_ok from match report
+31883,119018,INF179K01YV8,HDFC Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664459+00:00,auto_ok from match report
+31885,120484,INF192K01BQ9,JM Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655992+00:00,auto_ok from match report
+31887,120490,INF192K01BZ0,JM Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664729+00:00,auto_ok from match report
+31893,118531,INF090I01FN7,Franklin India Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664408+00:00,auto_ok from match report
+31894,118533,INF090I01FH9,,100.0,manual,2026-05-29T10:10:59.753551+00:00,bulk_grid
+31895,118535,INF090I01FK3,Franklin India Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661420+00:00,auto_ok from match report
+31913,120264,INF767K01EG3,LIC MF Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661799+00:00,auto_ok from match report
+31919,120261,INF767K01ED0,LIC MF Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656202+00:00,auto_ok from match report
+31937,120267,INF767K01EJ7,LIC MF Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664781+00:00,auto_ok from match report
+31951,130498,INF179KA1RQ7,HDFC Large and Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663151+00:00,auto_ok from match report
+31961,118678,INF204K01F20,,86.0,manual,2026-05-29T09:39:28.204148+00:00,bulk_grid
+31962,118668,INF204K01E54,,82.73,manual,2026-05-29T09:39:28.241200+00:00,bulk_grid
+31976,119721,INF200K01UJ5,SBI Large & Midcap Fund,100.0,auto,2026-05-29T10:42:17.663730+00:00,auto_ok from match report
+31977,119723,INF200K01UM9,SBI ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660635+00:00,auto_ok from match report
+31983,119609,INF200K01RY0,SBI Equity Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656659+00:00,auto_ok from match report
+31990,119053,INF277K01MN2,Tata Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656713+00:00,auto_ok from match report
+31998,118955,INF179K01UT0,HDFC Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661472+00:00,auto_ok from match report
+32037,120665,INF789F01UG3,,100.0,manual,2026-05-29T10:10:59.722754+00:00,bulk_grid
+32063,120674,INF789F01SK9,UTI Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656766+00:00,auto_ok from match report
+32142,120270,INF767K01EM1,LIC MF ELSS Tax Saver,100.0,auto,2026-05-29T10:42:17.660267+00:00,auto_ok from match report
+32210,119160,INF277K01QZ7,Tata Large Cap Fund,100.0,auto,2026-05-29T10:42:17.665198+00:00,auto_ok from match report
+32212,120517,INF209K01ZC0,Aditya Birla Sun Life Equity Hybrid '95 Fund,100.0,auto,2026-05-29T10:42:17.654931+00:00,auto_ok from match report
+32231,120596,INF109K011O5,ICICI Prudential Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663252+00:00,auto_ok from match report
+32245,118537,INF090I01FE6,Franklin India Technology Fund,100.0,auto,2026-05-29T10:42:17.673164+00:00,auto_ok from match report
+32258,120564,INF209K01XX1,Aditya Birla Sun Life Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661000+00:00,auto_ok from match report
+32273,120152,INF174K01KW6,,84.1,manual,2026-05-29T09:39:28.219788+00:00,bulk_grid
+32291,118540,INF090I01JS8,Franklin India ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660003+00:00,auto_ok from match report
+32299,119019,INF740K01NY4,DSP Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655404+00:00,auto_ok from match report
+32328,120592,INF109K01Y31,ICICI Prudential ELSS Tax Saver,100.0,auto,2026-05-29T10:42:17.660055+00:00,auto_ok from match report
+32369,120251,INF109K01Y07,ICICI Prudential Equity & Debt Fund,100.0,auto,2026-05-29T10:42:17.655778+00:00,auto_ok from match report
+32375,118546,INF090I01FZ1,Franklin India Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655588+00:00,auto_ok from match report
+32397,149601,INF173K01FE6,Sundaram Aggressive Hybrid Fund,66.88,manual,2026-05-29T10:42:07.305021+00:00,manual_rework_review9
+32407,120715,INF789F01TF7,UTI ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660793+00:00,auto_ok from match report
+32410,120539,INF209K01VF2,Aditya Birla Sun Life Digital India Fund,100.0,auto,2026-05-29T10:42:17.673031+00:00,auto_ok from match report
+32420,120594,INF109K01Z48,ICICI Prudential Technology Fund,100.0,auto,2026-05-29T10:42:17.673280+00:00,auto_ok from match report
+32451,119218,INF740K01PL6,DSP Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662999+00:00,auto_ok from match report
+32470,131670,INF084M01DJ5,Aditya Birla Sun Life Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658265+00:00,auto_ok from match report
+32489,120847,INF966L01986,,100.0,manual,2026-05-29T10:10:59.539161+00:00,bulk_grid
+32508,118968,INF179K01WA6,,92.4,manual,2026-05-29T09:39:28.139444+00:00,bulk_grid
+32517,119060,INF179K01YS4,,98.37,manual,2026-05-29T09:39:28.157446+00:00,bulk_grid
+32603,120819,INF966L01556,Quant Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656606+00:00,auto_ok from match report
+32605,120823,INF966L01614,Quant Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669275+00:00,auto_ok from match report
+32607,120821,INF966L01580,Quant Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667452+00:00,auto_ok from match report
+32611,120841,INF966L01887,Quant Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.666195+00:00,auto_ok from match report
+33105,139527,INF761K01DM6,,92.24,manual,2026-05-29T09:39:28.100906+00:00,bulk_grid
+33387,139781,INF174V01093,Mahindra Manulife ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660319+00:00,auto_ok from match report
+33424,139872,INF247L01635,,97.06,manual,2026-05-29T09:39:28.143919+00:00,bulk_grid
+33736,150251,INF251K01OT0,Baroda BNP Paribas Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657089+00:00,auto_ok from match report
+33762,140382,INF194KA1U56,,85.9,manual,2026-05-29T09:39:28.099089+00:00,bulk_grid
+33825,152002,INF397L01JK8,,91.08,manual,2026-05-29T09:39:28.237489+00:00,bulk_grid
+34328,150260,INF251K01OZ7,Baroda BNP Paribas Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655124+00:00,auto_ok from match report
+34465,111549,INF082J01069,Quantum ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660579+00:00,auto_ok from match report
+34477,141226,INF174V01341,Mahindra Manulife Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669022+00:00,auto_ok from match report
+34573,141248,INF582M01CU7,Union Largecap Fund,100.0,auto,2026-05-29T10:42:17.665303+00:00,auto_ok from match report
+34761,152004,INF397L01JS1,LIC MF Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674613+00:00,auto_ok from match report
+34956,141642,INF846K01A29,Axis Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658316+00:00,auto_ok from match report
+35196,141925,INF846K01B28,Axis Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661053+00:00,auto_ok from match report
+35346,142038,INF582M01DE9,Union Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659463+00:00,auto_ok from match report
+35440,142110,INF174V01507,Mahindra Manulife Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.666040+00:00,auto_ok from match report
+35592,142283,INF740KA1DN4,DSP Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657144+00:00,auto_ok from match report
+36421,143163,INF959L01CX3,Navi Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656435+00:00,auto_ok from match report
+36872,143614,INF761K01ED3,,84.7,manual,2026-05-29T09:39:28.110750+00:00,bulk_grid
+37022,143537,INF205K014Q7,Invesco India Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655904+00:00,auto_ok from match report
+37164,143793,INF959L01DT9,Navi Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662015+00:00,auto_ok from match report
+37558,144335,INF174KA1210,Kotak Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658881+00:00,auto_ok from match report
+37614,144394,INF846K01E25,Axis Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655045+00:00,auto_ok from match report
+37919,144546,INF277K015K0,Tata Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662330+00:00,auto_ok from match report
+38316,145110,INF846K01J46,,100.0,manual,2026-05-29T10:10:59.555790+00:00,bulk_grid
+38320,145137,INF205K013T3,Invesco India Smallcap Fund,100.0,auto,2026-05-29T10:42:17.674506+00:00,auto_ok from match report
+38468,145206,INF277K011O1,Tata Small Cap Fund,100.0,auto,2026-05-29T10:42:17.675103+00:00,auto_ok from match report
+38590,145396,INF955L01HF7,Baroda BNP Paribas Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658419+00:00,auto_ok from match report
+38760,145678,INF761K01EP7,,84.67,manual,2026-05-29T09:39:28.284284+00:00,bulk_grid
+38979,145724,INF277K017Q3,Tata Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.658055+00:00,auto_ok from match report
+39178,145895,INF767K01PP0,LIC MF Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657635+00:00,auto_ok from match report
+39184,146010,INF277K013S8,Tata Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659357+00:00,auto_ok from match report
+39294,146130,INF760K01JC6,Canara Robeco Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674079+00:00,auto_ok from match report
+39328,146196,INF754K01JN6,Edelweiss Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674190+00:00,auto_ok from match report
+39447,146297,INF582M01ES7,Union Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.658157+00:00,auto_ok from match report
+39700,146549,INF174V01721,Mahindra Manulife Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664833+00:00,auto_ok from match report
+39840,146643,INF200KA1A71,SBI Equity Minimum Variance Fund,100.0,auto,2026-05-29T10:42:17.665039+00:00,auto_ok from match report
+39932,146772,INF336L01NV5,,81.88,manual,2026-05-29T09:39:28.199848+00:00,bulk_grid
+40307,147183,INF00XX01168,ITI Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668386+00:00,auto_ok from match report
+40523,147445,INF769K01FA9,,78.66,manual,2026-05-29T09:39:28.239166+00:00,bulk_grid
+40569,147446,INF174V01788,Mahindra Manulife Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656282+00:00,auto_ok from match report
+40581,147481,INF879O01100,,92.05,manual,2026-05-29T09:39:28.172832+00:00,bulk_grid
+40612,147541,INF00XX01390,ITI ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660107+00:00,auto_ok from match report
+40730,147617,INF00XX01440,ITI Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657408+00:00,auto_ok from match report
+40809,147704,INF247L01999,,88.7,manual,2026-05-29T09:39:28.202440+00:00,bulk_grid
+40856,147750,INF582M01GA0,,100.0,manual,2026-05-29T10:10:59.737016+00:00,bulk_grid
+40868,147840,INF174V01945,,100.0,manual,2026-05-29T10:10:59.641041+00:00,bulk_grid
+40896,147789,INF00XX01689,ITI Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658779+00:00,auto_ok from match report
+40997,147919,INF00XX01747,ITI Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674453+00:00,auto_ok from match report
+41035,147946,INF194KB1AL4,,79.84,manual,2026-05-29T09:39:28.282603+00:00,bulk_grid
+41156,148053,INF277K019Y3,Tata Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667668+00:00,auto_ok from match report
+41239,148073,INF582M01GI3,Union Midcap Fund,100.0,auto,2026-05-29T10:42:17.666405+00:00,auto_ok from match report
+41483,148401,INF769K01FS1,,88.79,manual,2026-05-29T09:39:28.115124+00:00,bulk_grid
+41487,148404,INF761K01FF5,Bank of India Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661209+00:00,auto_ok from match report
+41540,148457,INF204KB19V4,Nippon India Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667346+00:00,auto_ok from match report
+41550,148468,INF174V01AA0,Mahindra Manulife Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657687+00:00,auto_ok from match report
+41554,148474,INF955L01JU2,Baroda BNP Paribas Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662896+00:00,auto_ok from match report
+41570,148507,INF903JA1JC0,Sundaram Large Cap Fund,62.27,manual,2026-05-29T10:42:07.424789+00:00,manual_rework_review9
+41652,148592,INF582M01GY0,Union Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656820+00:00,auto_ok from match report
+41656,148623,INF769K01GX9,,97.04,manual,2026-05-29T09:39:28.273159+00:00,bulk_grid
+41676,148353,INF00XX01804,ITI Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664618+00:00,auto_ok from match report
+41699,148618,INF789F1AUQ1,UTI Small Cap Fund,100.0,auto,2026-05-29T10:42:17.675158+00:00,auto_ok from match report
+41729,148658,INF663L01V49,PGIM India Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659090+00:00,auto_ok from match report
+41785,148733,INF00XX01929,ITI Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.665884+00:00,auto_ok from match report
+41932,148921,INF209KB1Y49,,93.7,manual,2026-05-29T09:39:28.258595+00:00,bulk_grid
+41987,148980,INF761K01FL3,,84.7,manual,2026-05-29T09:39:28.213613+00:00,bulk_grid
+41991,148990,INF109KC1R14,ICICI Prudential Flexicap Fund,100.0,auto,2026-05-29T10:42:17.661590+00:00,auto_ok from match report
+41999,148986,INF179KC1BG0,HDFC Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671125+00:00,auto_ok from match report
+42043,149019,INF663L01W06,PGIM India Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674829+00:00,auto_ok from match report
+42082,149094,INF204KC1121,,79.23,manual,2026-05-29T09:39:28.187952+00:00,bulk_grid
+42099,149104,INF174V01AS2,Mahindra Manulife Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661850+00:00,auto_ok from match report
+42121,149134,INF200KA1Y73,SBI Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659196+00:00,auto_ok from match report
+42173,149185,INF174KA1HV3,Kotak Multicap Fund,100.0,auto,2026-05-29T10:42:17.668777+00:00,auto_ok from match report
+42273,149261,INF767K01QY0,LIC MF Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658933+00:00,auto_ok from match report
+42285,149303,INF194KB1CL0,Bandhan Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.667872+00:00,auto_ok from match report
+42297,149321,INF00XX01BU6,ITI Banking and Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671467+00:00,auto_ok from match report
+42301,149329,INF204KC1303,Nippon India Taiwan Equity Fund,100.0,auto,2026-05-29T10:42:17.662588+00:00,auto_ok from match report
+42327,149368,INF179KC1BS5,HDFC Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668234+00:00,auto_ok from match report
+42348,149383,INF846K013E0,,82.0,manual,2026-05-29T10:10:59.758616+00:00,bulk_grid
+42384,149406,INF174V01BE0,Mahindra Manulife Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658985+00:00,auto_ok from match report
+42399,149450,INF0K1H01024,Samco Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662274+00:00,auto_ok from match report
+42467,149763,INF205KA1494,Invesco India Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661696+00:00,auto_ok from match report
+42561,149882,INF200KA18E2,SBI Multicap Fund,100.0,auto,2026-05-29T10:42:17.669339+00:00,auto_ok from match report
+42755,150470,INF769K01IN6,Mirae Asset Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659037+00:00,auto_ok from match report
+42759,150387,INF251K01QZ2,Baroda BNP Paribas Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661264+00:00,auto_ok from match report
+42767,150346,INF03VN01530,WhiteOak Capital Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662434+00:00,auto_ok from match report
+42784,150404,INF194KB1DJ2,Bandhan Midcap Fund,100.0,auto,2026-05-29T10:42:17.665461+00:00,auto_ok from match report
+42809,150440,INF966L01AT0,Quant Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664987+00:00,auto_ok from match report
+42897,150481,INF090I01WQ5,,94.44,manual,2026-05-29T09:39:28.137789+00:00,bulk_grid
+42925,150584,INF03VN01597,,85.3,manual,2026-05-29T09:39:28.245393+00:00,bulk_grid
+42929,150587,INF03VN01621,,89.12,manual,2026-05-29T09:39:28.177223+00:00,bulk_grid
+43071,150659,INF767K01RK7,LIC MF Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668943+00:00,auto_ok from match report
+43147,150817,INF760K01KI1,Canara Robeco Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.665521+00:00,auto_ok from match report
+43155,150797,INF03VN01696,,86.54,manual,2026-05-29T09:39:28.228788+00:00,bulk_grid
+43173,150815,INF192K01MV6,JM Midcap Fund,100.0,auto,2026-05-29T10:42:17.665936+00:00,auto_ok from match report
+43203,150838,INF0K1H01065,Samco ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660688+00:00,auto_ok from match report
+43221,150858,INF582M01IO7,Union Multicap Fund,100.0,auto,2026-05-29T10:42:17.669616+00:00,auto_ok from match report
+43225,150865,INF251K01RF2,Baroda BNP Paribas Multi Asset Fund,100.0,auto,2026-05-29T10:42:17.666664+00:00,auto_ok from match report
+43241,150915,INF174V01BK7,Mahindra Manulife Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674666+00:00,auto_ok from match report
+43447,151267,INF03VN01738,,90.81,manual,2026-05-29T09:39:28.151925+00:00,bulk_grid
+43461,151290,INF336L01QN5,HSBC Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668285+00:00,auto_ok from match report
+43469,151232,INF277KA1679,Tata Multicap Fund,100.0,auto,2026-05-29T10:42:17.669469+00:00,auto_ok from match report
+43473,151307,INF209KB15R9,,97.5,manual,2026-05-29T09:39:28.246956+00:00,bulk_grid
+43551,151379,INF00XX01CO7,ITI Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661644+00:00,auto_ok from match report
+43559,151384,INF174KA1MD1,Kotak Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.672296+00:00,auto_ok from match report
+43565,151412,INF769K01JJ2,Mirae Asset Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661906+00:00,auto_ok from match report
+43593,151443,INF761K01FR0,Bank of India Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.667925+00:00,auto_ok from match report
+43622,151471,INF959L01GR6,Navi ELSS Tax Saver Nifty 50 Index Fund,90.41,manual,2026-05-29T05:55:55.573763+00:00,
+43876,151713,INF966L01BL5,Quant Dynamic Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.659142+00:00,auto_ok from match report
+43907,151745,INF03VN01761,,92.24,manual,2026-05-29T09:39:28.256516+00:00,bulk_grid
+43952,151796,INF579M01AS1,360 ONE FlexiCap Fund,100.0,auto,2026-05-29T10:42:17.660897+00:00,auto_ok from match report
+43956,151792,INF754K01RS8,Edelweiss Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666819+00:00,auto_ok from match report
+43960,151791,INF966L01BX0,Quant BFSI Fund,100.0,auto,2026-05-29T10:42:17.672573+00:00,auto_ok from match report
+43972,151816,INF194KB1GB2,Bandhan Financial Services Fund,100.0,auto,2026-05-29T10:42:17.670265+00:00,auto_ok from match report
+43976,151824,INF760K01KO9,Canara Robeco Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668028+00:00,auto_ok from match report
+43983,151810,INF769K01KK8,Mirae Asset Multicap Fund,100.0,auto,2026-05-29T10:42:17.669119+00:00,auto_ok from match report
+44044,151895,INF0QA701342,Bajaj Finserv Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661105+00:00,auto_ok from match report
+44057,151885,INF789F1AYV3,,100.0,manual,2026-05-29T10:18:26.086796+00:00,bulk_grid
+44115,152064,INF174KA1PD4,Kotak Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667132+00:00,auto_ok from match report
+44124,152056,INF740KA1TE9,DSP Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666767+00:00,auto_ok from match report
+44139,152059,INF179KC1HI3,HDFC Technology Fund,100.0,auto,2026-05-29T10:42:17.673221+00:00,auto_ok from match report
+44143,152071,INF03VN01803,,86.54,manual,2026-05-29T09:39:28.268641+00:00,bulk_grid
+44145,152067,INF966L01CT6,Quant Teck Fund,100.0,auto,2026-05-29T10:42:17.673511+00:00,auto_ok from match report
+44149,152076,INF579M01AY9,360 ONE Balanced Hybrid Fund,100.0,auto,2026-05-29T10:42:17.658213+00:00,auto_ok from match report
+44153,152077,INF0QA701524,Bajaj Finserv Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.656983+00:00,auto_ok from match report
+44161,152094,INF754K01SD8,Edelweiss Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668130+00:00,auto_ok from match report
+44174,152128,INF251K01SR5,Baroda BNP Paribas Small Cap Fund,100.0,auto,2026-05-29T10:42:17.673973+00:00,auto_ok from match report
+44194,152107,INF082J01432,,100.0,manual,2026-05-29T10:10:59.768799+00:00,bulk_grid
+44196,152109,INF879O01225,,83.97,manual,2026-05-29T09:39:28.121792+00:00,bulk_grid
+44207,152132,INF03VN01829,,89.57,manual,2026-05-29T09:39:28.130404+00:00,bulk_grid
+44218,152135,INF0R8701046,Helios Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661536+00:00,auto_ok from match report
+44251,152188,INF0K1H01131,Samco Dynamic Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.659249+00:00,auto_ok from match report
+44255,152194,INF0QA701656,Bajaj Finserv Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658367+00:00,auto_ok from match report
+44270,152206,INF740KA1TQ3,DSP Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671011+00:00,auto_ok from match report
+44298,152226,INF03VN01845,,88.65,manual,2026-05-29T09:39:28.211023+00:00,bulk_grid
+44310,152237,INF247L01BY3,Motilal Oswal Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674776+00:00,auto_ok from match report
+44362,152310,INF740KA1UC1,DSP Multicap Fund,100.0,auto,2026-05-29T10:42:17.668079+00:00,auto_ok from match report
+44367,152344,INF769K01KZ6,Mirae Asset Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667294+00:00,auto_ok from match report
+44393,152324,INF194KB1HM7,Bandhan Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666560+00:00,auto_ok from match report
+44405,152314,INF903JA1LK9,,89.12,manual,2026-05-29T09:39:28.252813+00:00,bulk_grid
+44409,152321,INF03VN01860,,97.27,manual,2026-05-29T09:39:28.277971+00:00,bulk_grid
+44427,152354,INF247L01CE3,,81.4,manual,2026-05-29T09:39:28.221496+00:00,bulk_grid
+44448,152382,INF663L01Y12,,99.23,manual,2026-05-29T09:39:28.205764+00:00,bulk_grid
+44452,152380,INF336L01RI3,HSBC Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666977+00:00,auto_ok from match report
+44461,152396,INF761K01FZ3,Bank of India Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666612+00:00,auto_ok from match report
+44481,152408,INF0QA701763,Bajaj Finserv Large and Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662742+00:00,auto_ok from match report
+44485,152437,INF754K01SK3,Edelweiss Technology Fund,100.0,auto,2026-05-29T10:42:17.673104+00:00,auto_ok from match report
+44493,152443,INF174V01BW2,Mahindra Manulife Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667239+00:00,auto_ok from match report
+44527,152462,INF174KA1QZ5,Kotak Technology Fund,100.0,auto,2026-05-29T10:42:17.673399+00:00,auto_ok from match report
+44532,152468,INF879O01266,,91.55,manual,2026-05-29T09:39:28.148767+00:00,bulk_grid
+44540,152474,INF082J01457,,100.0,manual,2026-05-29T10:10:59.757648+00:00,bulk_grid
+44571,152509,INF0R8701145,Helios Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658677+00:00,auto_ok from match report
+44672,152614,INF192K01NH3,JM Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674559+00:00,auto_ok from match report
+44688,152639,INF0QA701821,,95.42,manual,2026-05-29T09:39:28.248625+00:00,bulk_grid
+44697,152651,INF247L01CL8,,84.7,manual,2026-05-29T09:39:28.263325+00:00,bulk_grid
+44728,152688,INF760K01LD0,Canara Robeco Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658472+00:00,auto_ok from match report
+44732,152679,INF0R8701202,Helios Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671229+00:00,auto_ok from match report
+44768,152739,INF090I01XA7,Franklin India Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668182+00:00,auto_ok from match report
+44813,152783,INF0QA701896,Bajaj Finserv Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664096+00:00,auto_ok from match report
+44828,119327,nan,Union Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667769+00:00,auto_ok from match report
+44859,152821,INF00XX01DA4,,93.7,manual,2026-05-29T10:10:59.624008+00:00,bulk_grid
+44863,152815,INF663L01Z03,PGIM India Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669177+00:00,auto_ok from match report
+44886,152847,INF0K1H01198,Samco Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669403+00:00,auto_ok from match report
+44888,152849,INF03VN01910,,86.54,manual,2026-05-29T09:39:28.128526+00:00,bulk_grid
+44901,152863,INF205KA1965,Invesco India Technology Fund,100.0,auto,2026-05-29T10:42:17.673341+00:00,auto_ok from match report
+44935,152915,INF03VN01936,,89.12,manual,2026-05-29T09:39:28.280429+00:00,bulk_grid
+44967,152941,INF0R8701269,Helios Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663201+00:00,auto_ok from match report
+44999,152964,INF247L01DN2,Motilal Oswal Digital India Fund,100.0,auto,2026-05-29T10:42:17.673455+00:00,auto_ok from match report
+45060,153043,INF090I01XS9,Franklin India Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657254+00:00,auto_ok from match report
+45081,153090,INF0K1H01214,Samco Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657950+00:00,auto_ok from match report
+45095,153047,INF205KA1AC1,Invesco India Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667080+00:00,auto_ok from match report
+45101,153070,INF109KC10Y6,ICICI Prudential Equity Minimum Variance Fund,100.0,auto,2026-05-29T10:42:17.664511+00:00,auto_ok from match report
+45135,153092,INF0K1H01230,Samco Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667616+00:00,auto_ok from match report
+45181,153196,INF769K01NJ4,Mirae Asset Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674719+00:00,auto_ok from match report
+45195,153187,INF247L01ED1,Motilal Oswal Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657740+00:00,auto_ok from match report
+45209,153201,INF0QA701AK0,Bajaj Finserv ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659637+00:00,auto_ok from match report
+45239,153246,INF767K01RZ5,LIC MF Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667184+00:00,auto_ok from match report
+45271,153309,INF0QA701AV7,Bajaj Finserv Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.667821+00:00,auto_ok from match report
+45279,153266,INF336L01RU8,,90.0,manual,2026-05-29T09:39:28.270853+00:00,bulk_grid
+45340,153326,INF0R8701327,Helios Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.665782+00:00,auto_ok from match report
+45367,153239,INF0K1H01255,Samco Large Cap Fund,100.0,auto,2026-05-29T10:42:17.665143+00:00,auto_ok from match report
+45423,153426,INF966L01DW8,Quant Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657844+00:00,auto_ok from match report
+45491,153515,INF789F1AB89,UTI Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669534+00:00,auto_ok from match report
+45516,153465,INF760K01LH1,Canara Robeco Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666715+00:00,auto_ok from match report
+45550,153534,INF0K1H01271,,100.0,manual,2026-05-29T10:10:59.689896+00:00,bulk_grid
+45619,153612,INF0QA701BN2,Bajaj Finserv Small Cap Fund,100.0,auto,2026-05-29T10:42:17.673899+00:00,auto_ok from match report
+45652,153629,INF192K01NK7,JM Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663407+00:00,auto_ok from match report
+45662,153738,INF226401018,,88.79,manual,2026-05-29T09:39:28.182258+00:00,bulk_grid
+45700,153731,INF090I01YH0,Franklin India Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666871+00:00,auto_ok from match report
+45717,153728,INF761K01GY4,,83.24,manual,2026-05-29T09:39:28.230484+00:00,bulk_grid
+45746,153774,INF579M01BM2,360 ONE Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666457+00:00,auto_ok from match report
+45827,153872,INF2F0001040,,92.5,manual,2026-05-29T09:39:28.191106+00:00,bulk_grid
+45843,153891,INF2F0001271,The Wealth Company Arbitrage Fund,92.5,manual,2026-05-29T10:42:07.557458+00:00,manual_rework_review9
+45869,154269,INF2F0001537,Samco Small Cap Fund,57.83,manual,2026-05-29T10:42:07.667786+00:00,manual_rework_review9
+45887,153912,INF0R8701384,Helios Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674349+00:00,auto_ok from match report
+45891,153937,INF0QA701BZ6,Bajaj Finserv Banking And Financial Services Fund,100.0,auto,2026-05-29T10:42:17.670097+00:00,auto_ok from match report
+45931,153979,INF0S5R01125,,88.12,manual,2026-05-29T09:39:28.119729+00:00,bulk_grid
+45947,153987,INF663L010A3,PGIM India Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667400+00:00,auto_ok from match report
+45960,153999,INF2F0001347,,96.79,manual,2026-05-29T09:39:28.254555+00:00,bulk_grid
+46008,154043,INF2JJD01136,Abakkus Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.660949+00:00,auto_ok from match report
+46069,154093,INF761K01HE4,Bank of India Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.670507+00:00,auto_ok from match report

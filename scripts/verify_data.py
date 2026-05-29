@@ -253,7 +253,58 @@ def main() -> int:
     else:
         ok("Each fund pair appears once (undirected)")
 
-    print(f"\n[6] Cross-file category consistency\n")
+    print(f"\n[6] fund_scheme_map.csv (ET ↔ MFAPI bridge)\n")
+    map_path = DATA / "fund_scheme_map.csv"
+    if not map_path.is_file():
+        warn("Missing fund_scheme_map.csv — run apply_et_mfapi_map.py after review")
+    else:
+        smap = pd.read_csv(map_path)
+        print(f"  Rows: {len(smap)}")
+        if smap.duplicated("scheme_id").any():
+            fail(f"{int(smap.duplicated('scheme_id').sum())} duplicate scheme_id in map")
+            issues += 1
+        else:
+            ok("scheme_id unique in fund_scheme_map")
+        if "mf_scheme_code" in smap.columns:
+            dup_mf = smap[smap.duplicated("mf_scheme_code", keep=False)]
+            if len(dup_mf):
+                fail(
+                    f"{dup_mf['mf_scheme_code'].nunique()} duplicate mf_scheme_code pairs "
+                    f"({len(dup_mf)} rows)"
+                )
+                issues += 1
+            else:
+                ok("mf_scheme_code unique in fund_scheme_map")
+            nav_db = DATA / "nav" / "nav.db"
+            if nav_db.is_file():
+                import sqlite3
+
+                conn = sqlite3.connect(nav_db)
+                try:
+                    nav_codes = set(
+                        pd.read_sql_query(
+                            "SELECT mf_scheme_code FROM schemes", conn
+                        )["mf_scheme_code"].astype(int)
+                    )
+                finally:
+                    conn.close()
+                bad = smap[~smap["mf_scheme_code"].astype(int).isin(nav_codes)]
+                if len(bad):
+                    fail(f"{len(bad)} map codes not found in nav.db")
+                    issues += 1
+                else:
+                    ok("All mapped mf_scheme_code values exist in nav.db")
+            else:
+                warn("nav.db not found — skipped NAV code check")
+        mapped_ids = set(smap["scheme_id"].astype(int)) if "scheme_id" in smap.columns else set()
+        non_index = active[~active["category"].astype(str).str.contains("Index", case=False, na=False)]
+        unmapped = set(non_index["scheme_id"].astype(int)) - mapped_ids
+        if len(unmapped) > 30:
+            warn(f"{len(unmapped)} non-index ACTIVE ET funds not in scheme map")
+        else:
+            ok(f"{len(mapped_ids)} ET funds mapped; {len(unmapped)} non-index ACTIVE without map")
+
+    print(f"\n[7] Cross-file category consistency\n")
     m_cat = active.set_index("fund_name")["category"]
     h_cat = holdings.groupby("fund_name")["category"].first()
     mismatch = []
