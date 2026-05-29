@@ -123,14 +123,14 @@ Do **not** write `fund_scheme_map.csv` or `fund_master_mfapi.csv` until:
 
 Run: `python scripts/mfapi_export_scheme_meta.py`
 - `data/raw/mfapi/MFAPI_FIELD_INVENTORY.md` — API + parsed column reference
-- `data/reports/mfapi_batch1_qc.txt` — counts and samples
+- `data/reports/mfapi_batch1_qc.txt` — counts and samples (local only, gitignored)
 
 Run: `python scripts/mfapi_fetch_schemes.py` (add `--refresh` to re-download)
 
 ## Batch 2 outputs
 
 - `data/nav/nav.db` — SQLite: `schemes` (meta + sync status), `nav_prices` (daily NAV >= 2015-01-01)
-- `data/reports/mfapi_batch2_qc.txt` — row counts, errors sample
+- `data/reports/mfapi_batch2_qc.txt` — row counts, errors sample (local only, gitignored)
 
 Run (repo root):
 

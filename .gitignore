@@ -36,6 +36,14 @@ data/nav/
 # Dated master backups (local only)
 data/backups/
 
+# Regenerated pipeline QC / scratch reports (keep match report + apply QC in git)
+data/reports/mfapi_batch1_qc.txt
+data/reports/mfapi_batch2_qc.txt
+data/reports/mfapi_batch3_qc.txt
+data/reports/mfapi_nav_prune_qc.txt
+data/reports/mfapi_direct_growth_ambiguous_base.csv
+data/reports/et_mfapi_needs_review.csv
+
 # Secrets / credentials
 *.env
 secrets.json

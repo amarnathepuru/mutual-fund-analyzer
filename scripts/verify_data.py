@@ -304,6 +304,33 @@ def main() -> int:
         else:
             ok(f"{len(mapped_ids)} ET funds mapped; {len(unmapped)} non-index ACTIVE without map")
 
+        dec_path = DATA / "et_mfapi_decisions.csv"
+        if dec_path.is_file():
+            dec = pd.read_csv(dec_path)
+            if dec.duplicated("scheme_id").any():
+                fail(
+                    f"{int(dec.duplicated('scheme_id').sum())} duplicate scheme_id in et_mfapi_decisions"
+                )
+                issues += 1
+            else:
+                ok("scheme_id unique in et_mfapi_decisions")
+            if "decision" in dec.columns and "scheme_id" in smap.columns:
+                map_ids = set(smap["scheme_id"].astype(int))
+                appr = dec[dec["decision"].astype(str).str.lower() == "approved"]
+                rej = dec[dec["decision"].astype(str).str.lower() == "rejected"]
+                missing = appr[~appr["scheme_id"].astype(int).isin(map_ids)]
+                if len(missing):
+                    fail(f"{len(missing)} approved decisions missing from fund_scheme_map")
+                    issues += 1
+                else:
+                    ok("All approved decisions present in fund_scheme_map")
+                still = rej[rej["scheme_id"].astype(int).isin(map_ids)]
+                if len(still):
+                    fail(f"{len(still)} rejected decisions still mapped")
+                    issues += 1
+                else:
+                    ok("No rejected decisions left in fund_scheme_map")
+
     print(f"\n[7] Cross-file category consistency\n")
     m_cat = active.set_index("fund_name")["category"]
     h_cat = holdings.groupby("fund_name")["category"].first()

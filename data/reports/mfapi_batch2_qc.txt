@@ -1,8 +1,0 @@
-MFApi Batch 2 — NAV sync QC
-Generated: 2026-05-27T06:17:35.499195+00:00
-
-Run: attempted=245 ok=245 error=0
-
-DB schemes rows: 4872 (ok=4872, error=0)
-NAV price rows (>= 2015-01-01): 4388525
-OK schemes with isin_growth: 4872
