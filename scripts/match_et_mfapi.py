@@ -25,7 +25,7 @@ if str(SCRIPTS) not in sys.path:
 
 from et_mfapi_decisions import decisions_as_override_map, load_decisions
 from et_mfapi_match_scope import is_et_index_fund
-from mfapi_scheme_name import normalize_match_key
+from mfapi_scheme_name import fund_name_match_score, mf_match_key, normalize_match_key
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -113,17 +113,29 @@ def _house_boost(et_house: str | None, mf_house: str | None) -> float:
     return 0.0
 
 
+def _house_penalty(et_house: str | None, mf_house: str | None) -> float:
+    if _house_boost(et_house, mf_house) >= 3:
+        return 0.0
+    eh, mh = _nfkc_house(et_house), _nfkc_house(mf_house)
+    if not eh or not mh:
+        return 0.0
+    if eh == mh or eh in mh or mh in eh:
+        return 0.0
+    return -12.0
+
+
 def _composite_score(
-    et_key: str,
-    mf_key: str,
+    et_fund_name: str,
+    mf_scheme_or_base: str,
     et_category: str | None,
     mf_category: str | None,
     et_house: str | None,
     mf_house: str | None,
 ) -> float:
-    base = _token_sort_ratio(et_key, mf_key)
+    base = fund_name_match_score(mf_scheme_or_base, et_fund_name)
     boost = _category_boost(et_category, mf_category) + _house_boost(et_house, mf_house)
-    return min(100.0, base + boost)
+    penalty = _house_penalty(et_house, mf_house)
+    return min(100.0, max(0.0, base + boost + penalty))
 
 
 def _load_approved_map() -> tuple[dict[int, int], dict[int, float]]:
@@ -147,18 +159,14 @@ def _load_approved_map() -> tuple[dict[int, int], dict[int, float]]:
 def _rank_candidates(
     et_row: pd.Series, mf_df: pd.DataFrame
 ) -> list[tuple[int, float, str, str]]:
-    et_key = normalize_match_key(str(et_row.get("fund_name", "")))
+    et_name = str(et_row.get("fund_name") or "")
     scored: list[tuple[int, float, str, str]] = []
     for _, mf in mf_df.iterrows():
         code = int(mf["mf_scheme_code"])
-        mf_key = str(mf.get("fund_name_match_key") or "")
-        if not mf_key:
-            mf_key = normalize_match_key(
-                str(mf.get("fund_name_base") or mf.get("scheme_name_raw") or "")
-            )
+        mf_raw = str(mf.get("scheme_name_raw") or mf.get("fund_name_base") or "")
         score = _composite_score(
-            et_key,
-            mf_key,
+            et_name,
+            mf_raw,
             et_row.get("category"),
             mf.get("scheme_category"),
             et_row.get("fund_house"),

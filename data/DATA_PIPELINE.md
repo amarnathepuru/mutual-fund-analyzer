@@ -24,7 +24,13 @@ Locked decisions from planning session. Implements Track prerequisites; see also
 - Ambiguous ties (95–99.99% and gap &lt; 3): flagged for manual review.
 - Portfolio NAV path: `fund_name` → ET master → `fund_scheme_map` → `mf_scheme_code`.
 - Track fund picker: **dropdown** from 881 MFAPI names (no free-text fuzzy pick).
-- **Match review UI:** `streamlit run scripts/review_et_mfapi_app.py` → `data/et_mfapi_decisions.csv` (Approve/Reject); export → `mfapi_et_manual_overrides.csv`.
+- **ET→MFAPI match review:** `streamlit run scripts/review_et_mfapi_app.py` → `data/et_mfapi_decisions.csv`; export → `mfapi_et_manual_overrides.csv`.
+- **MFAPI→ET match review (unmapped MFAPI-only):** `python scripts/match_mfapi_et.py` → `data/reports/mfapi_et_candidate_report.csv`; `streamlit run scripts/review_mfapi_et_app.py` → `data/mfapi_et_decisions.csv`; export → `data/mfapi_to_et_approved.csv`; apply → `python scripts/apply_mfapi_et_map.py` (after ET scrape for approved pairs).
+- **MFAPI→ET scrape (sample / one fund):** `python scripts/scrape_mfapi_et_one.py --mf-code 103490` (Quantum Value); validate → `streamlit run scripts/validate_mfapi_et_scrape_app.py --server.port 8503`. Library: `scripts/et_mfapi_scrape_lib.py`. Queue = `nav_universe_schemes` minus `fund_scheme_map` (Direct–Growth only).
+- **MFAPI→ET scrape (batch, no map yet):** `python scripts/scrape_mfapi_et_batch.py --resume` → `data/reports/mfapi_et_scrape_batch_progress.csv`; then `match_mfapi_et.py` + review + `apply_mfapi_et_map.py`. Batch review UI archived under `scripts/archive/`.
+- **MFAPI→ET map audit:** `python scripts/audit_fund_scheme_map.py` → `data/reports/fund_scheme_map_audit_review.csv`; browse → `streamlit run scripts/validate_map_audit_app.py --server.port 8505`.
+- **Close NAV universe (no ET / duplicates):** `python scripts/close_out_nav_unmapped.py` → rejects remaining unmapped MFAPI codes for track/NAV-only (`data/reports/nav_unmapped_closed.csv`). Mapping target for Analyze: **741** ET-linked rows in `fund_scheme_map.csv` (Jun 2026).
+- **Refresh analyse downstream (after map/scrape):** `python scripts/sync_map_master_metadata.py` → `python analytics/normalize_holdings.py` → `python scripts/rebuild_fund_similarity.py` → `python scripts/write_master_sync_qc.py` (see `data/reports/master_sync_qc.txt`).
 
 ## Locked decisions
 
@@ -75,12 +81,21 @@ Suggested columns:
 
 Same columns as ET master where applicable; ET-only fields blank; `status=NAV_ONLY`, `data_source=mfapi`.
 
-## Capability flags (app, later)
+## Capability flags (app)
 
 After union in `load_master()`:
 
 - `has_holdings` — fund in `master_holdings.csv` / ET ACTIVE with scraped holdings
 - `has_nav` — row in scheme map or MF supplement with `mf_scheme_code`
+
+**Analyse Funds tab:** ET holdings only (`master_for_analyze()`). MFAPI not used.
+
+**My Portfolio (single upload in Manage):**
+
+- Validate fund names against **MFAPI 881** (`portfolio_data.py` + `nav_universe_schemes.csv`).
+- Persist `mf_scheme_code`, `display_fund_name` (clean UI label), `fund_name` (same value for resolution), `plan_type`, `option_type`, `et_fund_name` when mapped.
+- **Analyse my portfolio:** holdings overlap only when `can_analyse` (ET holdings exist).
+- **Track my portfolio:** NAV from `nav.db` for all `can_track` rows.
 
 **Analyze / Compare / overlap:** exclude `has_holdings=false`; show which funds excluded; optional NAV-only metrics where data exists.
 

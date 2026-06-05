@@ -1,0 +1,339 @@
+mf_scheme_code,decision,scheme_id,computed_score,mf_scheme_name,et_fund_name,decided_at,notes
+103490,approved,34462.0,100.0,Quantum Value Fund - Direct Plan Growth Option,Quantum Value Fund,2026-06-01T05:35:04.525947+00:00,bulk_grid
+151458,approved,43612.0,100.0,Hdfc Mnc Fund,HDFC MNC Fund Direct-Growth,2026-06-02T03:49:22.734112+00:00,batch_scrape_review accept (rebuilt)
+147306,approved,40423.0,100.0,Dsp Quant Fund,DSP Quant Fund Direct-Growth,2026-06-02T03:49:22.735504+00:00,batch_scrape_review accept (rebuilt)
+148972,approved,41977.0,100.0,Iti Value Fund,ITI Value Fund Direct-Growth,2026-06-02T03:49:22.736672+00:00,batch_scrape_review accept (rebuilt)
+148595,approved,41662.0,100.0,Dsp Value Fund,DSP Value Fund Direct-Growth,2026-06-02T03:49:22.737847+00:00,batch_scrape_review accept (rebuilt)
+153204,approved,45220.0,100.0,Uti Quant Fund,UTI Quant Fund Direct-Growth,2026-06-02T03:49:22.739416+00:00,batch_scrape_review accept (rebuilt)
+152910,approved,44939.0,100.0,Kotak Mnc Fund,Kotak MNC Fund Direct-Growth,2026-06-02T03:49:22.740783+00:00,batch_scrape_review accept (rebuilt)
+152415,approved,44507.0,100.0,Quant Psu Fund,Quant PSU Fund Direct-Growth,2026-06-02T03:49:22.741869+00:00,batch_scrape_review accept (rebuilt)
+153154,approved,45163.0,100.0,Sbi Quant Fund,SBI Quant Fund Direct-Growth,2026-06-02T03:49:22.742932+00:00,batch_scrape_review accept (rebuilt)
+151113,approved,15836.0,100.0,Hsbc Value Fund,HSBC Value Fund Direct-Growth,2026-06-02T03:49:22.743953+00:00,batch_scrape_review accept (rebuilt)
+149166,approved,42164.0,100.0,Axis Value Fund,Axis Value Fund Direct-Growth,2026-06-02T03:49:22.745031+00:00,batch_scrape_review accept (rebuilt)
+148993,approved,41997.0,100.0,Axis Quant Fund,Axis Quant Fund Direct-Growth,2026-06-02T03:49:22.746948+00:00,batch_scrape_review accept (rebuilt)
+151777,approved,43941.0,100.0,Iti Focused Fund,ITI Focused Fund Direct-Growth,2026-06-02T03:49:22.748489+00:00,batch_scrape_review accept (rebuilt)
+151036,approved,15847.0,100.0,Hsbc Midcap Fund,HSBC Midcap Fund Direct-Growth,2026-06-02T03:49:22.749614+00:00,batch_scrape_review accept (rebuilt)
+149335,approved,42313.0,100.0,Quant Value Fund,Quant Value Fund Direct-Growth,2026-06-02T03:49:22.750671+00:00,batch_scrape_review accept (rebuilt)
+149091,approved,42097.0,100.0,Uti Focused Fund,UTI Focused Fund Direct-Growth,2026-06-02T03:49:22.751737+00:00,batch_scrape_review accept (rebuilt)
+154177,approved,46119.0,100.0,Sbi Quality Fund,SBI Quality Fund Direct-Growth,2026-06-02T03:49:22.752764+00:00,batch_scrape_review accept (rebuilt)
+151881,approved,44034.0,100.0,Kotak Quant Fund,Kotak Quant Fund Direct-Growth,2026-06-02T03:49:22.753816+00:00,batch_scrape_review accept (rebuilt)
+148411,approved,41493.0,100.0,Hsbc Focused Fund,HSBC Focused Fund Direct-Growth,2026-06-02T03:49:22.755281+00:00,batch_scrape_review accept (rebuilt)
+152018,approved,37696.0,100.0,Lic Mf Value Fund,LIC MF Value Fund Direct-Growth,2026-06-02T03:49:22.757248+00:00,batch_scrape_review accept (rebuilt)
+147757,approved,40878.0,100.0,Tata Focused Fund,Tata Focused Fund Direct-Growth,2026-06-02T03:49:22.758498+00:00,batch_scrape_review accept (rebuilt)
+151750,approved,43919.0,100.0,Hdfc Defence Fund,HDFC Defence Fund Direct-Growth,2026-06-02T03:49:22.759570+00:00,batch_scrape_review accept (rebuilt)
+147727,approved,40849.0,100.0,Kotak Pioneer Fund,Kotak Pioneer Fund Direct-Growth,2026-06-02T03:49:22.760667+00:00,batch_scrape_review accept (rebuilt)
+147473,approved,40575.0,100.0,Kotak Focused Fund,Kotak Focused Fund Direct-Growth,2026-06-02T03:49:22.762045+00:00,batch_scrape_review accept (rebuilt)
+153083,approved,45127.0,100.0,Axis Momentum Fund,Axis Momentum Fund Direct-Growth,2026-06-02T03:49:22.763156+00:00,batch_scrape_review accept (rebuilt)
+147492,approved,40585.0,100.0,Union Focused Fund,Union Focused Fund Direct-Growth,2026-06-02T03:49:22.764207+00:00,batch_scrape_review accept (rebuilt)
+149318,approved,42295.0,100.0,360 One Quant Fund,360 ONE Quant Fund Direct-Growth,2026-06-02T03:49:22.765261+00:00,batch_scrape_review accept (rebuilt)
+151130,approved,25653.0,100.0,Hsbc Small Cap Fund,HSBC Small Cap Fund Direct-Growth,2026-06-02T03:49:22.766306+00:00,batch_scrape_review accept (rebuilt)
+103734,approved,3196.0,100.0,Quantum Liquid Fund,Quantum Liquid Fund Direct-Growth,2026-06-02T03:49:22.767347+00:00,batch_scrape_review accept (rebuilt)
+154149,approved,46123.0,100.0,Kotak Services Fund,Kotak Services Fund Direct-Growth,2026-06-02T03:49:22.768322+00:00,batch_scrape_review accept (rebuilt)
+152010,approved,35224.0,100.0,Lic Mf Focused Fund,LIC MF Focused Fund Direct-Growth,2026-06-02T03:49:22.769335+00:00,batch_scrape_review accept (rebuilt)
+152189,approved,44262.0,100.0,Quant Momentum Fund,Quant Momentum Fund Direct-Growth,2026-06-02T03:49:22.770348+00:00,batch_scrape_review accept (rebuilt)
+153094,approved,45130.0,100.0,Quantum Ethical Fund,Quantum Ethical Fund Direct-Growth,2026-06-02T03:49:22.771587+00:00,batch_scrape_review accept (rebuilt)
+154210,approved,46140.0,100.0,Trustmf Mid Cap Fund,TRUSTMF Mid Cap Fund Direct-Growth,2026-06-02T03:49:22.772883+00:00,batch_scrape_review accept (rebuilt)
+154257,approved,46212.0,100.0,Helios Arbitrage Fund,Helios Arbitrage Fund Direct-Growth,2026-06-02T03:49:22.774085+00:00,batch_scrape_review accept (rebuilt)
+153693,approved,45646.0,100.0,Nippon India Mnc Fund,Nippon India MNC Fund Direct-Growth,2026-06-02T03:49:22.775102+00:00,batch_scrape_review accept (rebuilt)
+152255,approved,44332.0,100.0,Quant Commodities Fund,Quant Commodities Fund Direct-Growth,2026-06-02T03:49:22.777638+00:00,batch_scrape_review accept (rebuilt)
+150376,approved,42753.0,100.0,Edelweiss Focused Fund,Edelweiss Focused Fund Direct-Growth,2026-06-02T03:49:22.778555+00:00,batch_scrape_review accept (rebuilt)
+154244,approved,46176.0,100.0,Lic Mf Technology Fund,LIC MF Technology Fund Direct-Growth,2026-06-02T03:49:22.779596+00:00,batch_scrape_review accept (rebuilt)
+154215,approved,46184.0,100.0,Abakkus Small Cap Fund,Abakkus Small Cap Fund Direct-Growth,2026-06-02T03:49:22.780574+00:00,batch_scrape_review accept (rebuilt)
+148925,approved,41918.0,100.0,Quant Quantamental Fund,Quant Quantamental Fund Direct-Growth,2026-06-02T03:49:22.782375+00:00,batch_scrape_review accept (rebuilt)
+154157,approved,46133.0,100.0,Iti Business Cycle Fund,ITI Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.783576+00:00,batch_scrape_review accept (rebuilt)
+152358,approved,44403.0,100.0,Old Bridge Focused Fund,Old Bridge Focused Fund Direct-Growth,2026-06-02T03:49:22.784698+00:00,batch_scrape_review accept (rebuilt)
+153121,approved,45119.0,100.0,Dsp Business Cycle Fund,DSP Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.785721+00:00,batch_scrape_review accept (rebuilt)
+152694,approved,44746.0,100.0,Motilal Oswal Quant Fund,Motilal Oswal Quant Fund Direct-Growth,2026-06-02T03:49:22.786724+00:00,batch_scrape_review accept (rebuilt)
+147206,approved,40301.0,100.0,Mirae Asset Focused Fund,Mirae Asset Focused Fund Direct-Growth,2026-06-02T03:49:22.787803+00:00,batch_scrape_review accept (rebuilt)
+150805,approved,43171.0,100.0,Hdfc Business Cycle Fund,HDFC Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.789108+00:00,batch_scrape_review accept (rebuilt)
+149071,approved,42049.0,100.0,Tata Business Cycle Fund,Tata Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.790296+00:00,batch_scrape_review accept (rebuilt)
+151078,approved,15767.0,100.0,Hsbc Elss Tax Saver Fund,HSBC ELSS Tax Saver Fund Direct-Growth,2026-06-02T03:49:22.791368+00:00,batch_scrape_review accept (rebuilt)
+149085,approved,42093.0,100.0,Canara Robeco Value Fund,Canara Robeco Value Fund Direct-Growth,2026-06-02T03:49:22.792372+00:00,batch_scrape_review accept (rebuilt)
+147346,approved,40455.0,100.0,Icici Prudential Mnc Fund,ICICI Prudential MNC Fund Direct-Growth,2026-06-02T03:49:22.794193+00:00,batch_scrape_review accept (rebuilt)
+151757,approved,43925.0,100.0,Quant Business Cycle Fund,Quant Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.795112+00:00,batch_scrape_review accept (rebuilt)
+152409,approved,44503.0,100.0,Union Business Cycle Fund,Union Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.796157+00:00,batch_scrape_review accept (rebuilt)
+153722,approved,45684.0,100.0,Bandhan Multi-factor Fund,Bandhan Multi-Factor Fund Direct-Growth,2026-06-02T03:49:22.797190+00:00,batch_scrape_review accept (rebuilt)
+151142,approved,27103.0,100.0,Hsbc Business Cycles Fund,HSBC Business Cycles Fund Direct-Growth,2026-06-02T03:49:22.798188+00:00,batch_scrape_review accept (rebuilt)
+151368,approved,43557.0,100.0,Axis Business Cycles Fund,Axis Business Cycles Fund Direct-Growth,2026-06-02T03:49:22.799188+00:00,batch_scrape_review accept (rebuilt)
+154225,approved,46168.0,100.0,Old Bridge Flexi Cap Fund,Old Bridge Flexi Cap Fund Direct-Growth,2026-06-02T03:49:22.800195+00:00,batch_scrape_review accept (rebuilt)
+148481,approved,41564.0,100.0,Invesco India Focused Fund,Invesco India Focused Fund Direct-Growth,2026-06-02T03:49:22.801219+00:00,batch_scrape_review accept (rebuilt)
+148883,approved,41926.0,100.0,Canara Robeco Focused Fund,Canara Robeco Focused Fund Direct-Growth,2026-06-02T03:49:22.805761+00:00,batch_scrape_review accept (rebuilt)
+153109,approved,45143.0,100.0,Union Active Momentum Fund,Union Active Momentum Fund Direct-Growth,2026-06-02T03:49:22.807068+00:00,batch_scrape_review accept (rebuilt)
+154236,approved,46180.0,100.0,Capitalmind Arbitrage Fund,Capitalmind Arbitrage Fund Direct-Growth,2026-06-02T03:49:22.808184+00:00,batch_scrape_review accept (rebuilt)
+153753,approved,45723.0,100.0,Kotak Active Momentum Fund,Kotak Active Momentum Fund Direct-Growth,2026-06-02T03:49:22.809204+00:00,batch_scrape_review accept (rebuilt)
+153669,approved,45635.0,100.0,Sundaram Multi-factor Fund,Sundaram Multi-Factor Fund Direct-Growth,2026-06-02T03:49:22.810219+00:00,batch_scrape_review accept (rebuilt)
+151753,approved,43922.0,100.0,Samco Active Momentum Fund,Samco Active Momentum Fund Direct-Growth,2026-06-02T03:49:22.811223+00:00,batch_scrape_review accept (rebuilt)
+152878,approved,44880.0,100.0,Bandhan Business Cycle Fund,Bandhan Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.812213+00:00,batch_scrape_review accept (rebuilt)
+153558,approved,45536.0,100.0,Motilal Oswal Services Fund,Motilal Oswal Services Fund Direct-Growth,2026-06-02T03:49:22.813226+00:00,batch_scrape_review accept (rebuilt)
+154155,approved,46101.0,100.0,Parag Parikh Large Cap Fund,Parag Parikh Large Cap Fund Direct-Growth,2026-06-02T03:49:22.814236+00:00,batch_scrape_review accept (rebuilt)
+148600,approved,41674.0,100.0,Icici Prudential Quant Fund,ICICI Prudential Quant Fund Direct-Growth,2026-06-02T03:49:22.815229+00:00,batch_scrape_review accept (rebuilt)
+150624,approved,42975.0,100.0,Kotak Business Cycle,Kotak Business Cycle Fund,2026-06-02T03:49:22.816261+00:00,batch_scrape_review accept (rebuilt)
+152677,approved,44722.0,100.0,Sundaram Business Cycle Fund,Sundaram Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.817256+00:00,batch_scrape_review accept (rebuilt)
+153303,approved,45289.0,100.0,Mahindra Manulife Value Fund,Mahindra Manulife Value Fund Direct-Growth,2026-06-02T03:49:22.818273+00:00,batch_scrape_review accept (rebuilt)
+151755,approved,43915.0,100.0,Baroda Bnp Paribas Value Fund,Baroda BNP Paribas Value Fund Direct-Growth,2026-06-02T03:49:22.819306+00:00,batch_scrape_review accept (rebuilt)
+152417,approved,44511.0,100.0,Sbi Energy Opportunities Fund,SBI Energy Opportunities Fund Direct-Growth,2026-06-02T03:49:22.820603+00:00,batch_scrape_review accept (rebuilt)
+152710,approved,44754.0,100.0,Edelweiss Business Cycle Fund,Edelweiss Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.821761+00:00,batch_scrape_review accept (rebuilt)
+153458,approved,45514.0,100.0,Icici Prudential Quality Fund,ICICI Prudential Quality Fund Direct-Growth,2026-06-02T03:49:22.823056+00:00,batch_scrape_review accept (rebuilt)
+153970,approved,45927.0,100.0,Kotak Rural Opportunities Fund,Kotak Rural Opportunities Fund Direct-Growth,2026-06-02T03:49:22.824155+00:00,batch_scrape_review accept (rebuilt)
+148567,approved,41637.0,100.0,Mahindra Manulife Focused Fund,Mahindra Manulife Focused Fund Direct-Growth,2026-06-02T03:49:22.825204+00:00,batch_scrape_review accept (rebuilt)
+153895,approved,45855.0,100.0,The Wealth Company Ethical Fund,The Wealth Company Ethical Fund Direct-Growth,2026-06-02T03:49:22.827244+00:00,batch_scrape_review accept (rebuilt)
+150532,approved,42891.0,100.0,Tata Housing Opportunities Fund,Tata Housing Opportunities Fund Direct-Growth,2026-06-02T03:49:22.828254+00:00,batch_scrape_review accept (rebuilt)
+150539,approved,42895.0,100.0,Icici Prudential Psu Equity Fund,ICICI Prudential PSU Equity Fund Direct-Growth,2026-06-02T03:49:22.829317+00:00,batch_scrape_review accept (rebuilt)
+152586,approved,44641.0,100.0,Samco Special Opportunities Fund,Samco Special Opportunities Fund Direct-Growth,2026-06-02T03:49:22.830320+00:00,batch_scrape_review accept (rebuilt)
+152702,approved,44742.0,100.0,Kotak Special Opportunities Fund,Kotak Special Opportunities Fund Direct-Growth,2026-06-02T03:49:22.831355+00:00,batch_scrape_review accept (rebuilt)
+153624,approved,45674.0,100.0,Axis Services Opportunities Fund,Axis Services Opportunities Fund Direct-Growth,2026-06-02T03:49:22.832379+00:00,batch_scrape_review accept (rebuilt)
+153942,approved,45915.0,100.0,Franklin India Multi-factor Fund,Franklin India Multi-Factor Fund Direct-Growth,2026-06-02T03:49:22.833394+00:00,batch_scrape_review accept (rebuilt)
+152684,approved,44738.0,100.0,Aditya Birla Sun Life Quant Fund,Aditya Birla Sun Life Quant Fund Direct-Growth,2026-06-02T03:49:22.834383+00:00,batch_scrape_review accept (rebuilt)
+152796,approved,44840.0,100.0,Motilal Oswal Business Cycle Fund,Motilal Oswal Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.835424+00:00,batch_scrape_review accept (rebuilt)
+153291,approved,45285.0,100.0,Invesco India Business Cycle Fund,Invesco India Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.836439+00:00,batch_scrape_review accept (rebuilt)
+152787,approved,44830.0,100.0,Union Multi Asset Allocation Fund,Union Multi Asset Allocation Fund Direct-Growth,2026-06-02T03:49:22.837442+00:00,batch_scrape_review accept (rebuilt)
+152789,approved,44834.0,100.0,Bank Of India Business Cycle Fund,Bank of India Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.839000+00:00,batch_scrape_review accept (rebuilt)
+147662,approved,40779.0,100.0,Icici Prudential Commodities Fund,ICICI Prudential Commodities Fund Direct-Growth,2026-06-02T03:49:22.840315+00:00,batch_scrape_review accept (rebuilt)
+154269,approved,46217.0,100.0,The Wealth Company Small Cap Fund,The Wealth Company Small Cap Fund Direct-Growth,2026-06-02T03:49:22.841480+00:00,batch_scrape_review accept (rebuilt)
+153274,approved,45293.0,100.0,Nippon India Active Momentum Fund,Nippon India Active Momentum Fund Direct-Growth,2026-06-02T03:49:22.842509+00:00,batch_scrape_review accept (rebuilt)
+154108,approved,46075.0,100.0,Edelweiss Financial Services Fund,Edelweiss Financial Services Fund Direct-Growth,2026-06-02T03:49:22.843520+00:00,batch_scrape_review accept (rebuilt)
+153364,approved,45357.0,100.0,Motilal Oswal Active Momentum Fund,Motilal Oswal Active Momentum Fund Direct-Growth,2026-06-02T03:49:22.845384+00:00,batch_scrape_review accept (rebuilt)
+153867,approved,45821.0,100.0,Icici Prudential Conglomerate Fund,ICICI Prudential Conglomerate Fund Direct-Growth,2026-06-02T03:49:22.846321+00:00,batch_scrape_review accept (rebuilt)
+148564,approved,41633.0,100.0,Quant Esg Integration Strategy Fund,Quant ESG Integration Strategy Fund Direct-Growth,2026-06-02T03:49:22.847339+00:00,batch_scrape_review accept (rebuilt)
+148651,approved,41713.0,100.0,Icici Prudential Business Cycle Fund,ICICI Prudential Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.848395+00:00,batch_scrape_review accept (rebuilt)
+153189,approved,45208.0,100.0,Whiteoak Capital Quality Equity Fund,WhiteOak Capital Quality Equity Fund Direct-Growth,2026-06-02T03:49:22.849490+00:00,batch_scrape_review accept (rebuilt)
+152829,approved,44884.0,100.0,Hsbc India Export Opportunities Fund,HSBC India Export Opportunities Fund Direct-Growth,2026-06-02T03:49:22.850492+00:00,batch_scrape_review accept (rebuilt)
+154142,approved,46093.0,100.0,Motilal Oswal Financial Services Fund,Motilal Oswal Financial Services Fund Direct-Growth,2026-06-02T03:49:22.852371+00:00,batch_scrape_review accept (rebuilt)
+153684,approved,45692.0,100.0,Icici Prudential Active Momentum Fund,ICICI Prudential Active Momentum Fund Direct-Growth,2026-06-02T03:49:22.853375+00:00,batch_scrape_review accept (rebuilt)
+152045,approved,44121.0,100.0,Mahindra Manulife Business Cycle Fund,Mahindra Manulife Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.854802+00:00,batch_scrape_review accept (rebuilt)
+147844,approved,40971.0,100.0,Aditya Birla Sun Life Psu Equity Fund,Aditya Birla Sun Life PSU Equity Fund Direct-Growth,2026-06-02T03:49:22.856173+00:00,batch_scrape_review accept (rebuilt)
+149141,approved,42139.0,100.0,Baroda Bnp Paribas Business Cycle Fund,Baroda BNP Paribas Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.857445+00:00,batch_scrape_review accept (rebuilt)
+154232,approved,46172.0,100.0,Capitalmind Multi Asset Allocation Fund,Capitalmind Multi Asset Allocation Fund Direct-Growth,2026-06-02T03:49:22.858492+00:00,batch_scrape_review accept (rebuilt)
+153124,approved,45147.0,100.0,Aditya Birla Sun Life Conglomerate Fund,Aditya Birla Sun Life Conglomerate Fund Direct-Growth,2026-06-02T03:49:22.859482+00:00,batch_scrape_review accept (rebuilt)
+153749,approved,45727.0,100.0,Motilal Oswal Special Opportunities Fund,Motilal Oswal Special Opportunities Fund Direct-Growth,2026-06-02T03:49:22.860524+00:00,batch_scrape_review accept (rebuilt)
+149295,approved,42279.0,100.0,Aditya Birla Sun Life Business Cycle Fund,Aditya Birla Sun Life Business Cycle Fund Direct-Growth,2026-06-02T03:49:22.861517+00:00,batch_scrape_review accept (rebuilt)
+153184,approved,45201.0,100.0,Icici Prudential Rural Opportunities Fund,ICICI Prudential Rural Opportunities Fund Direct-Growth,2026-06-02T03:49:22.862517+00:00,batch_scrape_review accept (rebuilt)
+154185,approved,46097.0,100.0,The Wealth Company Balanced Advantage Fund,The Wealth Company Balanced Advantage Fund Direct-Growth,2026-06-02T03:49:22.863534+00:00,batch_scrape_review accept (rebuilt)
+152728,approved,44778.0,100.0,Icici Prudential Energy Opportunities Fund,ICICI Prudential Energy Opportunities Fund Direct-Growth,2026-06-02T03:49:22.864535+00:00,batch_scrape_review accept (rebuilt)
+150310,approved,42705.0,100.0,Icici Prudential Housing Opportunities Fund,ICICI Prudential Housing Opportunities Fund Direct-Growth,2026-06-02T03:49:22.865570+00:00,batch_scrape_review accept (rebuilt)
+152644,approved,44694.0,100.0,Whiteoak Capital Special Opportunities Fund,WhiteOak Capital Special Opportunities Fund Direct-Growth,2026-06-02T03:49:22.866645+00:00,batch_scrape_review accept (rebuilt)
+153225,approved,45205.0,100.0,Baroda Bnp Paribas Energy Opportunities Fund,Baroda BNP Paribas Energy Opportunities Fund Direct-Growth,2026-06-02T03:49:22.868459+00:00,batch_scrape_review accept (rebuilt)
+153847,approved,45791.0,100.0,Baroda Bnp Paribas Business Conglomerates Fund,Baroda BNP Paribas Business Conglomerates Fund Direct-Growth,2026-06-02T03:49:22.869376+00:00,batch_scrape_review accept (rebuilt)
+148539,approved,41611.0,100.0,Aditya Birla Sun Life Special Opportunities Fund,Aditya Birla Sun Life Special Opportunities Fund Direct-Growth,2026-06-02T03:49:22.870943+00:00,batch_scrape_review accept (rebuilt)
+120688,approved,2778.0,100.0,Icici Prudential Exports & Services Fund,ICICI Prudential Exports and Services Fund,2026-06-02T03:49:22.872392+00:00,batch_scrape_review accept (rebuilt)
+133801,approved,6459.0,100.0,Kotak Infrastructure & Economic Reform Fund,Kotak Infrastructure and Economic Reform Fund,2026-06-02T03:49:22.873813+00:00,batch_scrape_review accept (rebuilt)
+147409,approved,40483.0,100.0,Aditya Birla Sun Life Pharma And Healthcare Fund,Aditya Birla Sun Life Pharma & Healthcare Fund,2026-06-02T03:49:22.874892+00:00,batch_scrape_review accept (rebuilt)
+151853,approved,44015.0,100.0,Quant Healthcare Fund,Quant Healthcare Fund,2026-06-02T03:49:22.875902+00:00,batch_scrape_review accept (rebuilt)
+145454,approved,38676.0,100.0,Dsp Healthcare Fund,DSP Healthcare Fund,2026-06-02T03:49:22.876885+00:00,batch_scrape_review accept (rebuilt)
+144835,approved,38059.0,100.0,Sundaram Services Fund,Sundaram Services Fund,2026-06-02T03:49:22.877859+00:00,batch_scrape_review accept (rebuilt)
+145473,approved,38684.0,100.0,Union Value Fund,Union Value Fund,2026-06-02T03:49:22.878886+00:00,batch_scrape_review accept (rebuilt)
+120782,approved,32342.0,100.0,Uti Healthcare Fund,UTI Healthcare Fund,2026-06-02T03:49:22.879867+00:00,batch_scrape_review accept (rebuilt)
+135810,approved,30849.0,100.0,Tata India Pharma & Healthcare Fund,Tata India Pharma & HealthCare Fund,2026-06-02T03:49:22.880875+00:00,batch_scrape_review accept (rebuilt)
+142388,approved,35716.0,100.0,Edelweiss Recently Listed Ipo Fund,Edelweiss Recently Listed IPO Fund,2026-06-02T03:49:22.881848+00:00,batch_scrape_review accept (rebuilt)
+141924,approved,35254.0,100.0,Hdfc Housing Opportunities Fund,HDFC Housing Opportunities Fund,2026-06-02T03:49:22.882862+00:00,batch_scrape_review accept (rebuilt)
+143783,approved,36864.0,100.0,Mirae Asset Healthcare Fund,Mirae Asset Healthcare Fund,2026-06-02T03:49:22.883833+00:00,batch_scrape_review accept (rebuilt)
+119783,approved,32320.0,100.0,Sbi Healthcare Opportunities Fund,SBI Healthcare Opportunities Fund,2026-06-02T03:49:22.884838+00:00,batch_scrape_review accept (rebuilt)
+118759,approved,2059.0,100.0,Nippon India Pharma Fund,Nippon India Pharma Fund,2026-06-02T03:49:22.885822+00:00,batch_scrape_review accept (rebuilt)
+118267,approved,2770.0,100.0,Canara Robeco Infrastructure Fund,Canara Robeco Infrastructure Fund,2026-06-02T03:49:22.886815+00:00,batch_scrape_review accept (rebuilt)
+118469,approved,11731.0,100.0,Bandhan Infrastructure Fund,Bandhan Infrastructure Fund,2026-06-02T03:49:22.887866+00:00,batch_scrape_review accept (rebuilt)
+118421,approved,2960.0,100.0,Bandhan Focused Fund,Bandhan Focused Fund,2026-06-02T03:49:22.889433+00:00,batch_scrape_review accept (rebuilt)
+119028,approved,6915.0,100.0,Dsp Natural Resources And New Energy Fund,DSP Natural Resources and New Energy Fund,2026-06-02T03:49:22.890773+00:00,batch_scrape_review accept (rebuilt)
+118979,approved,6467.0,100.0,Hdfc Infrastructure Fund,HDFC Infrastructure Fund,2026-06-02T03:49:22.891828+00:00,batch_scrape_review accept (rebuilt)
+118950,approved,2190.0,100.0,Hdfc Focused Fund,HDFC Focused Fund,2026-06-02T03:49:22.892825+00:00,batch_scrape_review accept (rebuilt)
+118935,approved,31997.0,100.0,Hdfc Value Fund,HDFC Value Fund,2026-06-02T03:49:22.893839+00:00,batch_scrape_review accept (rebuilt)
+118784,approved,2604.0,100.0,Nippon India Value Fund,Nippon India Value Fund,2026-06-02T03:49:22.894809+00:00,batch_scrape_review accept (rebuilt)
+119231,approved,2085.0,100.0,Tata Value Fund,Tata Value Fund,2026-06-02T03:49:22.895813+00:00,batch_scrape_review accept (rebuilt)
+119243,approved,2360.0,100.0,Tata Infrastructure Fund,Tata Infrastructure Fund,2026-06-02T03:49:22.896780+00:00,batch_scrape_review accept (rebuilt)
+119096,approved,10816.0,100.0,Dsp Focused Fund,DSP Focused Fund,2026-06-02T03:49:22.897760+00:00,batch_scrape_review accept (rebuilt)
+119364,approved,10508.0,100.0,Bank Of India Manufacturing & Infrastructure Fund,Bank of India Manufacturing & Infrastructure Fund,2026-06-02T03:49:22.898747+00:00,batch_scrape_review accept (rebuilt)
+118763,approved,2012.0,100.0,Nippon India Power & Infra Fund,Nippon India Power & Infra Fund,2026-06-02T03:49:22.899719+00:00,batch_scrape_review accept (rebuilt)
+118769,approved,2449.0,100.0,Nippon India Quant Fund,Nippon India Quant Fund,2026-06-02T03:49:22.900725+00:00,batch_scrape_review accept (rebuilt)
+118481,approved,6483.0,100.0,Bandhan Value Fund,Bandhan Value Fund,2026-06-02T03:49:22.901709+00:00,batch_scrape_review accept (rebuilt)
+118494,approved,32000.0,100.0,Templeton India Value Fund,Templeton India Value Fund,2026-06-02T03:49:22.902816+00:00,batch_scrape_review accept (rebuilt)
+118539,approved,32434.0,100.0,Franklin India Opportunities Fund,Franklin India Opportunities Fund,2026-06-02T03:49:22.903952+00:00,batch_scrape_review accept (rebuilt)
+118557,approved,10232.0,100.0,Franklin Build India Fund,Franklin Build India Fund,2026-06-02T03:49:22.905514+00:00,batch_scrape_review accept (rebuilt)
+118564,approved,4948.0,100.0,Franklin India Focused Equity Fund,Franklin India Focused Equity Fund,2026-06-02T03:49:22.906960+00:00,batch_scrape_review accept (rebuilt)
+119700,approved,4878.0,100.0,Sbi Infrastructure Fund,SBI Infrastructure Fund,2026-06-02T03:49:22.908238+00:00,batch_scrape_review accept (rebuilt)
+119659,approved,6566.0,100.0,Aditya Birla Sun Life Value Fund,Aditya Birla Sun Life Value Fund,2026-06-02T03:49:22.909278+00:00,batch_scrape_review accept (rebuilt)
+119646,approved,31805.0,100.0,Aditya Birla Sun Life Mnc Fund,Aditya Birla Sun Life MNC Fund,2026-06-02T03:49:22.910249+00:00,batch_scrape_review accept (rebuilt)
+119564,approved,2677.0,100.0,Aditya Birla Sun Life Focused Fund,Aditya Birla Sun Life Focused Fund,2026-06-02T03:49:22.911261+00:00,batch_scrape_review accept (rebuilt)
+119549,approved,32370.0,100.0,Sundaram Value Fund,Sundaram Value Fund,2026-06-02T03:49:22.912246+00:00,batch_scrape_review accept (rebuilt)
+119514,approved,2969.0,100.0,Aditya Birla Sun Life Infrastructure Fund,Aditya Birla Sun Life Infrastructure Fund,2026-06-02T03:49:22.913284+00:00,batch_scrape_review accept (rebuilt)
+119172,approved,31992.0,100.0,Tata Ethical Fund,Tata Ethical Fund,2026-06-02T03:49:22.914338+00:00,batch_scrape_review accept (rebuilt)
+119705,approved,2626.0,100.0,Sbi Comma Fund,SBI Comma Fund,2026-06-02T03:49:22.915374+00:00,batch_scrape_review accept (rebuilt)
+119835,approved,32321.0,100.0,Sbi Contra Fund,SBI Contra Fund,2026-06-02T03:49:22.916370+00:00,batch_scrape_review accept (rebuilt)
+120348,approved,4085.0,100.0,Invesco India Contra Fund,Invesco India Contra Fund,2026-06-02T03:49:22.917345+00:00,batch_scrape_review accept (rebuilt)
+120351,approved,6568.0,100.0,Lic Mf Infrastructure Fund,LIC MF Infrastructure Fund,2026-06-02T03:49:22.918337+00:00,batch_scrape_review accept (rebuilt)
+120395,approved,10348.0,100.0,Invesco India Psu Equity Fund,Invesco India PSU Equity Fund,2026-06-02T03:49:22.919318+00:00,batch_scrape_review accept (rebuilt)
+119732,approved,10831.0,100.0,Sbi Psu Fund,SBI PSU Fund,2026-06-02T03:49:22.920559+00:00,batch_scrape_review accept (rebuilt)
+119727,approved,2233.0,100.0,Sbi Focused Fund,SBI Focused Fund,2026-06-02T03:49:22.922165+00:00,batch_scrape_review accept (rebuilt)
+119769,approved,2594.0,100.0,Kotak Contra Fund,Kotak Contra Fund,2026-06-02T03:49:22.923565+00:00,batch_scrape_review accept (rebuilt)
+119711,approved,31980.0,100.0,Sbi Mnc Fund,SBI MNC Fund,2026-06-02T03:49:22.924796+00:00,batch_scrape_review accept (rebuilt)
+120488,approved,6463.0,100.0,Jm Focused Fund,JM Focused Fund,2026-06-02T03:49:22.925796+00:00,batch_scrape_review accept (rebuilt)
+120486,approved,32140.0,100.0,Jm Value Fund,JM Value Fund,2026-06-02T03:49:22.926800+00:00,batch_scrape_review accept (rebuilt)
+120468,approved,14519.0,100.0,Axis Focused Fund,Axis Focused Fund,2026-06-02T03:49:22.927782+00:00,batch_scrape_review accept (rebuilt)
+120405,approved,5689.0,100.0,Invesco India Infrastructure Fund,Invesco India Infrastructure Fund,2026-06-02T03:49:22.928784+00:00,batch_scrape_review accept (rebuilt)
+120722,approved,10077.0,100.0,Icici Prudential Focused Equity Fund,ICICI Prudential Focused Equity Fund,2026-06-02T03:49:22.929782+00:00,batch_scrape_review accept (rebuilt)
+120587,approved,32285.0,100.0,Icici Prudential Fmcg Fund,ICICI Prudential FMCG Fund,2026-06-02T03:49:22.930755+00:00,batch_scrape_review accept (rebuilt)
+120621,approved,2628.0,100.0,Icici Prudential Infrastructure Fund,ICICI Prudential Infrastructure Fund,2026-06-02T03:49:22.931762+00:00,batch_scrape_review accept (rebuilt)
+120682,approved,32241.0,100.0,Uti - Mnc Fund,UTI MNC Fund,2026-06-02T03:49:22.932789+00:00,batch_scrape_review accept (rebuilt)
+120833,approved,5428.0,100.0,Quant Infrastructure Fund,Quant Infrastructure Fund,2026-06-02T03:49:22.933784+00:00,batch_scrape_review accept (rebuilt)
+120751,approved,2634.0,100.0,Uti Value Fund,UTI Value Fund,2026-06-02T03:49:22.934763+00:00,batch_scrape_review accept (rebuilt)
+120728,approved,1961.0,100.0,Uti Infrastructure Fund,UTI Infrastructure Fund,2026-06-02T03:49:22.935772+00:00,batch_scrape_review accept (rebuilt)
+120834,approved,7970.0,100.0,Quant Focused Fund,Quant Focused Fund,2026-06-02T03:49:22.936784+00:00,batch_scrape_review accept (rebuilt)
+129212,approved,2646.0,100.0,Sundaram Infrastructure Advantage Fund,Sundaram Infrastructure Advantage Fund,2026-06-02T03:49:22.937851+00:00,batch_scrape_review accept (rebuilt)
+122389,approved,19043.0,100.0,Motilal Oswal Focused Fund,Motilal Oswal Focused Fund,2026-06-02T03:49:22.939423+00:00,batch_scrape_review accept (rebuilt)
+131580,approved,27976.0,100.0,360 One Focused Fund,360 ONE Focused Fund,2026-06-02T03:49:22.940722+00:00,batch_scrape_review accept (rebuilt)
+135813,approved,30861.0,100.0,Tata Resources & Energy Fund,Tata Resources & Energy Fund,2026-06-02T03:49:22.941792+00:00,batch_scrape_review accept (rebuilt)
+118692,approved,3707.0,100.0,Nippon India Focused Fund,Nippon India Focused Fund,2026-06-02T03:49:22.942800+00:00,batch_scrape_review accept (rebuilt)
+151040,approved,5371.0,100.0,Hsbc Infrastructure Fund,HSBC Infrastructure Fund,2026-06-02T03:49:22.943859+00:00,batch_scrape_review accept (rebuilt)
+149268,approved,42256.0,100.0,Iti Pharma And Healthcare Fund,ITI Pharma and Healthcare Fund,2026-06-02T03:49:22.944855+00:00,batch_scrape_review accept (rebuilt)
+153674,approved,45627.0,100.0,Mahindra Manulife Banking & Financial Services Fund,Mahindra Manulife Banking & Financial Services Fund,2026-06-02T03:49:22.945900+00:00,batch_scrape_review accept (rebuilt)
+153983,approved,45921.0,100.0,Mirae Asset Infrastructure Fund,Mirae Asset Infrastructure Fund,2026-06-02T03:49:22.946885+00:00,batch_scrape_review accept (rebuilt)
+153972,approved,45876.0,100.0,Bandhan Healthcare Fund,Bandhan Healthcare Fund,2026-06-02T03:49:22.947904+00:00,batch_scrape_review accept (rebuilt)
+153484,approved,45465.0,100.0,Motilal Oswal Infrastructure Fund,Motilal Oswal Infrastructure Fund,2026-06-02T03:49:22.948889+00:00,batch_scrape_review accept (rebuilt)
+153039,approved,45050.0,100.0,Pgim India Healthcare Fund,PGIM India Healthcare Fund,2026-06-02T03:49:22.949906+00:00,batch_scrape_review accept (rebuilt)
+152082,approved,44165.0,100.0,Hdfc Pharma And Healthcare Fund,HDFC Pharma And Healthcare Fund,2026-06-02T03:49:22.950873+00:00,batch_scrape_review accept (rebuilt)
+152024,approved,39527.0,100.0,Lic Mf Healthcare Fund,LIC MF Healthcare Fund,2026-06-02T03:49:22.951886+00:00,batch_scrape_review accept (rebuilt)
+152214,approved,44274.0,100.0,Kotak Healthcare Fund,Kotak Healthcare Fund,2026-06-02T03:49:22.952863+00:00,batch_scrape_review accept (rebuilt)
+153604,approved,45581.0,100.0,Baroda Bnp Paribas Health And Wellness Fund,Baroda BNP Paribas Health and Wellness Fund,2026-06-02T03:49:22.953866+00:00,batch_scrape_review accept (rebuilt)
+153157,approved,45131.0,100.0,Bajaj Finserv Healthcare Fund,Bajaj Finserv Healthcare Fund,2026-06-02T03:49:22.955350+00:00,batch_scrape_review accept (rebuilt)
+153447,approved,45414.0,100.0,Kotak Energy Opportunities Fund,Kotak Energy Opportunities Fund,2026-06-02T03:49:22.957570+00:00,batch_scrape_review accept (rebuilt)
+119893,rejected,,,Bnp Paribas Large Cap Fund,,2026-06-02T04:06:39.964293+00:00,batch_scrape_review no link: BNP duplicate; duplicate_mfapi_keep_existing_map_150187
+119988,rejected,,,Bnp Paribas Multi Cap Fund,,2026-06-02T04:06:39.966142+00:00,batch_scrape_review no link: BNP duplicate; duplicate_mfapi_keep_existing_map_119354
+140386,rejected,,,Bnp Paribas Arbitrage Fund,,2026-06-02T04:06:39.967413+00:00,batch_scrape_review no link: BNP duplicate; duplicate_mfapi_keep_existing_map_150251
+150264,rejected,,,Baroda Bnp Paribas Focused Fund,,2026-06-02T04:06:39.968539+00:00,batch_scrape_review no link: BNP duplicate; duplicate_mfapi_keep_existing_map_141813
+119298,rejected,,,L&t Balanced Advantage Fund,,2026-06-02T04:06:39.970011+00:00,batch_scrape_review no link: L&T not on ET Money; track/NAV only
+119308,rejected,,,L&t India Large Cap Fund,,2026-06-02T04:06:39.972517+00:00,batch_scrape_review no link: L&T not on ET Money; track/NAV only
+119347,rejected,,,L&t Hybrid Equity Fund,,2026-06-02T04:06:39.973852+00:00,batch_scrape_review no link: L&T not on ET Money; track/NAV only
+119397,rejected,,,L&t Large And Midcap Fund,,2026-06-02T04:06:39.974943+00:00,batch_scrape_review no link: L&T not on ET Money; track/NAV only
+119413,rejected,,,L&t Infrastructure Fund,,2026-06-02T04:06:39.976020+00:00,batch_scrape_review no link: L&T not on ET Money; track/NAV only
+119807,rejected,,,L&t Mid Cap Fund,,2026-06-02T04:06:39.977055+00:00,batch_scrape_review no link: L&T not on ET Money; track/NAV only
+130450,rejected,,,L&t Arbitrage Opportunities Fund,,2026-06-02T04:06:39.978159+00:00,batch_scrape_review no link: L&T not on ET Money; track/NAV only
+130825,rejected,,,L&t Business Cycles Fund,,2026-06-02T04:06:39.979205+00:00,batch_scrape_review no link: L&T not on ET Money; track/NAV only
+118344,rejected,,,Idbi India Top 100 Equity Fund,,2026-06-02T04:11:53.087170+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118345,rejected,,,Idbi Liquid Fund,,2026-06-02T04:11:53.088461+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118452,rejected,,,Idbi Equity Savings Fund,,2026-06-02T04:11:53.089577+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118610,rejected,,,Reliance Liquid Fund - Cash Plan,,2026-06-02T04:11:53.091471+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118636,rejected,,,Edelweiss Liquid Fund,,2026-06-02T04:11:53.092473+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118857,rejected,,,Mirae Asset Liquid Fund,,2026-06-02T04:11:53.093859+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118866,rejected,,,Taurus Elss Tax Saver Fund,,2026-06-02T04:11:53.094689+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118868,rejected,,,Taurus Banking & Financial Services Fund,,2026-06-02T04:11:53.095496+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118870,rejected,,,Taurus Large Cap Fund,,2026-06-02T04:11:53.096228+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118872,rejected,,,Taurus Mid Cap Fund,,2026-06-02T04:11:53.096943+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118876,rejected,,,Taurus Ethical Fund,,2026-06-02T04:11:53.097715+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118879,rejected,,,Taurus Infrastructure Fund,,2026-06-02T04:11:53.098467+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118883,rejected,,,Taurus Flexi Cap Fund,,2026-06-02T04:11:53.099205+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+118893,rejected,,,Taurus Liquid Fund,,2026-06-02T04:11:53.099996+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119133,rejected,,,Groww Largecap Fund (formerly Known As Indiabulls Blue Chip Fund),,2026-06-02T04:11:53.101895+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119135,rejected,,,Groww Liquid Fund ( Formerly Known As Indiabulls Liquid )fund,,2026-06-02T04:11:53.103224+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119148,rejected,,,Navi Large Cap Equity Fund,,2026-06-02T04:11:53.104359+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119156,rejected,,,Navi Conservative Hybrid Fund,,2026-06-02T04:11:53.105629+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119173,rejected,,,Morgan Stanley Liquid Fund,,2026-06-02T04:11:53.107081+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119176,rejected,,,Navi 3 In 1 Fund,,2026-06-02T04:11:53.107993+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119181,rejected,,,Daiwa Liquid Fund,,2026-06-02T04:11:53.109480+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119291,rejected,,,L&t Flexicap Fund,,2026-06-02T04:11:53.113156+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119326,rejected,,,Baroda Hybrid Equity Fund - Plan B,,2026-06-02T04:11:53.118717+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119360,rejected,,,Pinebridge India Liquid Fund,,2026-06-02T04:11:53.122583+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119389,rejected,,,Baroda Conservative Hybrid Fund - Plan B,,2026-06-02T04:11:53.125797+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119392,rejected,,,Baroda Mid-cap Fund- Plan B,,2026-06-02T04:11:53.128758+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119404,rejected,,,L&t India Value Fund,,2026-06-02T04:11:53.131919+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119417,rejected,,,L&t Tax Advantage Fund,,2026-06-02T04:11:53.135579+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119441,rejected,,,Principal Emerging Bluechip Fund,,2026-06-02T04:11:53.137863+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119452,rejected,,,Principal Multi Cap Growth Fund,,2026-06-02T04:11:53.139502+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119464,rejected,,,Principal Focused Multicap Fund,,2026-06-02T04:11:53.141101+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119468,rejected,,,Principal Cash Management Fund,,2026-06-02T04:11:53.143042+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119472,rejected,,,Principal Equity Savings Fund,,2026-06-02T04:11:53.146583+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119482,rejected,,,Principal Balanced Advantage Fund,,2026-06-02T04:11:53.148497+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119484,rejected,,,Principal Hybrid Equity Fund,,2026-06-02T04:11:53.149877+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119517,rejected,,,Aditya Birla Sun Life International Equity Fund,,2026-06-02T04:11:53.151945+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119542,rejected,,,Sundaram Equity Hybrid Fund,,2026-06-02T04:11:53.154334+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119578,rejected,,,Sundaram Select Focus,,2026-06-02T04:11:53.156996+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119612,rejected,,,Aditya Birla Sun Life Gilt Plus - Liquid Plan,,2026-06-02T04:11:53.159497+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119790,rejected,,,L&t Liquid Fund,,2026-06-02T04:11:53.162551+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119802,rejected,,,L&t Equity Savings Fund,,2026-06-02T04:11:53.164583+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119852,rejected,,,L&t Conservative Hybrid Fund,,2026-06-02T04:11:53.167358+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119905,rejected,,,Jpmorgan India Liquid Fund,,2026-06-02T04:11:53.169370+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119935,rejected,,,Ing Liquid Fund - Super Institutional Plan,,2026-06-02T04:11:53.170997+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+119960,rejected,,,Tata Equity Savings Fund,,2026-06-02T04:11:53.172181+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+120042,rejected,,,Hsbc Dynamic Asset Allocation Fund,,2026-06-02T04:11:53.173531+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+120082,rejected,,,Bnp Paribas Conservative Hybrid Fund,,2026-06-02T04:11:53.174865+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+120104,rejected,,,Dhfl Pramerica Liquid Fund,,2026-06-02T04:11:53.175977+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+120123,rejected,,,Bnp Paribas Liquid Fund,,2026-06-02T04:11:53.177268+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+120262,rejected,,,Sahara Liquid Fund-fixed Pricing,,2026-06-02T04:11:53.178963+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+120280,rejected,,,Sahara Liquid Fund-variable Pricing,,2026-06-02T04:11:53.180294+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+120406,rejected,,,Jm Liquid Fund,,2026-06-02T04:11:53.181752+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+120415,rejected,,,Jm Floater Short Term Fund,,2026-06-02T04:11:53.182692+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+125711,rejected,,,Shriram Aggressive Hybrid Fund,,2026-06-02T04:11:53.185668+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+129052,rejected,,,Hdfc Arbitrage Fund,,2026-06-02T04:11:53.187285+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+129220,rejected,,,L&t Emerging Businesses Fund,,2026-06-02T04:11:53.188321+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+130479,rejected,,,Bnp Paribas Liquid Fund,,2026-06-02T04:11:53.189578+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+133181,rejected,,,Groww Arbitrage Fund (formerly Known As Indiabulls Arbitrage Fund),,2026-06-02T04:11:53.191120+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+134045,rejected,,,Baroda Elss 96 Plan B,,2026-06-02T04:11:53.192309+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+134110,rejected,,,Sbi Dynamic Asset Allocation Fund,,2026-06-02T04:11:53.193256+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+134923,rejected,,,Nippon India Us Equity Opportunities Fund,,2026-06-02T04:11:53.194310+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+135341,rejected,,,Groww Value Fund (formerly Known As Indiabulls Value Fund),,2026-06-02T04:11:53.195288+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+135654,rejected,,,Navi Elss Tax Saver Fund,,2026-06-02T04:11:53.196188+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+135677,rejected,,,Navi Large & Midcap Fund,,2026-06-02T04:11:53.197149+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+135689,rejected,,,Indiabulls Savings Income Fund,,2026-06-02T04:11:53.198198+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+138394,rejected,,,Dhfl Pramerica Tax Plan,,2026-06-02T04:11:53.199577+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+138464,rejected,,,Dhfl Pramerica Hybrid Debt Fund,,2026-06-02T04:11:53.200513+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+139221,rejected,,,Principal Arbitrage Fund,,2026-06-02T04:11:53.201674+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+139257,rejected,,,Jm Liquid Fund Unclaimed Redemption,,2026-06-02T04:11:53.203822+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+139259,rejected,,,Jm Liquid Fund Unclaimed Redemption Ief,,2026-06-02T04:11:53.204968+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+139538,rejected,,,Mahindra Manulife Liquid Fund,,2026-06-02T04:11:53.206684+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+139971,rejected,,,Idbi Hybrid Equity Fund,,2026-06-02T04:11:53.208386+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+140461,rejected,,,Idbi Midcap Fund,,2026-06-02T04:11:53.211515+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+141006,rejected,,,Bnp Paribas Substantial Equity Hybrid Fund,,2026-06-02T04:11:53.213209+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+141475,rejected,,,Idbi Small Cap Fund,,2026-06-02T04:11:53.214865+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+141808,rejected,,,Groww Elss Tax Saver Fund (formerly Known As Indiabulls Tax Savings Fund),,2026-06-02T04:11:53.216382+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+144455,rejected,,,Idbi Long Term Value Fund,,2026-06-02T04:11:53.217884+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+144634,rejected,,,Bnp Paribas India Consumption Fund,,2026-06-02T04:11:53.219431+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+144658,rejected,,,Navi Arbitrage Fund,,2026-06-02T04:11:53.220640+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+144681,rejected,,,Motilal Oswal Equity Hybrid Fund (mofeh),,2026-06-02T04:11:53.221784+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+144905,rejected,,,Shriram Flexi Cap Fund,,2026-06-02T04:11:53.223039+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+145228,rejected,,,Hsbc Equity Hybrid Fund,,2026-06-02T04:11:53.224656+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+145376,rejected,,,L&t Focused Equity Fund,,2026-06-02T04:11:53.227331+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+145599,rejected,,,Groww Aggressive Hybrid Fund (formerly Known As Indiabulls Equity Hybrid Fund),,2026-06-02T04:11:53.231097+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+145819,rejected,,,Shriram Elss Tax Saver Fund,,2026-06-02T04:11:53.233811+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+146402,rejected,,,Bnp Paribas Dynamic Equity Fund,,2026-06-02T04:11:53.236702+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+147131,rejected,,,Principal Small Cap Fund,,2026-06-02T04:11:53.239016+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+147406,rejected,,,Shriram Balanced Advantage Fund,,2026-06-02T04:11:53.242042+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+147689,rejected,,,Nippon India Equity Hybrid Fund - Segregated Portfolio 1,,2026-06-02T04:11:53.247077+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+147697,rejected,,,Nippon India Equity Savings Fund - Segregated Portfolio 1,,2026-06-02T04:11:53.249470+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+147778,rejected,,,Principal Midcap Fund,,2026-06-02T04:11:53.252232+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+147937,rejected,,,Indiabulls Liquid Fund,,2026-06-02T04:11:53.256766+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+147939,rejected,,,Indiabulls Liquid Fund,,2026-06-02T04:11:53.259399+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148143,rejected,,,Nippon India Hybrid Bond Fund - Segregated Portfolio 1,,2026-06-02T04:11:53.262619+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148274,rejected,,,Nippon India Equity Savings Fund - Segregated Portfolio 2,,2026-06-02T04:11:53.265675+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148296,rejected,,,Nippon India Conservative Hybrid Fund - Segregated Portfolio 2,,2026-06-02T04:11:53.268647+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148302,rejected,,,Franklin India Debt Hybrid Fund - Segregated Portfolio 1 (10.25% Yes Bank Ltd Co 05mar20),,2026-06-02T04:11:53.271461+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148413,rejected,,,Jm Liquid Fund - Unclaimed Brokerage I.e.f.,,2026-06-02T04:11:53.274311+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148414,rejected,,,Jm Liquid Fund - Unclaimed Application Refund Amount I.e.f.,,2026-06-02T04:11:53.277452+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148415,rejected,,,Jm Liquid Fund - Withheld Brokerage I.e.f.,,2026-06-02T04:11:53.279887+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148454,rejected,,,Motilal Oswal Multi Asset Fund,,2026-06-02T04:11:53.282212+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148524,rejected,,,Principal Large Cap Fund,,2026-06-02T04:11:53.284817+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+148841,rejected,,,Trustmf Liquid Fund,,2026-06-02T04:11:53.286478+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+149264,rejected,,,Nj Balanced Advantage Fund,,2026-06-02T04:11:53.288136+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+149679,rejected,,,Sundaram Equity Savings Fund (formerly Known As Principal Equity Savings Fund),,2026-06-02T04:11:53.289787+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+150367,rejected,,,Nj Arbitrage Fund,,2026-06-02T04:11:53.291353+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+151611,rejected,,,Nj Elss Tax Saver Scheme,,2026-06-02T04:11:53.293840+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+151917,rejected,,,Nj Flexi Cap Fund,,2026-06-02T04:11:53.295464+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+152051,rejected,,,Shriram Multi Asset Allocation Fund,,2026-06-02T04:11:53.296690+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+152254,rejected,,,Groww Banking & Financial Services Fund,,2026-06-02T04:11:53.298355+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+152584,rejected,,,Trustmf Flexi Cap Fund,,2026-06-02T04:11:53.300000+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+152939,rejected,,,Trustmf Small Cap Fund,,2026-06-02T04:11:53.302366+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153034,rejected,,,Groww Multicap Fund,,2026-06-02T04:11:53.303767+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153035,rejected,,,Shriram Liquid Fund,,2026-06-02T04:11:53.304763+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153076,rejected,,,Shriram Multi Sector Rotation Fund,,2026-06-02T04:11:53.305915+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153260,rejected,,,Iti Bharat Consumption Fund,,2026-06-02T04:11:53.307571+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153376,rejected,,,Unifi Dynamic Asset Allocation Fund,,2026-06-02T04:11:53.308838+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153543,rejected,,,Unifi Flexi Cap Fund,,2026-06-02T04:11:53.310045+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153570,rejected,,,Unifi Liquid Fund,,2026-06-02T04:11:53.311078+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153644,rejected,,,Trustmf Multi Cap Fund,,2026-06-02T04:11:53.312301+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153651,rejected,,,Jioblackrock Liquid Fund,,2026-06-02T04:11:53.313271+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153804,rejected,,,Trustmf Arbitrage Fund,,2026-06-02T04:11:53.314641+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153821,rejected,,,Groww Multi Asset Allocation Fund,,2026-06-02T04:11:53.315598+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+153859,rejected,,,Jioblackrock Flexi Cap Fund,,2026-06-02T04:11:53.316510+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+154063,rejected,,,Groww Small Cap Fund,,2026-06-02T04:11:53.318165+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+154076,rejected,,,Jioblackrock Arbitrage Fund,,2026-06-02T04:11:53.319063+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+154082,rejected,,,Jioblackrock Sector Rotation Fund,,2026-06-02T04:11:53.320041+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+154307,rejected,,,Jioblackrock Large Cap Fund,,2026-06-02T04:11:53.321612+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+154320,rejected,,,Groww Arbitrage Fund,,2026-06-02T04:11:53.322480+00:00,nav_universe closed: no ET Money page or duplicate MFAPI; track/NAV only
+120147,rejected,,,Bnp Paribas Long Term Equity Fund,,2026-06-02T04:16:59.549304+00:00,manual fix wrong batch map; no correct ET page; track/NAV only
+147587,rejected,,,Sundaram Equity Fund,,2026-06-02T04:16:59.552875+00:00,manual fix wrong batch map; no correct ET page; track/NAV only

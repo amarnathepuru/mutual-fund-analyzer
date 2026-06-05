@@ -33,11 +33,36 @@ def filter_funds(
     category: str,
     period: str,
     min_return_pct: float | None,
+    *,
+    category_map: dict[str, list[str]] | None = None,
+    stock_only: bool = False,
+    allowed_funds: set[str] | None = None,
 ) -> list[str]:
-    """Funds in category that meet the minimum trailing return (None = no floor)."""
-    names = funds_in_category(master, category)
+    """Funds in category (browse card or raw label) that meet the minimum trailing return."""
+    if category_map:
+        raw_labels = category_map.get(category, [category])
+        if master.empty or "category" not in master.columns:
+            names: list[str] = []
+        else:
+            names = (
+                master.loc[master["category"].isin(raw_labels), "fund_name"]
+                .dropna()
+                .unique()
+                .tolist()
+            )
+    else:
+        names = funds_in_category(master, category)
     if not names or master.empty:
         return []
+
+    if stock_only and "has_holdings" in master.columns:
+        held = set(
+            master.loc[master["has_holdings"], "fund_name"].dropna().astype(str).str.strip()
+        )
+        names = [n for n in names if str(n).strip() in held]
+
+    if allowed_funds is not None:
+        names = [n for n in names if n in allowed_funds]
 
     col = return_column(period)
     if col not in master.columns:

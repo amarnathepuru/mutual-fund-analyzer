@@ -1,46 +1,48 @@
 scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,notes
 1233,119581,INF903J01MJ3,Sundaram Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.666299+00:00,auto_ok from match report
 1247,119528,INF209K01YY7,Aditya Birla Sun Life Large Cap Fund,100.0,auto,2026-05-29T10:42:17.663993+00:00,auto_ok from match report
-1286,119620,INF209K01Q30,,99.6,manual,2026-05-29T10:10:59.750520+00:00,bulk_grid
+1286,119620,INF209K01Q30,Aditya Birla Sun Life Mid Cap Fund,99.6,manual,2026-05-29T10:10:59.750520+00:00,bulk_grid
 1318,120334,INF109K015K4,ICICI Prudential Multi Asset Fund,100.0,auto,2026-05-29T10:42:17.667028+00:00,auto_ok from match report
-1328,120030,INF336L01CM7,,83.08,manual,2026-05-29T10:18:26.146574+00:00,bulk_grid
+1328,120030,INF336L01CM7,HSBC Large Cap Fund,83.08,manual,2026-05-29T10:18:26.146574+00:00,bulk_grid
 1360,138312,INF663L01GR4,PGIM India Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664935+00:00,auto_ok from match report
 1386,119250,INF740K01PR3,DSP Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664303+00:00,auto_ok from match report
-1546,118589,INF204K01XO1,,88.6,manual,2026-05-29T09:39:28.275830+00:00,bulk_grid
+1546,118589,INF204K01XO1,Nippon India Banking & Financial Services Fund,88.6,manual,2026-05-29T09:39:28.275830+00:00,bulk_grid
 1657,119354,INF955L01AG0,Baroda BNP Paribas Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.667977+00:00,auto_ok from match report
-1674,118275,INF760K01EF0,,97.27,manual,2026-05-29T09:39:28.179882+00:00,bulk_grid
+1674,118275,INF760K01EF0,Canara Robeco Flexi Cap Fund,97.27,manual,2026-05-29T09:39:28.179882+00:00,bulk_grid
 1883,138386,INF663L01GX2,PGIM India Aggressive Hybrid Equity Fund,100.0,auto,2026-05-29T10:42:17.656549+00:00,auto_ok from match report
 1898,120046,INF336L01DH5,HSBC Flexi Cap Fund,83.08,manual,2026-05-29T10:42:06.949645+00:00,manual_rework_review9
 1960,120726,INF789F01UA6,UTI Mid Cap Fund,70.38,manual,2026-05-29T10:42:07.061282+00:00,manual_rework_review9
 1963,120733,INF789F01SN3,UTI Banking and Financial Services Fund,100.0,auto,2026-05-29T10:42:17.672929+00:00,auto_ok from match report
-2151,149154,nan,,88.79,manual,2026-05-29T09:39:28.234059+00:00,bulk_grid
+2151,149154,nan,HSBC Midcap Fund,88.79,manual,2026-05-29T09:39:28.234059+00:00,bulk_grid
 2156,150187,INF251K01HN7,Baroda BNP Paribas Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664199+00:00,auto_ok from match report
 2178,120158,INF174K01LF9,Kotak Large & Midcap Fund,100.0,auto,2026-05-29T10:42:17.663459+00:00,auto_ok from match report
 2257,120381,INF109K011N7,ICICI Prudential Midcap Fund,100.0,auto,2026-05-29T10:42:17.665833+00:00,auto_ok from match report
-2328,118736,INF204K01G94,,85.0,manual,2026-05-29T09:39:28.146152+00:00,bulk_grid
-2412,120164,INF174K01KT2,,84.07,manual,2026-05-29T09:39:28.288275+00:00,bulk_grid
+2328,118736,INF204K01G94,Nippon India Balanced Advantage Fund,85.0,manual,2026-05-29T09:39:28.146152+00:00,bulk_grid
+2412,120164,INF174K01KT2,Kotak Small Cap Fund,84.07,manual,2026-05-29T09:39:28.288275+00:00,bulk_grid
 2414,119589,INF903J01NK9,Sundaram Small Cap Fund,100.0,auto,2026-05-29T10:42:17.675040+00:00,auto_ok from match report
 2420,118510,INF090I01IN1,Franklin India Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663100+00:00,auto_ok from match report
-2455,118650,INF204K01XF9,,79.23,manual,2026-05-29T09:39:28.265024+00:00,bulk_grid
+2455,118650,INF204K01XF9,Nippon India Multi Cap Fund,79.23,manual,2026-05-29T09:39:28.265024+00:00,bulk_grid
 2460,118278,INF760K01EI4,Canara Robeco Large and Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662948+00:00,auto_ok from match report
 2477,119716,INF200K01TP4,SBI Midcap Fund,100.0,auto,2026-05-29T10:42:17.666247+00:00,auto_ok from match report
 2483,119062,INF179K01XZ1,HDFC Hybrid Equity Fund,100.0,auto,2026-05-29T10:42:17.655690+00:00,auto_ok from match report
-2605,118794,INF204K01B08,,84.47,manual,2026-05-29T09:39:28.105919+00:00,bulk_grid
+2605,118794,INF204K01B08,Nippon India Aggressive Hybrid Fund,84.47,manual,2026-05-29T09:39:28.105919+00:00,bulk_grid
 2611,118419,INF194K01V89,Bandhan Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662794+00:00,auto_ok from match report
-2630,118803,INF204K01L55,,82.73,manual,2026-05-29T09:39:28.170952+00:00,bulk_grid
+2630,118803,INF204K01L55,Nippon India ELSS Tax Saver Fund,82.73,manual,2026-05-29T09:39:28.170952+00:00,bulk_grid
+2632,119131,INF179K01XW8,HDFC Multi-Asset Allocation Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 2671,119718,INF200K01UG1,SBI Flexicap Fund,100.0,auto,2026-05-29T10:42:17.662223+00:00,auto_ok from match report
 2694,119771,INF174K01LC6,Kotak Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657582+00:00,auto_ok from match report
 2698,118424,INF194K01W62,Bandhan Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661157+00:00,auto_ok from match report
-2749,119773,INF174K01LI3,,88.12,manual,2026-05-29T09:39:28.166867+00:00,bulk_grid
+2749,119773,INF174K01LI3,Kotak ELSS Tax Saver Fund,88.12,manual,2026-05-29T09:39:28.166867+00:00,bulk_grid
 2811,150159,INF251K01HF3,Baroda BNP Paribas ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659794+00:00,auto_ok from match report
 2825,119843,INF200K01TZ3,SBI Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667565+00:00,auto_ok from match report
 2829,118525,INF090I01IQ4,Franklin India Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674244+00:00,auto_ok from match report
 2893,119598,INF200K01QX4,SBI Large Cap Fund,100.0,auto,2026-05-29T10:42:17.665091+00:00,auto_ok from match report
-2922,120079,INF336L01EE0,,94.0,manual,2026-05-29T09:39:28.161787+00:00,bulk_grid
-3066,150212,INF251K01HQ0,,98.52,manual,2026-05-29T09:39:28.232180+00:00,bulk_grid
+2922,120079,INF336L01EE0,HSBC ELSS Tax saver Fund,94.0,manual,2026-05-29T09:39:28.161787+00:00,bulk_grid
+3066,150212,INF251K01HQ0,Baroda BNP Paribas Midcap Fund,98.52,manual,2026-05-29T09:39:28.232180+00:00,bulk_grid
 3207,118479,INF194K01Z44,Bandhan Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664148+00:00,auto_ok from match report
 3253,120482,INF192K01BN6,JM Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657528+00:00,auto_ok from match report
 3271,120795,INF789FB1RG6,UTI Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.658106+00:00,auto_ok from match report
+3494,119574,INF200K01QU0,SBI Arbitrage Opportunities Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 3532,119071,INF740K01PX1,DSP Midcap Fund,100.0,auto,2026-05-29T10:42:17.665575+00:00,auto_ok from match report
 3709,120364,INF109K016O4,ICICI Prudential Equity Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657357+00:00,auto_ok from match report
 3713,120377,INF109K012B0,ICICI Prudential Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658727+00:00,auto_ok from match report
@@ -48,16 +50,16 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 3778,118474,INF194K01Y60,Bandhan Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657035+00:00,auto_ok from match report
 3792,119242,INF740K01OK1,DSP ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659899+00:00,auto_ok from match report
 3918,120826,INF966L01648,Quant Large and Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663678+00:00,auto_ok from match report
-3959,119566,INF903J01PR9,,98.52,manual,2026-05-29T09:39:28.207567+00:00,bulk_grid
+3959,119566,INF903J01PR9,Sundaram Large and Mid Cap Fund,98.52,manual,2026-05-29T09:39:28.207567+00:00,bulk_grid
 4077,119775,INF174K01LT0,Kotak Midcap Fund,100.0,auto,2026-05-29T10:42:17.665987+00:00,auto_ok from match report
-4087,120403,INF205K01MV6,,96.3,manual,2026-05-29T09:39:28.235808+00:00,bulk_grid
+4087,120403,INF205K01MV6,Invesco India Mid Cap Fund,96.3,manual,2026-05-29T09:39:28.235808+00:00,bulk_grid
 4647,120401,INF205K01KR8,Invesco India Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657461+00:00,auto_ok from match report
-4678,140175,INF843K01AL0,,100.0,manual,2026-05-29T10:10:59.602262+00:00,bulk_grid
+4678,140175,INF843K01AL0,Edelweiss Large & Mid Cap Fund,100.0,manual,2026-05-29T10:10:59.602262+00:00,bulk_grid
 4813,119556,INF209K01WN4,Aditya Birla Sun Life Small Cap Fund,100.0,auto,2026-05-29T10:42:17.673753+00:00,auto_ok from match report
 4874,118989,INF179K01XQ0,HDFC Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.665730+00:00,auto_ok from match report
 4876,119212,INF740K01QD1,DSP Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674135+00:00,auto_ok from match report
 5050,119076,INF740K01PI2,DSP Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661316+00:00,auto_ok from match report
-5077,118632,INF204K01XI3,,79.23,manual,2026-05-29T09:39:28.223077+00:00,bulk_grid
+5077,118632,INF204K01XI3,Nippon India Large Cap Fund,79.23,manual,2026-05-29T09:39:28.223077+00:00,bulk_grid
 5153,120357,INF205K01MA0,Invesco India Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663356+00:00,auto_ok from match report
 5373,120333,INF205K01LN5,Invesco India Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658830+00:00,auto_ok from match report
 5453,120591,INF109K015M0,ICICI Prudential Smallcap Fund,100.0,auto,2026-05-29T10:42:17.674401+00:00,auto_ok from match report
@@ -69,6 +71,7 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 6550,118825,INF769K01AX2,Mirae Asset Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664884+00:00,auto_ok from match report
 6558,130503,INF179KA1RW5,HDFC Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674296+00:00,auto_ok from match report
 7010,119544,INF209K01UN8,Aditya Birla Sun Life ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659526+00:00,auto_ok from match report
+7298,120586,INF109K016L0,ICICI Prudential Large Cap Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 7386,119597,INF903J01NB8,Sundaram Financial Services Opportunities Fund,100.0,auto,2026-05-29T10:42:17.672738+00:00,auto_ok from match report
 7599,120385,INF205K01KY4,Invesco India Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671773+00:00,auto_ok from match report
 8044,120244,INF109K013J1,ICICI Prudential Banking and Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671327+00:00,auto_ok from match report
@@ -83,7 +86,7 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 10108,118617,INF754K01BW4,Edelweiss Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664356+00:00,auto_ok from match report
 10234,120392,INF205K01LB0,Invesco India Largecap Fund,100.0,auto,2026-05-29T10:42:17.664670+00:00,auto_ok from match report
 10250,119526,INF209K01VP1,Aditya Birla Sun Life Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.656874+00:00,auto_ok from match report
-10258,120166,INF174K01LS2,,83.1,manual,2026-05-29T09:39:28.186200+00:00,bulk_grid
+10258,120166,INF174K01LS2,Kotak Flexicap Fund,83.1,manual,2026-05-29T09:39:28.186200+00:00,bulk_grid
 10265,125497,INF200K01T51,SBI Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674988+00:00,auto_ok from match report
 10269,118615,INF754K01BS2,Edelweiss Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658573+00:00,auto_ok from match report
 10271,118624,INF754K01CE0,Edelweiss Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655509+00:00,auto_ok from match report
@@ -92,11 +95,12 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 10842,118834,INF769K01BI1,Mirae Asset Large & Midcap Fund,100.0,auto,2026-05-29T10:42:17.663625+00:00,auto_ok from match report
 10960,118269,INF760K01FR2,Canara Robeco Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664251+00:00,auto_ok from match report
 10970,120524,INF846K01EV4,Axis Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666509+00:00,auto_ok from match report
-11077,118778,INF204K01K15,,79.23,manual,2026-05-29T09:39:28.290262+00:00,bulk_grid
-11236,118585,INF204K01XZ7,,79.23,manual,2026-05-29T09:39:28.117149+00:00,bulk_grid
+11077,118778,INF204K01K15,Nippon India Small Cap Fund,79.23,manual,2026-05-29T09:39:28.290262+00:00,bulk_grid
+11236,118585,INF204K01XZ7,Nippon India Arbitrage Fund,79.23,manual,2026-05-29T09:39:28.117149+00:00,bulk_grid
 11431,148026,nan,Sundaram Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659304+00:00,auto_ok from match report
 11656,120505,INF846K01EH3,Axis Midcap Fund,100.0,auto,2026-05-29T10:42:17.665409+00:00,auto_ok from match report
-11660,151122,INF917K01LE4,,89.4,manual,2026-05-29T09:39:28.103615+00:00,bulk_grid
+11660,151122,INF917K01LE4,HSBC Aggressive Hybrid Fund,89.4,manual,2026-05-29T09:39:28.103615+00:00,bulk_grid
+11662,151129,INF917K01IN1,HSBC Balanced Advantage Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 12396,119292,INF582M01633,Union Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662382+00:00,auto_ok from match report
 13091,119307,INF582M01765,Union ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660845+00:00,auto_ok from match report
 14514,119333,INF955L01971,Baroda BNP Paribas Banking and Financial Services Fund,100.0,auto,2026-05-29T10:42:17.670799+00:00,auto_ok from match report
@@ -108,21 +112,21 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 22046,125597,INF209K014W1,Aditya Birla Sun Life Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.669728+00:00,auto_ok from match report
 22958,126393,INF740K01K81,DSP Dynamic Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.658523+00:00,auto_ok from match report
 23600,127042,INF247L01445,Motilal Oswal Midcap Fund,100.0,auto,2026-05-29T10:42:17.666091+00:00,auto_ok from match report
-24276,127850,INF761K01BO6,,89.57,manual,2026-05-29T09:39:28.135289+00:00,bulk_grid
+24276,127850,INF761K01BO6,Bank of India Balanced Advantage Fund,89.57,manual,2026-05-29T09:39:28.135289+00:00,bulk_grid
 25643,129046,INF247L01502,Motilal Oswal Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661961+00:00,auto_ok from match report
-25651,120069,nan,,94.4,manual,2026-05-29T09:39:28.286306+00:00,bulk_grid
+25651,120069,nan,HSBC Small Cap Fund,94.4,manual,2026-05-29T09:39:28.286306+00:00,bulk_grid
 26378,129649,INF582M01BU9,Union Small Cap Fund,100.0,auto,2026-05-29T10:42:17.675215+00:00,auto_ok from match report
 26662,130206,INF754K01EA4,Edelweiss Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657199+00:00,auto_ok from match report
 26816,151138,INF917K01QR5,HSBC Arbitrage Fund,83.08,manual,2026-05-29T10:42:07.168728+00:00,manual_rework_review9
 27105,130773,INF846K01PZ1,Axis Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.656930+00:00,auto_ok from match report
-27208,130860,INF204KA1SI1,,76.4,manual,2026-05-29T09:39:28.196111+00:00,bulk_grid
+27208,130860,INF204KA1SI1,Nippon India Japan Equity Fund,76.4,manual,2026-05-29T09:39:28.196111+00:00,bulk_grid
 27390,138875,INF223J013N7,PGIM India Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657793+00:00,auto_ok from match report
-27860,131355,INF194KA1UH1,,86.54,manual,2026-05-29T09:39:28.133033+00:00,bulk_grid
+27860,131355,INF194KA1UH1,Bandhan Balanced Advantage Fund,86.54,manual,2026-05-29T09:39:28.133033+00:00,bulk_grid
 28004,132756,INF277K01I86,Tata ELSS Fund,100.0,auto,2026-05-29T10:42:17.660741+00:00,auto_ok from match report
 28150,133035,INF174K01F00,Kotak Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656113+00:00,auto_ok from match report
 28670,133386,INF247L01569,Motilal Oswal ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660423+00:00,auto_ok from match report
 28768,140353,INF843K01KK1,Edelweiss Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661368+00:00,auto_ok from match report
-28921,133710,INF767K01NE9,,100.0,manual,2026-05-29T10:10:59.634542+00:00,bulk_grid
+28921,133710,INF767K01NE9,LIC MF Large & Mid Cap Fund,100.0,manual,2026-05-29T10:10:59.634542+00:00,bulk_grid
 28968,133859,INF200KA1507,SBI Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.672675+00:00,auto_ok from match report
 28978,133839,INF663L01FF1,PGIM India Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662066+00:00,auto_ok from match report
 29210,134017,INF767K01NK6,LIC MF Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.672484+00:00,auto_ok from match report
@@ -137,27 +141,28 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 31845,120828,INF966L01689,Quant Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674883+00:00,auto_ok from match report
 31854,118272,INF760K01EZ8,Canara Robeco Equity Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655236+00:00,auto_ok from match report
 31865,120599,INF109K014O9,ICICI Prudential Multicap Fund,100.0,auto,2026-05-29T10:42:17.668335+00:00,auto_ok from match report
-31868,149570,INF173K01HZ7,,84.7,manual,2026-05-29T09:39:28.174672+00:00,bulk_grid
-31881,119202,INF277K01MK8,,100.0,manual,2026-05-29T10:10:59.721181+00:00,bulk_grid
+31868,149570,INF173K01HZ7,Sundaram ELSS Tax Saver Fund,84.7,manual,2026-05-29T09:39:28.174672+00:00,bulk_grid
+31881,119202,INF277K01MK8,Tata Large & Mid Cap Fund,100.0,manual,2026-05-29T10:10:59.721181+00:00,bulk_grid
 31882,119178,INF277K01PY2,Tata Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.666351+00:00,auto_ok from match report
 31883,119018,INF179K01YV8,HDFC Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664459+00:00,auto_ok from match report
 31885,120484,INF192K01BQ9,JM Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655992+00:00,auto_ok from match report
 31887,120490,INF192K01BZ0,JM Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664729+00:00,auto_ok from match report
 31893,118531,INF090I01FN7,Franklin India Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664408+00:00,auto_ok from match report
-31894,118533,INF090I01FH9,,100.0,manual,2026-05-29T10:10:59.753551+00:00,bulk_grid
+31894,118533,INF090I01FH9,Franklin India Mid Cap Fund,100.0,manual,2026-05-29T10:10:59.753551+00:00,bulk_grid
 31895,118535,INF090I01FK3,Franklin India Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661420+00:00,auto_ok from match report
 31913,120264,INF767K01EG3,LIC MF Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661799+00:00,auto_ok from match report
 31919,120261,INF767K01ED0,LIC MF Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656202+00:00,auto_ok from match report
 31937,120267,INF767K01EJ7,LIC MF Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664781+00:00,auto_ok from match report
 31951,130498,INF179KA1RQ7,HDFC Large and Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663151+00:00,auto_ok from match report
-31961,118678,INF204K01F20,,86.0,manual,2026-05-29T09:39:28.204148+00:00,bulk_grid
-31962,118668,INF204K01E54,,82.73,manual,2026-05-29T09:39:28.241200+00:00,bulk_grid
+31961,118678,INF204K01F20,Nippon India Vision Large & Mid Cap Fund,86.0,manual,2026-05-29T09:39:28.204148+00:00,bulk_grid
+31962,118668,INF204K01E54,Nippon India Growth Mid Cap Fund,82.73,manual,2026-05-29T09:39:28.241200+00:00,bulk_grid
 31976,119721,INF200K01UJ5,SBI Large & Midcap Fund,100.0,auto,2026-05-29T10:42:17.663730+00:00,auto_ok from match report
 31977,119723,INF200K01UM9,SBI ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660635+00:00,auto_ok from match report
 31983,119609,INF200K01RY0,SBI Equity Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656659+00:00,auto_ok from match report
 31990,119053,INF277K01MN2,Tata Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656713+00:00,auto_ok from match report
 31998,118955,INF179K01UT0,HDFC Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661472+00:00,auto_ok from match report
-32037,120665,INF789F01UG3,,100.0,manual,2026-05-29T10:10:59.722754+00:00,bulk_grid
+32026,120662,INF789F01TC4,UTI Flexi Cap Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
+32037,120665,INF789F01UG3,UTI Large & Mid Cap Fund,100.0,manual,2026-05-29T10:10:59.722754+00:00,bulk_grid
 32063,120674,INF789F01SK9,UTI Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656766+00:00,auto_ok from match report
 32142,120270,INF767K01EM1,LIC MF ELSS Tax Saver,100.0,auto,2026-05-29T10:42:17.660267+00:00,auto_ok from match report
 32210,119160,INF277K01QZ7,Tata Large Cap Fund,100.0,auto,2026-05-29T10:42:17.665198+00:00,auto_ok from match report
@@ -165,7 +170,7 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 32231,120596,INF109K011O5,ICICI Prudential Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663252+00:00,auto_ok from match report
 32245,118537,INF090I01FE6,Franklin India Technology Fund,100.0,auto,2026-05-29T10:42:17.673164+00:00,auto_ok from match report
 32258,120564,INF209K01XX1,Aditya Birla Sun Life Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661000+00:00,auto_ok from match report
-32273,120152,INF174K01KW6,,84.1,manual,2026-05-29T09:39:28.219788+00:00,bulk_grid
+32273,120152,INF174K01KW6,Kotak Large Cap Fund,84.1,manual,2026-05-29T09:39:28.219788+00:00,bulk_grid
 32291,118540,INF090I01JS8,Franklin India ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660003+00:00,auto_ok from match report
 32299,119019,INF740K01NY4,DSP Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655404+00:00,auto_ok from match report
 32328,120592,INF109K01Y31,ICICI Prudential ELSS Tax Saver,100.0,auto,2026-05-29T10:42:17.660055+00:00,auto_ok from match report
@@ -177,19 +182,20 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 32420,120594,INF109K01Z48,ICICI Prudential Technology Fund,100.0,auto,2026-05-29T10:42:17.673280+00:00,auto_ok from match report
 32451,119218,INF740K01PL6,DSP Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662999+00:00,auto_ok from match report
 32470,131670,INF084M01DJ5,Aditya Birla Sun Life Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658265+00:00,auto_ok from match report
-32489,120847,INF966L01986,,100.0,manual,2026-05-29T10:10:59.539161+00:00,bulk_grid
-32508,118968,INF179K01WA6,,92.4,manual,2026-05-29T09:39:28.139444+00:00,bulk_grid
-32517,119060,INF179K01YS4,,98.37,manual,2026-05-29T09:39:28.157446+00:00,bulk_grid
+32489,120847,INF966L01986,Quant ELSS Tax Saver Fund,100.0,manual,2026-05-29T10:10:59.539161+00:00,bulk_grid
+32508,118968,INF179K01WA6,HDFC Balanced Advantage Fund,92.4,manual,2026-05-29T09:39:28.139444+00:00,bulk_grid
+32517,119060,INF179K01YS4,HDFC ELSS Tax Saver Fund,98.37,manual,2026-05-29T09:39:28.157446+00:00,bulk_grid
+32529,149669,INF173K01FQ0,Sundaram Multi Cap Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 32603,120819,INF966L01556,Quant Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656606+00:00,auto_ok from match report
 32605,120823,INF966L01614,Quant Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669275+00:00,auto_ok from match report
 32607,120821,INF966L01580,Quant Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667452+00:00,auto_ok from match report
 32611,120841,INF966L01887,Quant Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.666195+00:00,auto_ok from match report
-33105,139527,INF761K01DM6,,92.24,manual,2026-05-29T09:39:28.100906+00:00,bulk_grid
+33105,139527,INF761K01DM6,Bank of India Mid & Small Cap Equity & Debt Fund,92.24,manual,2026-05-29T09:39:28.100906+00:00,bulk_grid
 33387,139781,INF174V01093,Mahindra Manulife ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660319+00:00,auto_ok from match report
-33424,139872,INF247L01635,,97.06,manual,2026-05-29T09:39:28.143919+00:00,bulk_grid
+33424,139872,INF247L01635,Motilal Oswal Balanced Advantage Fund,97.06,manual,2026-05-29T09:39:28.143919+00:00,bulk_grid
 33736,150251,INF251K01OT0,Baroda BNP Paribas Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657089+00:00,auto_ok from match report
-33762,140382,INF194KA1U56,,85.9,manual,2026-05-29T09:39:28.099089+00:00,bulk_grid
-33825,152002,INF397L01JK8,,91.08,manual,2026-05-29T09:39:28.237489+00:00,bulk_grid
+33762,140382,INF194KA1U56,Bandhan Aggressive Hybrid Fund,85.9,manual,2026-05-29T09:39:28.099089+00:00,bulk_grid
+33825,152002,INF397L01JK8,LIC MF Midcap Fund,91.08,manual,2026-05-29T09:39:28.237489+00:00,bulk_grid
 34328,150260,INF251K01OZ7,Baroda BNP Paribas Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655124+00:00,auto_ok from match report
 34465,111549,INF082J01069,Quantum ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660579+00:00,auto_ok from match report
 34477,141226,INF174V01341,Mahindra Manulife Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669022+00:00,auto_ok from match report
@@ -201,17 +207,17 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 35440,142110,INF174V01507,Mahindra Manulife Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.666040+00:00,auto_ok from match report
 35592,142283,INF740KA1DN4,DSP Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657144+00:00,auto_ok from match report
 36421,143163,INF959L01CX3,Navi Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656435+00:00,auto_ok from match report
-36872,143614,INF761K01ED3,,84.7,manual,2026-05-29T09:39:28.110750+00:00,bulk_grid
+36872,143614,INF761K01ED3,Bank of India Arbitrage Fund,84.7,manual,2026-05-29T09:39:28.110750+00:00,bulk_grid
 37022,143537,INF205K014Q7,Invesco India Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655904+00:00,auto_ok from match report
 37164,143793,INF959L01DT9,Navi Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662015+00:00,auto_ok from match report
 37558,144335,INF174KA1210,Kotak Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658881+00:00,auto_ok from match report
 37614,144394,INF846K01E25,Axis Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.655045+00:00,auto_ok from match report
 37919,144546,INF277K015K0,Tata Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662330+00:00,auto_ok from match report
-38316,145110,INF846K01J46,,100.0,manual,2026-05-29T10:10:59.555790+00:00,bulk_grid
+38316,145110,INF846K01J46,Axis Large & Mid Cap Fund,100.0,manual,2026-05-29T10:10:59.555790+00:00,bulk_grid
 38320,145137,INF205K013T3,Invesco India Smallcap Fund,100.0,auto,2026-05-29T10:42:17.674506+00:00,auto_ok from match report
 38468,145206,INF277K011O1,Tata Small Cap Fund,100.0,auto,2026-05-29T10:42:17.675103+00:00,auto_ok from match report
 38590,145396,INF955L01HF7,Baroda BNP Paribas Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658419+00:00,auto_ok from match report
-38760,145678,INF761K01EP7,,84.67,manual,2026-05-29T09:39:28.284284+00:00,bulk_grid
+38760,145678,INF761K01EP7,Bank of India Small Cap Fund,84.67,manual,2026-05-29T09:39:28.284284+00:00,bulk_grid
 38979,145724,INF277K017Q3,Tata Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.658055+00:00,auto_ok from match report
 39178,145895,INF767K01PP0,LIC MF Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657635+00:00,auto_ok from match report
 39184,146010,INF277K013S8,Tata Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659357+00:00,auto_ok from match report
@@ -220,39 +226,39 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 39447,146297,INF582M01ES7,Union Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.658157+00:00,auto_ok from match report
 39700,146549,INF174V01721,Mahindra Manulife Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664833+00:00,auto_ok from match report
 39840,146643,INF200KA1A71,SBI Equity Minimum Variance Fund,100.0,auto,2026-05-29T10:42:17.665039+00:00,auto_ok from match report
-39932,146772,INF336L01NV5,,81.88,manual,2026-05-29T09:39:28.199848+00:00,bulk_grid
+39932,146772,INF336L01NV5,HSBC Large and Mid Cap Fund,81.88,manual,2026-05-29T09:39:28.199848+00:00,bulk_grid
 40307,147183,INF00XX01168,ITI Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668386+00:00,auto_ok from match report
-40523,147445,INF769K01FA9,,78.66,manual,2026-05-29T09:39:28.239166+00:00,bulk_grid
+40523,147445,INF769K01FA9,Mirae Asset Midcap Fund,78.66,manual,2026-05-29T09:39:28.239166+00:00,bulk_grid
 40569,147446,INF174V01788,Mahindra Manulife Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656282+00:00,auto_ok from match report
-40581,147481,INF879O01100,,92.05,manual,2026-05-29T09:39:28.172832+00:00,bulk_grid
+40581,147481,INF879O01100,Parag Parikh ELSS Tax Saver Fund,92.05,manual,2026-05-29T09:39:28.172832+00:00,bulk_grid
 40612,147541,INF00XX01390,ITI ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660107+00:00,auto_ok from match report
 40730,147617,INF00XX01440,ITI Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657408+00:00,auto_ok from match report
-40809,147704,INF247L01999,,88.7,manual,2026-05-29T09:39:28.202440+00:00,bulk_grid
-40856,147750,INF582M01GA0,,100.0,manual,2026-05-29T10:10:59.737016+00:00,bulk_grid
-40868,147840,INF174V01945,,100.0,manual,2026-05-29T10:10:59.641041+00:00,bulk_grid
+40809,147704,INF247L01999,Motilal Oswal Large and Midcap Fund,88.7,manual,2026-05-29T09:39:28.202440+00:00,bulk_grid
+40856,147750,INF582M01GA0,Union Large & Midcap Fund,100.0,manual,2026-05-29T10:10:59.737016+00:00,bulk_grid
+40868,147840,INF174V01945,Mahindra Manulife Large & Mid Cap Fund,100.0,manual,2026-05-29T10:10:59.641041+00:00,bulk_grid
 40896,147789,INF00XX01689,ITI Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658779+00:00,auto_ok from match report
 40997,147919,INF00XX01747,ITI Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674453+00:00,auto_ok from match report
-41035,147946,INF194KB1AL4,,79.84,manual,2026-05-29T09:39:28.282603+00:00,bulk_grid
+41035,147946,INF194KB1AL4,Bandhan Small Cap Fund,79.84,manual,2026-05-29T09:39:28.282603+00:00,bulk_grid
 41156,148053,INF277K019Y3,Tata Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667668+00:00,auto_ok from match report
 41239,148073,INF582M01GI3,Union Midcap Fund,100.0,auto,2026-05-29T10:42:17.666405+00:00,auto_ok from match report
-41483,148401,INF769K01FS1,,88.79,manual,2026-05-29T09:39:28.115124+00:00,bulk_grid
+41483,148401,INF769K01FS1,Mirae Asset Arbitrage Fund,88.79,manual,2026-05-29T09:39:28.115124+00:00,bulk_grid
 41487,148404,INF761K01FF5,Bank of India Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661209+00:00,auto_ok from match report
 41540,148457,INF204KB19V4,Nippon India Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667346+00:00,auto_ok from match report
 41550,148468,INF174V01AA0,Mahindra Manulife Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657687+00:00,auto_ok from match report
 41554,148474,INF955L01JU2,Baroda BNP Paribas Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662896+00:00,auto_ok from match report
 41570,148507,INF903JA1JC0,Sundaram Large Cap Fund,62.27,manual,2026-05-29T10:42:07.424789+00:00,manual_rework_review9
 41652,148592,INF582M01GY0,Union Aggressive Hybrid Fund,100.0,auto,2026-05-29T10:42:17.656820+00:00,auto_ok from match report
-41656,148623,INF769K01GX9,,97.04,manual,2026-05-29T09:39:28.273159+00:00,bulk_grid
+41656,148623,INF769K01GX9,Mirae Asset Banking and Financial Services Fund,97.04,manual,2026-05-29T09:39:28.273159+00:00,bulk_grid
 41676,148353,INF00XX01804,ITI Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664618+00:00,auto_ok from match report
 41699,148618,INF789F1AUQ1,UTI Small Cap Fund,100.0,auto,2026-05-29T10:42:17.675158+00:00,auto_ok from match report
 41729,148658,INF663L01V49,PGIM India Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659090+00:00,auto_ok from match report
 41785,148733,INF00XX01929,ITI Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.665884+00:00,auto_ok from match report
-41932,148921,INF209KB1Y49,,93.7,manual,2026-05-29T09:39:28.258595+00:00,bulk_grid
-41987,148980,INF761K01FL3,,84.7,manual,2026-05-29T09:39:28.213613+00:00,bulk_grid
+41932,148921,INF209KB1Y49,Aditya Birla Sun Life Multi-Cap Fund,93.7,manual,2026-05-29T09:39:28.258595+00:00,bulk_grid
+41987,148980,INF761K01FL3,Bank of India Large Cap Fund,84.7,manual,2026-05-29T09:39:28.213613+00:00,bulk_grid
 41991,148990,INF109KC1R14,ICICI Prudential Flexicap Fund,100.0,auto,2026-05-29T10:42:17.661590+00:00,auto_ok from match report
 41999,148986,INF179KC1BG0,HDFC Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671125+00:00,auto_ok from match report
 42043,149019,INF663L01W06,PGIM India Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674829+00:00,auto_ok from match report
-42082,149094,INF204KC1121,,79.23,manual,2026-05-29T09:39:28.187952+00:00,bulk_grid
+42082,149094,INF204KC1121,Nippon India Flexi Cap Fund,79.23,manual,2026-05-29T09:39:28.187952+00:00,bulk_grid
 42099,149104,INF174V01AS2,Mahindra Manulife Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661850+00:00,auto_ok from match report
 42121,149134,INF200KA1Y73,SBI Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.659196+00:00,auto_ok from match report
 42173,149185,INF174KA1HV3,Kotak Multicap Fund,100.0,auto,2026-05-29T10:42:17.668777+00:00,auto_ok from match report
@@ -261,7 +267,7 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 42297,149321,INF00XX01BU6,ITI Banking and Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671467+00:00,auto_ok from match report
 42301,149329,INF204KC1303,Nippon India Taiwan Equity Fund,100.0,auto,2026-05-29T10:42:17.662588+00:00,auto_ok from match report
 42327,149368,INF179KC1BS5,HDFC Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668234+00:00,auto_ok from match report
-42348,149383,INF846K013E0,,82.0,manual,2026-05-29T10:10:59.758616+00:00,bulk_grid
+42348,149383,INF846K013E0,Axis Multicap Fund,82.0,manual,2026-05-29T10:10:59.758616+00:00,bulk_grid
 42384,149406,INF174V01BE0,Mahindra Manulife Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658985+00:00,auto_ok from match report
 42399,149450,INF0K1H01024,Samco Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662274+00:00,auto_ok from match report
 42467,149763,INF205KA1494,Invesco India Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661696+00:00,auto_ok from match report
@@ -271,28 +277,30 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 42767,150346,INF03VN01530,WhiteOak Capital Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.662434+00:00,auto_ok from match report
 42784,150404,INF194KB1DJ2,Bandhan Midcap Fund,100.0,auto,2026-05-29T10:42:17.665461+00:00,auto_ok from match report
 42809,150440,INF966L01AT0,Quant Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664987+00:00,auto_ok from match report
-42897,150481,INF090I01WQ5,,94.44,manual,2026-05-29T09:39:28.137789+00:00,bulk_grid
-42925,150584,INF03VN01597,,85.3,manual,2026-05-29T09:39:28.245393+00:00,bulk_grid
-42929,150587,INF03VN01621,,89.12,manual,2026-05-29T09:39:28.177223+00:00,bulk_grid
+42897,150481,INF090I01WQ5,Franklin India Balanced Advantage Fund,94.44,manual,2026-05-29T09:39:28.137789+00:00,bulk_grid
+42925,150584,INF03VN01597,WhiteOak Capital Mid Cap Fund,85.3,manual,2026-05-29T09:39:28.245393+00:00,bulk_grid
+42929,150587,INF03VN01621,WhiteOak Capital ELSS Tax Saver Fund,89.12,manual,2026-05-29T09:39:28.177223+00:00,bulk_grid
+42946,150571,INF903JA1LE2,Sundaram Flexi Cap Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 43071,150659,INF767K01RK7,LIC MF Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668943+00:00,auto_ok from match report
 43147,150817,INF760K01KI1,Canara Robeco Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.665521+00:00,auto_ok from match report
-43155,150797,INF03VN01696,,86.54,manual,2026-05-29T09:39:28.228788+00:00,bulk_grid
+43155,150797,INF03VN01696,WhiteOak Capital Large Cap Fund,86.54,manual,2026-05-29T09:39:28.228788+00:00,bulk_grid
 43173,150815,INF192K01MV6,JM Midcap Fund,100.0,auto,2026-05-29T10:42:17.665936+00:00,auto_ok from match report
 43203,150838,INF0K1H01065,Samco ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.660688+00:00,auto_ok from match report
 43221,150858,INF582M01IO7,Union Multicap Fund,100.0,auto,2026-05-29T10:42:17.669616+00:00,auto_ok from match report
 43225,150865,INF251K01RF2,Baroda BNP Paribas Multi Asset Fund,100.0,auto,2026-05-29T10:42:17.666664+00:00,auto_ok from match report
 43241,150915,INF174V01BK7,Mahindra Manulife Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674666+00:00,auto_ok from match report
-43447,151267,INF03VN01738,,90.81,manual,2026-05-29T09:39:28.151925+00:00,bulk_grid
+43350,151165,INF579M01AN2,360 ONE ELSS Tax Saver Nifty 50 Index Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
+43447,151267,INF03VN01738,WhiteOak Capital Balanced Advantage Fund,90.81,manual,2026-05-29T09:39:28.151925+00:00,bulk_grid
 43461,151290,INF336L01QN5,HSBC Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668285+00:00,auto_ok from match report
 43469,151232,INF277KA1679,Tata Multicap Fund,100.0,auto,2026-05-29T10:42:17.669469+00:00,auto_ok from match report
-43473,151307,INF209KB15R9,,97.5,manual,2026-05-29T09:39:28.246956+00:00,bulk_grid
+43473,151307,INF209KB15R9,Aditya Birla Sun Life Multi Asset Allocation Fund,97.5,manual,2026-05-29T09:39:28.246956+00:00,bulk_grid
 43551,151379,INF00XX01CO7,ITI Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661644+00:00,auto_ok from match report
 43559,151384,INF174KA1MD1,Kotak Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.672296+00:00,auto_ok from match report
 43565,151412,INF769K01JJ2,Mirae Asset Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661906+00:00,auto_ok from match report
 43593,151443,INF761K01FR0,Bank of India Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.667925+00:00,auto_ok from match report
 43622,151471,INF959L01GR6,Navi ELSS Tax Saver Nifty 50 Index Fund,90.41,manual,2026-05-29T05:55:55.573763+00:00,
 43876,151713,INF966L01BL5,Quant Dynamic Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.659142+00:00,auto_ok from match report
-43907,151745,INF03VN01761,,92.24,manual,2026-05-29T09:39:28.256516+00:00,bulk_grid
+43907,151745,INF03VN01761,WhiteOak Capital Multi Asset Allocation Fund,92.24,manual,2026-05-29T09:39:28.256516+00:00,bulk_grid
 43952,151796,INF579M01AS1,360 ONE FlexiCap Fund,100.0,auto,2026-05-29T10:42:17.660897+00:00,auto_ok from match report
 43956,151792,INF754K01RS8,Edelweiss Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666819+00:00,auto_ok from match report
 43960,151791,INF966L01BX0,Quant BFSI Fund,100.0,auto,2026-05-29T10:42:17.672573+00:00,auto_ok from match report
@@ -300,55 +308,56 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 43976,151824,INF760K01KO9,Canara Robeco Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668028+00:00,auto_ok from match report
 43983,151810,INF769K01KK8,Mirae Asset Multicap Fund,100.0,auto,2026-05-29T10:42:17.669119+00:00,auto_ok from match report
 44044,151895,INF0QA701342,Bajaj Finserv Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661105+00:00,auto_ok from match report
-44057,151885,INF789F1AYV3,,100.0,manual,2026-05-29T10:18:26.086796+00:00,bulk_grid
+44057,151885,INF789F1AYV3,UTI Balanced Advantage Fund,100.0,manual,2026-05-29T10:18:26.086796+00:00,bulk_grid
 44115,152064,INF174KA1PD4,Kotak Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667132+00:00,auto_ok from match report
 44124,152056,INF740KA1TE9,DSP Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666767+00:00,auto_ok from match report
 44139,152059,INF179KC1HI3,HDFC Technology Fund,100.0,auto,2026-05-29T10:42:17.673221+00:00,auto_ok from match report
-44143,152071,INF03VN01803,,86.54,manual,2026-05-29T09:39:28.268641+00:00,bulk_grid
+44143,152071,INF03VN01803,WhiteOak Capital Multi Cap Fund,86.54,manual,2026-05-29T09:39:28.268641+00:00,bulk_grid
 44145,152067,INF966L01CT6,Quant Teck Fund,100.0,auto,2026-05-29T10:42:17.673511+00:00,auto_ok from match report
 44149,152076,INF579M01AY9,360 ONE Balanced Hybrid Fund,100.0,auto,2026-05-29T10:42:17.658213+00:00,auto_ok from match report
 44153,152077,INF0QA701524,Bajaj Finserv Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.656983+00:00,auto_ok from match report
 44161,152094,INF754K01SD8,Edelweiss Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668130+00:00,auto_ok from match report
 44174,152128,INF251K01SR5,Baroda BNP Paribas Small Cap Fund,100.0,auto,2026-05-29T10:42:17.673973+00:00,auto_ok from match report
-44194,152107,INF082J01432,,100.0,manual,2026-05-29T10:10:59.768799+00:00,bulk_grid
-44196,152109,INF879O01225,,83.97,manual,2026-05-29T09:39:28.121792+00:00,bulk_grid
-44207,152132,INF03VN01829,,89.57,manual,2026-05-29T09:39:28.130404+00:00,bulk_grid
+44194,152107,INF082J01432,Quantum Small Cap Fund,100.0,manual,2026-05-29T10:10:59.768799+00:00,bulk_grid
+44196,152109,INF879O01225,Parag Parikh Arbitrage Fund,83.97,manual,2026-05-29T09:39:28.121792+00:00,bulk_grid
+44207,152132,INF03VN01829,WhiteOak Capital Balanced Hybrid Fund,89.57,manual,2026-05-29T09:39:28.130404+00:00,bulk_grid
 44218,152135,INF0R8701046,Helios Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.661536+00:00,auto_ok from match report
 44251,152188,INF0K1H01131,Samco Dynamic Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.659249+00:00,auto_ok from match report
 44255,152194,INF0QA701656,Bajaj Finserv Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658367+00:00,auto_ok from match report
 44270,152206,INF740KA1TQ3,DSP Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671011+00:00,auto_ok from match report
-44298,152226,INF03VN01845,,88.65,manual,2026-05-29T09:39:28.211023+00:00,bulk_grid
+44298,152226,INF03VN01845,WhiteOak Capital Large & Mid Cap Fund,88.65,manual,2026-05-29T09:39:28.211023+00:00,bulk_grid
 44310,152237,INF247L01BY3,Motilal Oswal Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674776+00:00,auto_ok from match report
 44362,152310,INF740KA1UC1,DSP Multicap Fund,100.0,auto,2026-05-29T10:42:17.668079+00:00,auto_ok from match report
 44367,152344,INF769K01KZ6,Mirae Asset Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667294+00:00,auto_ok from match report
 44393,152324,INF194KB1HM7,Bandhan Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666560+00:00,auto_ok from match report
-44405,152314,INF903JA1LK9,,89.12,manual,2026-05-29T09:39:28.252813+00:00,bulk_grid
-44409,152321,INF03VN01860,,97.27,manual,2026-05-29T09:39:28.277971+00:00,bulk_grid
-44427,152354,INF247L01CE3,,81.4,manual,2026-05-29T09:39:28.221496+00:00,bulk_grid
-44448,152382,INF663L01Y12,,99.23,manual,2026-05-29T09:39:28.205764+00:00,bulk_grid
+44405,152314,INF903JA1LK9,Sundaram Multi Asset Allocation Fund,89.12,manual,2026-05-29T09:39:28.252813+00:00,bulk_grid
+44409,152321,INF03VN01860,WhiteOak Capital Banking & Financial Services Fund,97.27,manual,2026-05-29T09:39:28.277971+00:00,bulk_grid
+44427,152354,INF247L01CE3,Motilal Oswal Large Cap Fund,81.4,manual,2026-05-29T09:39:28.221496+00:00,bulk_grid
+44448,152382,INF663L01Y12,PGIM India Large and Mid Cap Fund,99.23,manual,2026-05-29T09:39:28.205764+00:00,bulk_grid
 44452,152380,INF336L01RI3,HSBC Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666977+00:00,auto_ok from match report
 44461,152396,INF761K01FZ3,Bank of India Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666612+00:00,auto_ok from match report
 44481,152408,INF0QA701763,Bajaj Finserv Large and Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.662742+00:00,auto_ok from match report
 44485,152437,INF754K01SK3,Edelweiss Technology Fund,100.0,auto,2026-05-29T10:42:17.673104+00:00,auto_ok from match report
 44493,152443,INF174V01BW2,Mahindra Manulife Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667239+00:00,auto_ok from match report
 44527,152462,INF174KA1QZ5,Kotak Technology Fund,100.0,auto,2026-05-29T10:42:17.673399+00:00,auto_ok from match report
-44532,152468,INF879O01266,,91.55,manual,2026-05-29T09:39:28.148767+00:00,bulk_grid
-44540,152474,INF082J01457,,100.0,manual,2026-05-29T10:10:59.757648+00:00,bulk_grid
+44532,152468,INF879O01266,Parag Parikh Dynamic Asset Allocation Fund,91.55,manual,2026-05-29T09:39:28.148767+00:00,bulk_grid
+44540,152474,INF082J01457,Quantum Multi Asset Allocation Fund,100.0,manual,2026-05-29T10:10:59.757648+00:00,bulk_grid
 44571,152509,INF0R8701145,Helios Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658677+00:00,auto_ok from match report
+44614,152537,INF663L01Y61,PGIM India Retirement Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 44672,152614,INF192K01NH3,JM Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674559+00:00,auto_ok from match report
-44688,152639,INF0QA701821,,95.42,manual,2026-05-29T09:39:28.248625+00:00,bulk_grid
-44697,152651,INF247L01CL8,,84.7,manual,2026-05-29T09:39:28.263325+00:00,bulk_grid
+44688,152639,INF0QA701821,Bajaj Finserv Multi Asset Allocation Fund,95.42,manual,2026-05-29T09:39:28.248625+00:00,bulk_grid
+44697,152651,INF247L01CL8,Motilal Oswal Multi Cap Fund,84.7,manual,2026-05-29T09:39:28.263325+00:00,bulk_grid
 44728,152688,INF760K01LD0,Canara Robeco Balanced Advantage Fund,100.0,auto,2026-05-29T10:42:17.658472+00:00,auto_ok from match report
 44732,152679,INF0R8701202,Helios Financial Services Fund,100.0,auto,2026-05-29T10:42:17.671229+00:00,auto_ok from match report
 44768,152739,INF090I01XA7,Franklin India Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.668182+00:00,auto_ok from match report
 44813,152783,INF0QA701896,Bajaj Finserv Large Cap Fund,100.0,auto,2026-05-29T10:42:17.664096+00:00,auto_ok from match report
 44828,119327,nan,Union Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667769+00:00,auto_ok from match report
-44859,152821,INF00XX01DA4,,93.7,manual,2026-05-29T10:10:59.624008+00:00,bulk_grid
+44859,152821,INF00XX01DA4,ITI Large & Mid Cap Fund,93.7,manual,2026-05-29T10:10:59.624008+00:00,bulk_grid
 44863,152815,INF663L01Z03,PGIM India Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669177+00:00,auto_ok from match report
 44886,152847,INF0K1H01198,Samco Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669403+00:00,auto_ok from match report
-44888,152849,INF03VN01910,,86.54,manual,2026-05-29T09:39:28.128526+00:00,bulk_grid
+44888,152849,INF03VN01910,WhiteOak Capital Arbitrage Fund,86.54,manual,2026-05-29T09:39:28.128526+00:00,bulk_grid
 44901,152863,INF205KA1965,Invesco India Technology Fund,100.0,auto,2026-05-29T10:42:17.673341+00:00,auto_ok from match report
-44935,152915,INF03VN01936,,89.12,manual,2026-05-29T09:39:28.280429+00:00,bulk_grid
+44935,152915,INF03VN01936,WhiteOak Capital Digital Bharat Fund,89.12,manual,2026-05-29T09:39:28.280429+00:00,bulk_grid
 44967,152941,INF0R8701269,Helios Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663201+00:00,auto_ok from match report
 44999,152964,INF247L01DN2,Motilal Oswal Digital India Fund,100.0,auto,2026-05-29T10:42:17.673455+00:00,auto_ok from match report
 45060,153043,INF090I01XS9,Franklin India Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657254+00:00,auto_ok from match report
@@ -361,26 +370,373 @@ scheme_id,mf_scheme_code,isin,et_fund_name,match_score,match_method,matched_at,n
 45209,153201,INF0QA701AK0,Bajaj Finserv ELSS Tax Saver Fund,100.0,auto,2026-05-29T10:42:17.659637+00:00,auto_ok from match report
 45239,153246,INF767K01RZ5,LIC MF Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667184+00:00,auto_ok from match report
 45271,153309,INF0QA701AV7,Bajaj Finserv Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.667821+00:00,auto_ok from match report
-45279,153266,INF336L01RU8,,90.0,manual,2026-05-29T09:39:28.270853+00:00,bulk_grid
+45279,153266,INF336L01RU8,HSBC Financial Services Fund,90.0,manual,2026-05-29T09:39:28.270853+00:00,bulk_grid
 45340,153326,INF0R8701327,Helios Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.665782+00:00,auto_ok from match report
 45367,153239,INF0K1H01255,Samco Large Cap Fund,100.0,auto,2026-05-29T10:42:17.665143+00:00,auto_ok from match report
 45423,153426,INF966L01DW8,Quant Arbitrage Fund,100.0,auto,2026-05-29T10:42:17.657844+00:00,auto_ok from match report
 45491,153515,INF789F1AB89,UTI Multi Cap Fund,100.0,auto,2026-05-29T10:42:17.669534+00:00,auto_ok from match report
 45516,153465,INF760K01LH1,Canara Robeco Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666715+00:00,auto_ok from match report
-45550,153534,INF0K1H01271,,100.0,manual,2026-05-29T10:10:59.689896+00:00,bulk_grid
+45550,153534,INF0K1H01271,Samco Large & Mid Cap Fund,100.0,manual,2026-05-29T10:10:59.689896+00:00,bulk_grid
 45619,153612,INF0QA701BN2,Bajaj Finserv Small Cap Fund,100.0,auto,2026-05-29T10:42:17.673899+00:00,auto_ok from match report
 45652,153629,INF192K01NK7,JM Large & Mid Cap Fund,100.0,auto,2026-05-29T10:42:17.663407+00:00,auto_ok from match report
-45662,153738,INF226401018,,88.79,manual,2026-05-29T09:39:28.182258+00:00,bulk_grid
+45662,153738,INF226401018,Capitalmind Flexi Cap Fund,88.79,manual,2026-05-29T09:39:28.182258+00:00,bulk_grid
 45700,153731,INF090I01YH0,Franklin India Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666871+00:00,auto_ok from match report
-45717,153728,INF761K01GY4,,83.24,manual,2026-05-29T09:39:28.230484+00:00,bulk_grid
+45717,153728,INF761K01GY4,Bank of India Mid Cap Fund,83.24,manual,2026-05-29T09:39:28.230484+00:00,bulk_grid
 45746,153774,INF579M01BM2,360 ONE Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.666457+00:00,auto_ok from match report
-45827,153872,INF2F0001040,,92.5,manual,2026-05-29T09:39:28.191106+00:00,bulk_grid
+45827,153872,INF2F0001040,The Wealth Company Flexi Cap Fund,92.5,manual,2026-05-29T09:39:28.191106+00:00,bulk_grid
 45843,153891,INF2F0001271,The Wealth Company Arbitrage Fund,92.5,manual,2026-05-29T10:42:07.557458+00:00,manual_rework_review9
-45869,154269,INF2F0001537,Samco Small Cap Fund,57.83,manual,2026-05-29T10:42:07.667786+00:00,manual_rework_review9
+45869,153868,INF0K1H01297,Samco Small Cap Fund,100.0,manual,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 45887,153912,INF0R8701384,Helios Small Cap Fund,100.0,auto,2026-05-29T10:42:17.674349+00:00,auto_ok from match report
 45891,153937,INF0QA701BZ6,Bajaj Finserv Banking And Financial Services Fund,100.0,auto,2026-05-29T10:42:17.670097+00:00,auto_ok from match report
-45931,153979,INF0S5R01125,,88.12,manual,2026-05-29T09:39:28.119729+00:00,bulk_grid
+45931,153979,INF0S5R01125,Old Bridge Arbitrage Fund,88.12,manual,2026-05-29T09:39:28.119729+00:00,bulk_grid
 45947,153987,INF663L010A3,PGIM India Multi Asset Allocation Fund,100.0,auto,2026-05-29T10:42:17.667400+00:00,auto_ok from match report
-45960,153999,INF2F0001347,,96.79,manual,2026-05-29T09:39:28.254555+00:00,bulk_grid
+45960,153999,INF2F0001347,The Wealth Company Multi Asset Allocation Fund,96.79,manual,2026-05-29T09:39:28.254555+00:00,bulk_grid
 46008,154043,INF2JJD01136,Abakkus Flexi Cap Fund,100.0,auto,2026-05-29T10:42:17.660949+00:00,auto_ok from match report
 46069,154093,INF761K01HE4,Bank of India Banking & Financial Services Fund,100.0,auto,2026-05-29T10:42:17.670507+00:00,auto_ok from match report
+34462,103490,INF082J01036,Quantum Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,bulk_grid
+21882,125345,INF579M01621,360 ONE Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:40.856572+00:00,manual ET link https://www.etmoney.com/mutual-funds/360-one-liquid-fund-direct-growth/21882
+46017,154051,INF2JJD01029,Abakkus Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:40.876158+00:00,manual ET link https://www.etmoney.com/mutual-funds/abakkus-liquid-fund-direct-growth/46017
+15367,119568,INF209K01VA3,Aditya Birla Sun Life Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:40.893069+00:00,manual ET link https://www.etmoney.com/mutual-funds/aditya-birla-sun-life-liquid-fund-direct-growth/15367
+15315,120389,INF846K01CX4,Axis Liquid Direct Fund-Growth,,manual_et_link,2026-06-01T13:12:40.909291+00:00,manual ET link https://www.etmoney.com/mutual-funds/axis-liquid-direct-fund-growth/15315
+44000,151833,INF0QA701011,Bajaj Finserv Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:40.926146+00:00,manual ET link https://www.etmoney.com/mutual-funds/bajaj-finserv-liquid-fund-direct-growth/44000
+16035,118364,INF194K01I60,Bandhan Liquid Fund Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:40.943554+00:00,manual ET link https://www.etmoney.com/mutual-funds/bandhan-liquid-fund-direct-plan-growth/16035
+15841,119369,INF761K01785,Bank of India Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:40.960050+00:00,manual ET link https://www.etmoney.com/mutual-funds/bank-of-india-liquid-fund-direct-growth/15841
+15341,119415,INF955L01AL0,Baroda BNP Paribas Liquid Direct Fund-Growth,,manual_et_link,2026-06-01T13:12:40.977507+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-liquid-direct-fund-growth/15341
+16178,118305,INF760K01FU6,Canara Robeco Liquid Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:40.997979+00:00,manual ET link https://www.etmoney.com/mutual-funds/canara-robeco-liquid-direct-plan-growth/16178
+45965,154011,INF226401034,Capitalmind Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.016911+00:00,manual ET link https://www.etmoney.com/mutual-funds/capitalmind-liquid-fund-direct-growth/45965
+15678,119125,INF740K01QL4,DSP Liquidity Direct-Growth,,manual_et_link,2026-06-01T13:12:41.037150+00:00,manual ET link https://www.etmoney.com/mutual-funds/dsp-liquidity-direct-growth/15678
+16139,140196,INF754K01GM4,Edelweiss Liquid Direct-Growth,,manual_et_link,2026-06-01T13:12:41.055832+00:00,manual ET link https://www.etmoney.com/mutual-funds/edelweiss-liquid-direct-growth/16139
+16411,118577,INF090I01JV2,Franklin India Liquid Fund Super Institutional Plan Direct-Growth,,manual_et_link,2026-06-01T13:12:41.074961+00:00,manual ET link https://www.etmoney.com/mutual-funds/franklin-india-liquid-fund-super-institutional-plan-direct-grow
+15734,119091,INF179KB1HP9,HDFC Liquid Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:41.096099+00:00,manual ET link https://www.etmoney.com/mutual-funds/hdfc-liquid-direct-plan-growth/15734
+15852,120038,INF336L01CC8,HSBC Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.114122+00:00,manual ET link https://www.etmoney.com/mutual-funds/hsbc-liquid-fund-direct-growth/15852
+15528,120197,INF109K01Q49,ICICI Prudential Liquid Fund Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:41.135150+00:00,manual ET link https://www.etmoney.com/mutual-funds/icici-prudential-liquid-fund-direct-plan-growth/15528
+16343,120537,INF205K01MF9,Invesco India Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.153893+00:00,manual ET link https://www.etmoney.com/mutual-funds/invesco-india-liquid-fund-direct-growth/16343
+40317,147157,INF00XX01283,ITI Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.198773+00:00,manual ET link https://www.etmoney.com/mutual-funds/iti-liquid-fund-direct-growth/40317
+15932,119766,INF174K01NE8,Kotak Liquid Direct-Growth,,manual_et_link,2026-06-01T13:12:41.217430+00:00,manual ET link https://www.etmoney.com/mutual-funds/kotak-liquid-direct-growth/15932
+16385,120249,INF767K01DN1,LIC MF Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.236386+00:00,manual ET link https://www.etmoney.com/mutual-funds/lic-mf-liquid-fund-direct-growth/16385
+16117,118859,INF769K01CM1,Mirae Asset Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.254984+00:00,manual ET link https://www.etmoney.com/mutual-funds/mirae-asset-liquid-fund-direct-growth/16117
+38994,145834,INF247L01734,Motilal Oswal Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.275222+00:00,manual ET link https://www.etmoney.com/mutual-funds/motilal-oswal-liquid-fund-direct-growth/38994
+16036,119164,INF959L01GF1,Navi Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.294489+00:00,manual ET link https://www.etmoney.com/mutual-funds/navi-liquid-fund-direct-growth/16036
+15667,118701,INF204K01ZH0,Nippon India Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.316276+00:00,manual ET link https://www.etmoney.com/mutual-funds/nippon-india-liquid-fund-direct-growth/15667
+36497,143269,INF879O01068,Parag Parikh Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.335925+00:00,manual ET link https://www.etmoney.com/mutual-funds/parag-parikh-liquid-fund-direct-growth/36497
+15172,138299,INF223J01NS5,PGIM India Liquid Fund Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:41.354382+00:00,manual ET link https://www.etmoney.com/mutual-funds/pgim-india-liquid-fund-direct-plan-growth/15172
+16587,120837,INF966L01820,Quant Liquid Direct Fund-Growth,,manual_et_link,2026-06-01T13:12:41.373823+00:00,manual ET link https://www.etmoney.com/mutual-funds/quant-liquid-direct-fund-growth/16587
+15869,119800,INF200K01UT4,SBI Liquid Fund Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:41.393557+00:00,manual ET link https://www.etmoney.com/mutual-funds/sbi-liquid-fund-direct-plan-growth/15869
+16095,149664,INF173K01GU0,Sundaram Liquid Direct-Growth,,manual_et_link,2026-06-01T13:12:41.412602+00:00,manual ET link https://www.etmoney.com/mutual-funds/sundaram-liquid-direct-growth/16095
+38210,119686,nan,Sundaram Money Market Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.432375+00:00,manual ET link https://www.etmoney.com/mutual-funds/sundaram-money-market-fund-direct-growth/38210
+16286,119861,INF277K01YE6,Tata Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.452463+00:00,manual ET link https://www.etmoney.com/mutual-funds/tata-liquid-fund-direct-growth/16286
+45839,153883,INF2F0001081,The Wealth Company Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.472105+00:00,manual ET link https://www.etmoney.com/mutual-funds/the-wealth-company-liquid-fund-direct-growth/45839
+15984,119303,INF582M01674,Union Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.491981+00:00,manual ET link https://www.etmoney.com/mutual-funds/union-liquid-fund-direct-growth/15984
+15325,120304,INF789F01XQ6,UTI Liquid Direct-Growth,,manual_et_link,2026-06-01T13:12:41.511254+00:00,manual ET link https://www.etmoney.com/mutual-funds/uti-liquid-direct-growth/15325
+39125,145971,INF03VN01043,WhiteOak Capital Liquid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.530060+00:00,manual ET link https://www.etmoney.com/mutual-funds/whiteoak-capital-liquid-fund-direct-growth/39125
+15456,119661,nan,Aditya Birla Sun Life ELSS Tax Saver Direct-Growth,,manual_et_link,2026-06-01T13:12:41.549663+00:00,manual ET link https://www.etmoney.com/mutual-funds/aditya-birla-sun-life-elss-tax-saver-direct-growth/15456
+17318,140241,nan,Edelweiss ELSS Tax Saver Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.587434+00:00,manual ET link https://www.etmoney.com/mutual-funds/edelweiss-elss-tax-saver-fund-direct-growth/17318
+15727,118929,nan,HDFC ELSS Tax Saver Fund Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:41.607045+00:00,manual ET link https://www.etmoney.com/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth/15727
+35140,141813,nan,Baroda BNP Paribas Focused Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.625782+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-focused-fund-direct-growth/35140
+16177,149533,INF173K01EK6,Sundaram Focused Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.644484+00:00,manual ET link https://www.etmoney.com/mutual-funds/sundaram-focused-fund-direct-growth/16177
+15286,119367,nan,Baroda BNP Paribas Large Cap Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.665421+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-large-cap-fund-direct-growth/15286
+15293,120002,nan,Baroda BNP Paribas Midcap Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.685065+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-midcap-fund-direct-growth/15293
+44407,119572,nan,Sundaram Multi Asset Allocation Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.724284+00:00,manual ET link https://www.etmoney.com/mutual-funds/sundaram-multi-asset-allocation-fund-direct-growth/44407
+15401,119591,INF209K01WC7,Aditya Birla Sun Life Consumption Direct Fund-Growth,,manual_et_link,2026-06-01T13:12:41.742673+00:00,manual ET link https://www.etmoney.com/mutual-funds/aditya-birla-sun-life-consumption-direct-fund-growth/15401
+41689,148637,INF209KB1U76,Aditya Birla Sun Life ESG Integration Strategy Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.761926+00:00,manual ET link https://www.etmoney.com/mutual-funds/aditya-birla-sun-life-esg-integration-strategy-fund-direct-grow
+28712,133516,INF209KA1YK0,Aditya Birla Sun Life Manufacturing Equity Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.782317+00:00,manual ET link https://www.etmoney.com/mutual-funds/aditya-birla-sun-life-manufacturing-equity-fund-direct-growth/2
+44211,152158,INF209KB15X7,Aditya Birla Sun Life Transportation and Logistics Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.802600+00:00,manual ET link https://www.etmoney.com/mutual-funds/aditya-birla-sun-life-transportation-and-logistics-fund-direct-
+44826,152805,INF846K013X0,Axis Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.823769+00:00,manual ET link https://www.etmoney.com/mutual-funds/axis-consumption-fund-direct-growth/44826
+41003,147928,INF846K01W23,Axis ESG Integration Strategy Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.843874+00:00,manual ET link https://www.etmoney.com/mutual-funds/axis-esg-integration-strategy-fund-direct-growth/41003
+44224,152202,INF846K016S3,Axis India Manufacturing Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.863426+00:00,manual ET link https://www.etmoney.com/mutual-funds/axis-india-manufacturing-fund-direct-growth/44224
+41693,148634,INF846K01X71,Axis Innovation Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.884168+00:00,manual ET link https://www.etmoney.com/mutual-funds/axis-innovation-fund-direct-growth/41693
+45048,153075,INF0QA701946,Bajaj Finserv Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.907086+00:00,manual ET link https://www.etmoney.com/mutual-funds/bajaj-finserv-consumption-fund-direct-growth/45048
+44610,152607,INF194KB1IE2,Bandhan Innovation Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.932301+00:00,manual ET link https://www.etmoney.com/mutual-funds/bandhan-innovation-fund-direct-growth/44610
+43069,150716,INF194KB1EB7,Bandhan Transportation and Logistics Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.956164+00:00,manual ET link https://www.etmoney.com/mutual-funds/bandhan-transportation-and-logistics-fund-direct-growth/43069
+45167,153139,INF761K01GI7,Bank of India Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:41.977171+00:00,manual ET link https://www.etmoney.com/mutual-funds/bank-of-india-consumption-fund-direct-growth/45167
+46163,154195,INF251K01VP3,Baroda BNP Paribas ESG Best-in-class strategy Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.003116+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-esg-best-in-class-strategy-fund-direct-growt
+37823,150266,INF251K01PT7,Baroda BNP Paribas India Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.035204+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-india-consumption-fund-direct-growth/37823
+44467,152470,INF251K01TE1,Baroda BNP Paribas Innovation Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.062511+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-innovation-fund-direct-growth/44467
+44726,152697,INF251K01TP7,Baroda BNP Paribas Manufacturing Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.085797+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-manufacturing-fund-direct-growth/44726
+46187,154250,INF760K01LN9,Canara Robeco Banking And Financial Services Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.108373+00:00,manual ET link https://www.etmoney.com/mutual-funds/canara-robeco-banking-and-financial-services-fund-direct-growth
+16163,118273,INF760K01DU1,Canara Robeco Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.131320+00:00,manual ET link https://www.etmoney.com/mutual-funds/canara-robeco-consumption-fund-direct-growth/16163
+44491,152450,INF760K01KZ5,Canara Robeco Manufacturing Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.150859+00:00,manual ET link https://www.etmoney.com/mutual-funds/canara-robeco-manufacturing-fund-direct-growth/44491
+15977,119247,INF740K01PU7,DSP India T.I.G.E.R. (The Infrastructure Growth and Economic Reforms Fund) Direct-Growth,,manual_et_link,2026-06-01T13:12:42.171685+00:00,manual ET link https://www.etmoney.com/mutual-funds/dsp-india-tiger-the-infrastructure-growth-and-economic-reforms-
+45237,153214,INF754K01TY2,Edelweiss Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.190818+00:00,manual ET link https://www.etmoney.com/mutual-funds/edelweiss-consumption-fund-direct-growth/45237
+43966,151804,INF179KC1GO3,HDFC Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.209519+00:00,manual ET link https://www.etmoney.com/mutual-funds/hdfc-consumption-fund-direct-growth/43966
+45625,153620,INF179KC1JO7,HDFC Innovation Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.228732+00:00,manual ET link https://www.etmoney.com/mutual-funds/hdfc-innovation-fund-direct-growth/45625
+44652,152600,INF179KC1II1,HDFC Manufacturing Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.247882+00:00,manual ET link https://www.etmoney.com/mutual-funds/hdfc-manufacturing-fund-direct-growth/44652
+44079,151901,INF179KC1GU0,HDFC Transportation and Logistics Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.296898+00:00,manual ET link https://www.etmoney.com/mutual-funds/hdfc-transportation-and-logistics-fund-direct-growth/44079
+44099,152032,INF336L01QZ9,HSBC Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.315926+00:00,manual ET link https://www.etmoney.com/mutual-funds/hsbc-consumption-fund-direct-growth/44099
+15842,120034,nan,HSBC Infrastructure Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.337415+00:00,manual ET link https://www.etmoney.com/mutual-funds/hsbc-infrastructure-fund-direct-growth/15842
+40150,146951,INF109KC1YD4,ICICI Prudential Bharat Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.356970+00:00,manual ET link https://www.etmoney.com/mutual-funds/icici-prudential-bharat-consumption-fund-direct-growth/40150
+41595,148516,INF109KC1O09,ICICI Prudential ESG Exclusionary Strategy Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.378784+00:00,manual ET link https://www.etmoney.com/mutual-funds/icici-prudential-esg-exclusionary-strategy-fund-direct-growth/4
+43851,151580,INF109KC12T2,ICICI Prudential Innovation Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.402717+00:00,manual ET link https://www.etmoney.com/mutual-funds/icici-prudential-innovation-fund-direct-growth/43851
+43065,150685,INF109KC12K1,ICICI Prudential Transportation and Logistics Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.423229+00:00,manual ET link https://www.etmoney.com/mutual-funds/icici-prudential-transportation-and-logistics-fund-direct-growt
+45859,153900,INF205KA1BI6,Invesco India Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.445288+00:00,manual ET link https://www.etmoney.com/mutual-funds/invesco-india-consumption-fund-direct-growth/45859
+41807,148751,INF205KA1338,Invesco India ESG Integration Strategy Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.464946+00:00,manual ET link https://www.etmoney.com/mutual-funds/invesco-india-esg-integration-strategy-fund-direct-growth/41807
+44796,152756,INF205KA1908,Invesco India Manufacturing Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.485260+00:00,manual ET link https://www.etmoney.com/mutual-funds/invesco-india-manufacturing-fund-direct-growth/44796
+44240,152169,INF174KA1PP8,Kotak Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.505306+00:00,manual ET link https://www.etmoney.com/mutual-funds/kotak-consumption-fund-direct-growth/44240
+41670,148606,INF174KA1FI4,Kotak ESG Exclusionary Strategy Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.524309+00:00,manual ET link https://www.etmoney.com/mutual-funds/kotak-esg-exclusionary-strategy-fund-direct-growth/41670
+42505,149841,INF174KA1IF4,Kotak Manufacture in India Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.543444+00:00,manual ET link https://www.etmoney.com/mutual-funds/kotak-manufacture-in-india-fund-direct-growth/42505
+45089,153118,INF174KA1TS4,Kotak Transportation & Logistics Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.563085+00:00,manual ET link https://www.etmoney.com/mutual-funds/kotak-transportation-and-logistics-fund-direct-growth/45089
+45898,153948,INF767K01SD0,LIC MF Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.582840+00:00,manual ET link https://www.etmoney.com/mutual-funds/lic-mf-consumption-fund-direct-growth/45898
+44945,152920,INF767K01RR2,LIC MF Manufacturing Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.602498+00:00,manual ET link https://www.etmoney.com/mutual-funds/lic-mf-manufacturing-fund-direct-growth/44945
+38326,145356,INF174V01663,Mahindra Manulife Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.622100+00:00,manual ET link https://www.etmoney.com/mutual-funds/mahindra-manulife-consumption-fund-direct-growth/38326
+46063,154121,INF174V01DA4,Mahindra Manulife Innovation Opportunities Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.641359+00:00,manual ET link https://www.etmoney.com/mutual-funds/mahindra-manulife-innovation-opportunities-fund-direct-growth/4
+44715,152672,INF174V01CC2,Mahindra Manulife Manufacturing Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.660940+00:00,manual ET link https://www.etmoney.com/mutual-funds/mahindra-manulife-manufacturing-fund-direct-growth/44715
+16147,118837,INF769K01BL5,Mirae Asset Great Consumer Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.681385+00:00,manual ET link https://www.etmoney.com/mutual-funds/mirae-asset-great-consumer-fund-direct-growth/16147
+45873,153913,INF247L01GA2,Motilal Oswal Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.734952+00:00,manual ET link https://www.etmoney.com/mutual-funds/motilal-oswal-consumption-fund-direct-growth/45873
+45257,153258,INF247L01EJ8,Motilal Oswal Innovation Opportunities Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.755680+00:00,manual ET link https://www.etmoney.com/mutual-funds/motilal-oswal-innovation-opportunities-fund-direct-growth/45257
+44802,152760,INF247L01DA9,Motilal Oswal Manufacturing Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.775182+00:00,manual ET link https://www.etmoney.com/mutual-funds/motilal-oswal-manufacturing-fund-direct-growth/44802
+15698,118724,INF204K01G52,Nippon India Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.795087+00:00,manual ET link https://www.etmoney.com/mutual-funds/nippon-india-consumption-fund-direct-growth/15698
+44109,152033,INF204KC1BO3,Nippon India Innovation Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.814845+00:00,manual ET link https://www.etmoney.com/mutual-funds/nippon-india-innovation-fund-direct-growth/44109
+44418,152336,INF966L01DN7,Quant Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.837509+00:00,manual ET link https://www.etmoney.com/mutual-funds/quant-consumption-fund-direct-growth/44418
+44075,151916,INF966L01CJ7,Quant Manufacturing Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.858918+00:00,manual ET link https://www.etmoney.com/mutual-funds/quant-manufacturing-fund-direct-growth/44075
+40488,147372,INF082J01382,Quantum ESG Best In Class Strategy Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.880207+00:00,manual ET link https://www.etmoney.com/mutual-funds/quantum-esg-best-in-class-strategy-fund-direct-growth/40488
+44707,152657,INF200KB1183,SBI Automotive Opportunities Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.899797+00:00,manual ET link https://www.etmoney.com/mutual-funds/sbi-automotive-opportunities-fund-direct-growth/44707
+17081,120575,INF200K01RM5,SBI Consumption Opportunities Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.925393+00:00,manual ET link https://www.etmoney.com/mutual-funds/sbi-consumption-opportunities-fund-direct-growth/17081
+15786,119709,INF200K01SE0,SBI ESG Exclusionary Strategy Fund Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:42.956711+00:00,manual ET link https://www.etmoney.com/mutual-funds/sbi-esg-exclusionary-strategy-fund-direct-plan-growth/15786
+44819,152776,INF200KB1324,SBI Innovative Opportunities Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:42.988892+00:00,manual ET link https://www.etmoney.com/mutual-funds/sbi-innovative-opportunities-fund-direct-growth/44819
+15730,119595,INF903J01NH5,Sundaram Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.056126+00:00,manual ET link https://www.etmoney.com/mutual-funds/sundaram-consumption-fund-direct-growth/15730
+30859,135805,INF277K013A6,Tata India Consumer Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.083506+00:00,manual ET link https://www.etmoney.com/mutual-funds/tata-india-consumer-fund-direct-growth/30859
+45075,153055,INF277KA1CU2,Tata India Innovation Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.111317+00:00,manual ET link https://www.etmoney.com/mutual-funds/tata-india-innovation-fund-direct-growth/45075
+45996,154020,INF582M01MH3,Union Consumption Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.138105+00:00,manual ET link https://www.etmoney.com/mutual-funds/union-consumption-fund-direct-growth/45996
+44063,151905,INF582M01JE6,Union Innovation & Opportunities Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.162430+00:00,manual ET link https://www.etmoney.com/mutual-funds/union-innovation-and-opportunities-fund-direct-growth/44063
+15461,120780,INF789F01VF3,UTI India Consumer Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.185095+00:00,manual ET link https://www.etmoney.com/mutual-funds/uti-india-consumer-fund-direct-growth/15461
+44180,152087,INF789F1AZA4,UTI Innovation Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.209944+00:00,manual ET link https://www.etmoney.com/mutual-funds/uti-innovation-fund-direct-growth/44180
+15522,120731,INF789F01SH5,UTI Transportation and Logistics Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.234598+00:00,manual ET link https://www.etmoney.com/mutual-funds/uti-transportation-and-logistics-fund-direct-growth/15522
+46106,154161,INF03VN01AD3,WhiteOak Capital Consumption Opportunities Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.258604+00:00,manual ET link https://www.etmoney.com/mutual-funds/whiteoak-capital-consumption-opportunities-fund-direct-growth/4
+45004,152962,INF03VN01951,WhiteOak Capital ESG Best-In-Class Strategy Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.283568+00:00,manual ET link https://www.etmoney.com/mutual-funds/whiteoak-capital-esg-best-in-class-strategy-fund-direct-growth/
+44426,152349,INF03VN01886,WhiteOak Capital Pharma and Healthcare Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.317793+00:00,manual ET link https://www.etmoney.com/mutual-funds/whiteoak-capital-pharma-and-healthcare-fund-direct-growth/44426
+15389,120323,INF109K012K1,ICICI Prudential Value Direct-Growth,,manual_et_link,2026-06-01T13:12:43.341037+00:00,manual ET link https://www.etmoney.com/mutual-funds/icici-prudential-value-direct-growth/15389
+15726,148265,INF204KB13T1,Nippon India Aggressive Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.363472+00:00,manual ET link https://www.etmoney.com/mutual-funds/nippon-india-aggressive-hybrid-fund-direct-growth/15726
+31779,149550,INF173K01NF7,Sundaram Arbitrage Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.386177+00:00,manual ET link https://www.etmoney.com/mutual-funds/sundaram-arbitrage-fund-direct-growth/31779
+16893,120480,INF846K01EA8,Axis Conservative Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.408228+00:00,manual ET link https://www.etmoney.com/mutual-funds/axis-conservative-hybrid-fund-direct-growth/16893
+16088,118491,INF194K015B9,Bandhan Conservative Hybrid Fund Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:43.429457+00:00,manual ET link https://www.etmoney.com/mutual-funds/bandhan-conservative-hybrid-fund-direct-plan-growth/16088
+15295,150206,INF251K01HR8,Baroda BNP Paribas Conservative Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.450661+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-conservative-hybrid-fund-direct-growth/15295
+15337,118309,INF760K01GB4,Canara Robeco Conservative Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.472325+00:00,manual ET link https://www.etmoney.com/mutual-funds/canara-robeco-conservative-hybrid-fund-direct-growth/15337
+17386,118574,INF090I01GF1,Franklin India Conservative Hybrid Fund A Direct-Growth,,manual_et_link,2026-06-01T13:12:43.494174+00:00,manual ET link https://www.etmoney.com/mutual-funds/franklin-india-conservative-hybrid-fund-a-direct-growth/17386
+16016,119118,INF179K01XE6,HDFC Hybrid Debt Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.514781+00:00,manual ET link https://www.etmoney.com/mutual-funds/hdfc-hybrid-debt-fund-direct-growth/16016
+16617,120073,INF336L01DW4,HSBC Conservative Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.535505+00:00,manual ET link https://www.etmoney.com/mutual-funds/hsbc-conservative-hybrid-fund-direct-growth/16617
+17351,120154,INF174K01JZ1,Kotak Debt Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.556666+00:00,manual ET link https://www.etmoney.com/mutual-funds/kotak-debt-hybrid-fund-direct-growth/17351
+17015,120276,INF767K01EO7,LIC MF Conservative Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.577443+00:00,manual ET link https://www.etmoney.com/mutual-funds/lic-mf-conservative-hybrid-fund-direct-growth/17015
+15711,118726,INF204K01YV4,Nippon India Conservative Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.597569+00:00,manual ET link https://www.etmoney.com/mutual-funds/nippon-india-conservative-hybrid-fund-direct-growth/15711
+41952,148958,INF879O01175,Parag Parikh Conservative Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.617760+00:00,manual ET link https://www.etmoney.com/mutual-funds/parag-parikh-conservative-hybrid-fund-direct-growth/41952
+17072,119839,INF200K01TS8,SBI Conservative Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.638974+00:00,manual ET link https://www.etmoney.com/mutual-funds/sbi-conservative-hybrid-fund-direct-growth/17072
+16786,119635,INF903J01OP6,Sundaram Conservative Hybrid Fund Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:43.659982+00:00,manual ET link https://www.etmoney.com/mutual-funds/sundaram-conservative-hybrid-fund-direct-plan-growth/16786
+15371,120779,INF789F01UJ7,UTI Conservative Hybrid Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.680528+00:00,manual ET link https://www.etmoney.com/mutual-funds/uti-conservative-hybrid-fund-direct-growth/15371
+16205,149717,INF173K01FI7,Sundaram Balanced Advantage Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.700655+00:00,manual ET link https://www.etmoney.com/mutual-funds/sundaram-balanced-advantage-fund-direct-growth/16205
+28190,132995,INF209KA1TP9,Aditya Birla Sun Life Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.721147+00:00,manual ET link https://www.etmoney.com/mutual-funds/aditya-birla-sun-life-equity-savings-fund-direct-growth/28190
+30202,135120,INF846K01VJ3,Axis Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.740948+00:00,manual ET link https://www.etmoney.com/mutual-funds/axis-equity-savings-fund-direct-growth/30202
+45732,153758,INF0QA701BT9,Bajaj Finserv Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.762007+00:00,manual ET link https://www.etmoney.com/mutual-funds/bajaj-finserv-equity-savings-fund-direct-growth/45732
+17411,118477,INF194K01Z02,Bandhan Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.786438+00:00,manual ET link https://www.etmoney.com/mutual-funds/bandhan-equity-savings-fund-direct-growth/17411
+40597,147496,INF955L01IL3,Baroda BNP Paribas Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.823566+00:00,manual ET link https://www.etmoney.com/mutual-funds/baroda-bnp-paribas-equity-savings-fund-direct-growth/40597
+31638,136567,INF740KA1504,DSP Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.843731+00:00,manual ET link https://www.etmoney.com/mutual-funds/dsp-equity-savings-fund-direct-growth/31638
+27749,140347,INF843K01KC8,Edelweiss Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.864913+00:00,manual ET link https://www.etmoney.com/mutual-funds/edelweiss-equity-savings-fund-direct-growth/27749
+37750,144466,INF090I01PD7,Franklin India Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.886087+00:00,manual ET link https://www.etmoney.com/mutual-funds/franklin-india-equity-savings-fund-direct-growth/37750
+15685,119128,INF179K01XT4,HDFC Equity Savings Direct Plan-Growth,,manual_et_link,2026-06-01T13:12:43.906315+00:00,manual ET link https://www.etmoney.com/mutual-funds/hdfc-equity-savings-direct-plan-growth/15685
+15850,151060,INF917K01GE4,HSBC Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.927014+00:00,manual ET link https://www.etmoney.com/mutual-funds/hsbc-equity-savings-fund-direct-growth/15850
+39639,146457,INF205KA1049,Invesco India Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.946798+00:00,manual ET link https://www.etmoney.com/mutual-funds/invesco-india-equity-savings-fund-direct-growth/39639
+27688,131373,INF174K01D28,Kotak Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.967039+00:00,manual ET link https://www.etmoney.com/mutual-funds/kotak-equity-savings-fund-direct-growth/27688
+16079,151952,INF397L01AZ5,LIC MF Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:43.987887+00:00,manual ET link https://www.etmoney.com/mutual-funds/lic-mf-equity-savings-fund-direct-growth/16079
+33847,140444,INF174V01184,Mahindra Manulife Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.010853+00:00,manual ET link https://www.etmoney.com/mutual-funds/mahindra-manulife-equity-savings-fund-direct-growth/33847
+38866,145693,INF769K01EK1,Mirae Asset Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.032033+00:00,manual ET link https://www.etmoney.com/mutual-funds/mirae-asset-equity-savings-fund-direct-growth/38866
+29719,134594,INF204KA1W77,Nippon India Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.053209+00:00,manual ET link https://www.etmoney.com/mutual-funds/nippon-india-equity-savings-fund-direct-growth/29719
+15959,138376,INF223J01QD0,PGIM India Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.073403+00:00,manual ET link https://www.etmoney.com/mutual-funds/pgim-india-equity-savings-fund-direct-growth/15959
+45688,153705,INF966L01EC8,Quant Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.094436+00:00,manual ET link https://www.etmoney.com/mutual-funds/quant-equity-savings-fund-direct-growth/45688
+29779,134643,INF200KA1DF3,SBI Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.114845+00:00,manual ET link https://www.etmoney.com/mutual-funds/sbi-equity-savings-fund-direct-growth/29779
+16382,145478,nan,Sundaram Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.136631+00:00,manual ET link https://www.etmoney.com/mutual-funds/sundaram-equity-savings-fund-direct-growth/16382
+37606,144312,INF582M01EC1,Union Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.158933+00:00,manual ET link https://www.etmoney.com/mutual-funds/union-equity-savings-fund-direct-growth/37606
+37837,144490,INF789F1A777,UTI Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.181213+00:00,manual ET link https://www.etmoney.com/mutual-funds/uti-equity-savings-fund-direct-growth/37837
+45354,153355,INF03VN01AB7,WhiteOak Capital Equity Savings Fund Direct-Growth,,manual_et_link,2026-06-01T13:12:44.202940+00:00,manual ET link https://www.etmoney.com/mutual-funds/whiteoak-capital-equity-savings-fund-direct-growth/45354
+46261,154316,INF174KA1ZO0,Kotak Multi Asset Active FoF Direct-Growth,,manual_et_link,2026-06-01T13:12:44.226548+00:00,manual ET link https://www.etmoney.com/mutual-funds/kotak-multi-asset-active-fof-direct-growth/46261
+43612,151458,INF179KC1FC0,HDFC MNC Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40423,147306,INF740KA1NQ6,DSP Quant Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41977,148972,INF00XX01AQ6,ITI Value Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41662,148595,INF740KA1PP3,DSP Value Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45220,153204,INF789F1AA98,UTI Quant Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44939,152910,INF174KA1TG9,Kotak MNC Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44507,152415,INF966L01DT4,Quant PSU Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45163,153154,INF200KB1506,SBI Quant Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+15836,151113,INF917K01HD4,HSBC Value Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42164,149166,INF846K010C0,Axis Value Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41997,148993,INF846K01Z87,Axis Quant Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+43941,151777,INF00XX01CS8,ITI Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+15847,151036,INF917K01FZ1,HSBC Midcap Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42313,149335,INF966L01AN3,Quant Value Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42097,149091,INF789F1AVA3,UTI Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46119,154177,INF200KB1AG6,SBI Quality Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44034,151881,INF174KA1OL0,Kotak Quant Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41493,148411,INF336L01PB2,HSBC Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+37696,152018,INF397L01KU5,LIC MF Value Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40878,147757,INF277K017X9,Tata Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+43919,151750,INF179KC1GI5,HDFC Defence Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40849,147727,INF174KA1EZ1,Kotak Pioneer Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40575,147473,INF174KA1EN7,Kotak Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45127,153083,INF846K011Z9,Axis Momentum Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40585,147492,INF582M01FS4,Union Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42295,149318,INF579M01AI2,360 ONE Quant Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+25653,151130,INF917K01QA1,HSBC Small Cap Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+3196,103734,INF082J01127,Quantum Liquid Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46123,154149,INF174KA1YV8,Kotak Services Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+35224,152010,INF397L01KA7,LIC MF Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44262,152189,INF966L01CZ3,Quant Momentum Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45130,153094,INF082J01473,Quantum Ethical Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46140,154210,INF0GCD01875,TRUSTMF Mid Cap Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46212,154257,INF0R8701442,Helios Arbitrage Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45646,153693,INF204KC1FR7,Nippon India MNC Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44332,152255,INF966L01DF3,Quant Commodities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42753,150376,INF754K01OP1,Edelweiss Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46176,154244,INF767K01SJ7,LIC MF Technology Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46184,154215,INF2JJD01177,Abakkus Small Cap Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41918,148925,INF966L01AK9,Quant Quantamental Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46133,154157,INF00XX01DM9,ITI Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44403,152358,INF0S5R01042,Old Bridge Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45119,153121,INF740KA1UX7,DSP Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44746,152694,INF247L01CS3,Motilal Oswal Quant Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40301,147206,INF769K01EU0,Mirae Asset Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+43171,150805,INF179KC1DY9,HDFC Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42049,149071,INF277KA1166,Tata Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+15767,151078,INF917K01GP0,HSBC ELSS Tax Saver Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42093,149085,INF760K01JW4,Canara Robeco Value Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40455,147346,INF109KC1D93,ICICI Prudential MNC Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+43925,151757,INF966L01BR2,Quant Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44503,152409,INF582M01JQ0,Union Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45684,153722,INF194KB1JX0,Bandhan Multi-Factor Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+27103,151142,INF917K01RI2,HSBC Business Cycles Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+43557,151368,INF846K016N4,Axis Business Cycles Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46168,154225,INF0S5R01133,Old Bridge Flexi Cap Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41564,148481,INF205KA1213,Invesco India Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41926,148883,INF760K01JQ6,Canara Robeco Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45143,153109,INF582M01KG9,Union Active Momentum Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46180,154236,INF226401117,Capitalmind Arbitrage Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45723,153753,INF174KA1XA4,Kotak Active Momentum Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45635,153669,INF903JA1LV6,Sundaram Multi-Factor Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+43922,151753,INF0K1H01081,Samco Active Momentum Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44880,152878,INF194KB1IQ6,Bandhan Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45536,153558,INF247L01FE6,Motilal Oswal Services Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46101,154155,INF879O01332,Parag Parikh Large Cap Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41674,148600,INF109KC1O66,ICICI Prudential Quant Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42975,150624,INF174KA1JN6,Kotak Business Cycle Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44722,152677,INF903JA1LQ6,Sundaram Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45289,153303,INF174V01CI9,Mahindra Manulife Value Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+43915,151755,INF251K01SD5,Baroda BNP Paribas Value Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44511,152417,INF200KB1126,SBI Energy Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44754,152710,INF754K01TA2,Edelweiss Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45514,153458,INF109K1A187,ICICI Prudential Quality Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45927,153970,INF174KA1XW8,Kotak Rural Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41637,148567,INF174V01AG7,Mahindra Manulife Focused Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45855,153895,INF2F0001214,The Wealth Company Ethical Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42891,150532,INF277KA1497,Tata Housing Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42895,150539,INF109KC12I5,ICICI Prudential PSU Equity Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44641,152586,INF0K1H01180,Samco Special Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44742,152702,INF174KA1SF3,Kotak Special Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45674,153624,INF846KA1168,Axis Services Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45915,153942,INF090I01YQ1,Franklin India Multi-Factor Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44738,152684,INF209KC1118,Aditya Birla Sun Life Quant Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44840,152796,INF247L01DG6,Motilal Oswal Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45285,153291,INF205KA1AI8,Invesco India Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44830,152787,INF582M01JY4,Union Multi Asset Allocation Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44834,152789,INF761K01GF3,Bank of India Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40779,147662,INF109KC1F91,ICICI Prudential Commodities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46217,154269,INF2F0001537,The Wealth Company Small Cap Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45293,153274,INF204KC1EK5,Nippon India Active Momentum Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46075,154108,INF754K01WH1,Edelweiss Financial Services Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45357,153364,INF247L01EP5,Motilal Oswal Active Momentum Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45821,153867,INF109K1A427,ICICI Prudential Conglomerate Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41633,148564,INF966L01AD4,Quant ESG Integration Strategy Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41713,148651,INF109KC1P24,ICICI Prudential Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45208,153189,INF03VN01977,WhiteOak Capital Quality Equity Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44884,152829,INF336L01RO1,HSBC India Export Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46093,154142,INF247L01GN5,Motilal Oswal Financial Services Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45692,153684,INF109K1A385,ICICI Prudential Active Momentum Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44121,152045,INF174V01BQ4,Mahindra Manulife Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40971,147844,INF209KB1O82,Aditya Birla Sun Life PSU Equity Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42139,149141,INF955L01KK1,Baroda BNP Paribas Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46172,154232,INF226401059,Capitalmind Multi Asset Allocation Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45147,153124,INF209KC1373,Aditya Birla Sun Life Conglomerate Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45727,153749,INF247L01FS6,Motilal Oswal Special Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42279,149295,INF209KB14D2,Aditya Birla Sun Life Business Cycle Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45201,153184,INF109KC12Z9,ICICI Prudential Rural Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+46097,154185,INF2F0001479,The Wealth Company Balanced Advantage Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44778,152728,INF109KC12W6,ICICI Prudential Energy Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42705,150310,INF109KC10C2,ICICI Prudential Housing Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44694,152644,INF03VN01902,WhiteOak Capital Special Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45205,153225,INF251K01UJ8,Baroda BNP Paribas Energy Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45791,153847,INF251K01VJ6,Baroda BNP Paribas Business Conglomerates Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+41611,148539,INF209KB1T79,Aditya Birla Sun Life Special Opportunities Fund Direct-Growth,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2778,120688,INF109K01W25,ICICI Prudential Exports and Services Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+6459,133801,INF178L01AL9,Kotak Infrastructure and Economic Reform Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+40483,147409,INF209KB1O25,Aditya Birla Sun Life Pharma & Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44015,151853,INF966L01CD0,Quant Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+38676,145454,INF740KA1LG1,DSP Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+38059,144835,INF903JA1FA2,Sundaram Services Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+38684,145473,INF582M01EK4,Union Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+32342,120782,INF789F01TO9,UTI Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+30849,135810,INF277K019A3,Tata India Pharma & HealthCare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+35716,142388,INF754K01ML4,Edelweiss Recently Listed IPO Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+35254,141924,INF179KC1AU3,HDFC Housing Opportunities Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+36864,143783,INF769K01ED6,Mirae Asset Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+32320,119783,INF200K01UP2,SBI Healthcare Opportunities Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2059,118759,INF204K01I50,Nippon India Pharma Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2770,118267,INF760K01FO9,Canara Robeco Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+11731,118469,INF194K01X46,Bandhan Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2960,118421,INF194K01W21,Bandhan Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+6915,119028,INF740K01QA7,DSP Natural Resources and New Energy Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+6467,118979,INF179K01WQ2,HDFC Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2190,118950,INF179K01VK7,HDFC Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+31997,118935,INF179K01VC4,HDFC Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2604,118784,INF204K01K49,Nippon India Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2085,119231,INF277K01ND1,Tata Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2360,119243,INF277K01PQ8,Tata Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+10816,119096,INF740K01OB0,DSP Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+10508,119364,INF761K01702,Bank of India Manufacturing & Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2012,118763,INF204K01I92,Nippon India Power & Infra Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2449,118769,INF204K01J34,Nippon India Quant Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+6483,118481,INF194K01Z85,Bandhan Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+32000,118494,INF090I01GY2,Templeton India Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+32434,118539,INF090I01GC8,Franklin India Opportunities Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+10232,118557,INF090I01JF5,Franklin Build India Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+4948,118564,INF090I01IW2,Franklin India Focused Equity Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+4878,119700,INF200K01RS2,SBI Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+6566,119659,INF209K01WQ7,Aditya Birla Sun Life Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+31805,119646,INF209K01VT3,Aditya Birla Sun Life MNC Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2677,119564,INF209K01WE3,Aditya Birla Sun Life Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+32370,119549,INF903J01NN3,Sundaram Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2969,119514,INF209K01WH6,Aditya Birla Sun Life Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+31992,119172,INF277K01NG4,Tata Ethical Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2626,119705,INF200K01SB6,SBI Comma Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+32321,119835,INF200K01RA0,SBI Contra Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+4085,120348,INF205K01LE4,Invesco India Contra Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+6568,120351,INF767K01GW5,LIC MF Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+10348,120395,INF205K01NG5,Invesco India PSU Equity Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+10831,119732,INF200K01UY4,SBI PSU Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2233,119727,INF200K01RJ1,SBI Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2594,119769,INF174K01KZ9,Kotak Contra Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+31980,119711,INF200K01SN1,SBI MNC Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+6463,120488,INF192K01BW7,JM Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+32140,120486,INF192K01BT3,JM Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+14519,120468,INF846K01CQ8,Axis Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+5689,120405,INF205K01MD4,Invesco India Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+10077,120722,INF109K018N2,ICICI Prudential Focused Equity Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+32285,120587,INF109K01Z14,ICICI Prudential FMCG Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2628,120621,INF109K018M4,ICICI Prudential Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+32241,120682,INF789F01UD0,UTI MNC Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+5428,120833,INF966L01721,Quant Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2634,120751,INF789F01VB2,UTI Value Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+1961,120728,INF789F01TU6,UTI Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+7970,120834,INF966L01853,Quant Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+2646,129212,INF903J01F92,Sundaram Infrastructure Advantage Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+19043,122389,INF247L01189,Motilal Oswal Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+27976,131580,INF579M01902,360 ONE Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+30861,135813,INF277K015B9,Tata Resources & Energy Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+3707,118692,INF204K01F95,Nippon India Focused Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+5371,151040,INF917K01FW8,HSBC Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+42256,149268,INF00XX01BO9,ITI Pharma and Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45627,153674,INF174V01CO7,Mahindra Manulife Banking & Financial Services Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45921,153983,INF769K01PV4,Mirae Asset Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45876,153972,INF194KB1KF5,Bandhan Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45465,153484,INF247L01EW1,Motilal Oswal Infrastructure Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45050,153039,INF663L01Z45,PGIM India Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44165,152082,INF179KC1HO1,HDFC Pharma And Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+39527,152024,INF397L01LK4,LIC MF Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+44274,152214,INF174KA1PZ7,Kotak Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45581,153604,INF251K01VA5,Baroda BNP Paribas Health and Wellness Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45131,153157,INF0QA701AB9,Bajaj Finserv Healthcare Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)
+45414,153447,INF174KA1VX0,Kotak Energy Opportunities Fund,,mfapi_et_review,2026-06-02T03:49:23.043832+00:00,batch_scrape_review accept (rebuilt)

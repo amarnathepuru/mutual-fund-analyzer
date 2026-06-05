@@ -282,9 +282,13 @@ def clear_portfolio_session_state() -> None:
     st.session_state.pop("fl_editor_rows", None)
     st.session_state.pop("manual_fund_select", None)
     st.session_state.pop("fl_portfolio_cache_warmed", None)
+    st.session_state.pop("fl_investment_labels_list", None)
+    st.session_state.pop("fl_investment_periods_list", None)
+    st.session_state.pop("fl_local_investment_labels", None)
+    st.session_state.pop("fl_filter_investment_label_keys", None)
     for key in list(st.session_state.keys()):
         if key in ("portfolio_entry_mode",) or key.startswith(
-            ("m_amt_", "m_units_", "m_nav_", "m_acct_", "m_date_", "m_plan_")
+            ("m_amt_", "m_units_", "m_nav_", "m_acct_", "m_date_", "m_plan_", "m_period_", "fl_txn_")
         ):
             del st.session_state[key]
 
@@ -1168,6 +1172,137 @@ def _resolve_member_id(family_member_id: str | None) -> str | None:
     return get_default_family_member_id()
 
 
+# ── Investment labels (optional tags on holdings) ───────────────────────────
+
+def _invalidate_labels_cache() -> None:
+    st.session_state.pop("fl_investment_labels_list", None)
+    st.session_state.pop("fl_investment_periods_list", None)
+
+
+def _list_investment_labels_raw(client: Client, owner_uid: str | None) -> list[dict[str, Any]]:
+    if not owner_uid:
+        return []
+    for attempt in range(2):
+        try:
+            res = (
+                client.table("investment_labels")
+                .select("id, label, sort_order, created_at")
+                .eq("owner_user_id", owner_uid)
+                .order("sort_order")
+                .order("created_at")
+                .execute()
+            )
+            return list(res.data or [])
+        except Exception as ex:
+            if attempt == 0 and _is_jwt_expired_error(ex) and _refresh_supabase_session(client):
+                continue
+            msg = str(ex).lower()
+            if "investment_labels" in msg and ("does not exist" in msg or "pgrst205" in msg):
+                return []
+            break
+    return []
+
+
+def _create_investment_label_raw(
+    client: Client,
+    owner_uid: str,
+    label: str,
+    sort_order: int,
+) -> str | None:
+    try:
+        res = (
+            client.table("investment_labels")
+            .insert(
+                {
+                    "owner_user_id": owner_uid,
+                    "label": label.strip(),
+                    "sort_order": sort_order,
+                }
+            )
+            .execute()
+        )
+        if res.data:
+            return str(res.data[0]["id"])
+    except Exception:
+        return None
+    return None
+
+
+def list_investment_labels(*, force_reload: bool = False) -> list[dict[str, Any]]:
+    """User-defined labels only; no auto-created defaults."""
+    if force_reload:
+        _invalidate_labels_cache()
+    cached = st.session_state.get("fl_investment_labels_list")
+    if isinstance(cached, list) and not force_reload:
+        return cached
+
+    client = _require_client()
+    if client is None:
+        return list(st.session_state.get("fl_local_investment_labels") or [])
+
+    uid = _effective_auth_uid(client) or st.session_state.fl_auth_uid
+    rows = _list_investment_labels_raw(client, uid)
+    st.session_state.fl_investment_labels_list = rows
+    return rows
+
+
+def create_investment_label(label: str) -> tuple[bool, str]:
+    """Add a label (Manage). Returns (ok, error_message_or_new_id)."""
+    name = (label or "").strip()
+    if not name:
+        return False, "Enter a name for this investment label."
+    if len(name) > 60:
+        return False, "Label must be 60 characters or fewer."
+
+    client = _require_client()
+    if client is None:
+        local = list(st.session_state.get("fl_local_investment_labels") or [])
+        if any(str(p.get("label", "")).lower() == name.lower() for p in local):
+            return False, "An investment label with this name already exists."
+        new_id = str(__import__("uuid").uuid4())
+        local.append({"id": new_id, "label": name, "sort_order": len(local)})
+        st.session_state.fl_local_investment_labels = local
+        _invalidate_labels_cache()
+        return True, new_id
+
+    uid = st.session_state.fl_auth_uid
+    for p in _list_investment_labels_raw(client, uid):
+        if str(p.get("label", "")).lower() == name.lower():
+            return False, "An investment label with this name already exists."
+    new_id = _create_investment_label_raw(
+        client, uid, name, len(_list_investment_labels_raw(client, uid))
+    )
+    if not new_id:
+        return False, (
+            "Could not create label. Run supabase/migrate_investment_labels.sql in Supabase SQL Editor."
+        )
+    _invalidate_labels_cache()
+    list_investment_labels(force_reload=True)
+    return True, new_id
+
+
+def delete_investment_label(label_id: str) -> tuple[bool, str]:
+    lid = str(label_id or "").strip()
+    if not lid:
+        return False, "No label selected."
+    client = _require_client()
+    if client is None:
+        local = [
+            r for r in (st.session_state.get("fl_local_investment_labels") or [])
+            if str(r.get("id")) != lid
+        ]
+        st.session_state.fl_local_investment_labels = local
+        _invalidate_labels_cache()
+        return True, ""
+    uid = st.session_state.fl_auth_uid
+    try:
+        client.table("investment_labels").delete().eq("id", lid).eq("owner_user_id", uid).execute()
+        _invalidate_labels_cache()
+        return True, ""
+    except Exception:
+        return False, "Could not delete this label."
+
+
 def save_portfolio(df: pd.DataFrame, family_member_id: str | None = None) -> bool:
     client = _require_client()
     if client is None:
@@ -1263,7 +1398,12 @@ def portfolio_fund_names(family_member_id: str | None = None) -> list:
     if not records:
         return []
     cols = row.get("columns") or []
-    fund_col = next((c for c in cols if "fund" in str(c).lower()), "fund_name")
+    fund_col = (
+        "display_fund_name"
+        if "display_fund_name" in cols
+        else next((c for c in cols if str(c).lower() == "fund_name"), None)
+        or next((c for c in cols if "fund" in str(c).lower()), "fund_name")
+    )
     names: list = []
     for rec in records:
         if isinstance(rec, dict) and rec.get(fund_col):

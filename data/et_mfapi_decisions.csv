@@ -124,14 +124,14 @@ scheme_id,decision,mf_scheme_code,computed_score,et_fund_name,mf_scheme_name,dec
 11236,approved,118585.0,79.23,,Nippon India Arbitrage Fund - Direct Plan Growth Plan - Growth Option,2026-05-29T09:39:28.117149+00:00,bulk_grid
 45931,approved,153979.0,88.12,,Old Bridge Arbitrage Fund Direct Growth,2026-05-29T09:39:28.119729+00:00,bulk_grid
 44196,approved,152109.0,83.97,,Parag Parikh Arbitrage Fund - Direct Plan Growth,2026-05-29T09:39:28.121792+00:00,bulk_grid
-3494,rejected,,,,,2026-05-29T09:39:28.124146+00:00,bulk_grid no link
+3494,approved,119574.0,100.0,SBI Arbitrage Opportunities Fund,SBI Arbitrage Opportunities Fund - Direct Plan - Gr,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 44888,approved,152849.0,86.54,,WhiteOak Capital Arbitrage Fund Direct Plan Growth,2026-05-29T09:39:28.128526+00:00,bulk_grid
 44207,approved,152132.0,89.57,,WhiteOak Capital Balanced Hybrid Fund Direct Plan Growth,2026-05-29T09:39:28.130404+00:00,bulk_grid
 27860,approved,131355.0,86.54,,BANDHAN Balanced Advantage Fund Direct Plan Growth,2026-05-29T09:39:28.133033+00:00,bulk_grid
 24276,approved,127850.0,89.57,,BANK OF INDIA BALANCED ADVANTAGE FUND DIRECT PLAN  GROWTH,2026-05-29T09:39:28.135289+00:00,bulk_grid
 42897,approved,150481.0,94.44,,Franklin India Balanced Advantage Fund- Growth- Direct,2026-05-29T09:39:28.137789+00:00,bulk_grid
 32508,approved,118968.0,92.4,,HDFC Balanced Advantage Fund - Growth Plan - Direct Plan,2026-05-29T09:39:28.139444+00:00,bulk_grid
-11662,rejected,,,,,2026-05-29T09:39:28.140977+00:00,bulk_grid no link
+11662,approved,151129.0,100.0,HSBC Balanced Advantage Fund,HSBC Balanced Advantage Fund - Direct Growth,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 33424,approved,139872.0,97.06,,Motilal Oswal Balanced Advantage Fund  (MOFDYNAMIC) - Direct Plan - Grow,2026-05-29T09:39:28.143919+00:00,bulk_grid
 2328,approved,118736.0,85.0,,Nippon India Balanced Advantage Fund - Direct Plan Growth Plan - Growth,2026-05-29T09:39:28.146152+00:00,bulk_grid
 44532,approved,152468.0,91.55,,Parag Parikh Dynamic Asset Allocation Fund - Direct Plan Growth,2026-05-29T09:39:28.148767+00:00,bulk_grid
@@ -156,7 +156,7 @@ scheme_id,decision,mf_scheme_code,computed_score,et_fund_name,mf_scheme_name,dec
 3959,approved,119566.0,98.52,,Sundaram Large and Midcap Fund Direct Plan - Growth,2026-05-29T09:39:28.207567+00:00,bulk_grid
 44298,approved,152226.0,88.65,,Whiteoak Capital Large & Mid Cap Fund Direct Plan Growth,2026-05-29T09:39:28.211023+00:00,bulk_grid
 41987,approved,148980.0,84.7,,BANK OF INDIA Large Cap Fund Direct Plan Growth,2026-05-29T09:39:28.213613+00:00,bulk_grid
-7298,rejected,,,,,2026-05-29T09:39:28.217950+00:00,bulk_grid no link
+7298,approved,120586.0,100.0,ICICI Prudential Large Cap Fund,ICICI Prudential Large Cap Fund (erstwhile Bluechip Fund) - Direct Plan - Growth,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 32273,approved,120152.0,84.1,,Kotak Large Cap  Fund - Growth - Direct,2026-05-29T09:39:28.219788+00:00,bulk_grid
 44427,approved,152354.0,81.4,,Motilal Oswal Large Cap Direct Plan Growth,2026-05-29T09:39:28.221496+00:00,bulk_grid
 5077,approved,118632.0,79.23,,Nippon India Large Cap Fund - Direct Plan Growth Plan - Growth Option,2026-05-29T09:39:28.223077+00:00,bulk_grid
@@ -171,7 +171,7 @@ scheme_id,decision,mf_scheme_code,computed_score,et_fund_name,mf_scheme_name,dec
 42925,approved,150584.0,85.3,,WhiteOak Capital Mid Cap Fund Direct Plan Growth,2026-05-29T09:39:28.245393+00:00,bulk_grid
 43473,approved,151307.0,97.5,,Aditya Birla Sun Life Multi Asset Allocation Fund-Direct Growth,2026-05-29T09:39:28.246956+00:00,bulk_grid
 44688,approved,152639.0,95.42,,Bajaj Finserv Multi Asset Allocation Fund - Direct Growth,2026-05-29T09:39:28.248625+00:00,bulk_grid
-2632,rejected,,,,,2026-05-29T09:39:28.250595+00:00,bulk_grid no link
+2632,approved,119131.0,100.0,HDFC Multi-Asset Allocation Fund,HDFC Multi-Asset Fund - Growth Option - Direct Plan,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 44405,approved,152314.0,89.12,,Sundaram Multi Asset Allocation Fund Direct Plan Growth,2026-05-29T09:39:28.252813+00:00,bulk_grid
 45960,approved,153999.0,96.79,,The Wealth Company Multi Asset Allocation Fund - Direct Growth,2026-05-29T09:39:28.254555+00:00,bulk_grid
 43907,approved,151745.0,92.24,,WhiteOak Capital Multi Asset Allocation Fund Direct Plan Growth,2026-05-29T09:39:28.256516+00:00,bulk_grid
@@ -206,14 +206,15 @@ scheme_id,decision,mf_scheme_code,computed_score,et_fund_name,mf_scheme_name,dec
 44194,approved,152107.0,100.0,,QUANTUM SMALL CAP FUND - DIRECT PLAN GROWTH OPTION,2026-05-29T10:10:59.768799+00:00,bulk_grid
 44057,approved,151885.0,100.0,,UTI Balanced Advantage Fund - Direct Plan - Growth Option,2026-05-29T10:18:26.086796+00:00,bulk_grid
 1328,approved,120030.0,83.08,,HSBC Large Cap Fund - Direct Growth,2026-05-29T10:18:26.146574+00:00,bulk_grid
-42946,rejected,,,,,2026-05-29T10:32:59.203220+00:00,bulk_grid no link
-32026,rejected,,,,,2026-05-29T10:32:59.204232+00:00,bulk_grid no link
-44614,rejected,,,,,2026-05-29T10:32:59.205117+00:00,bulk_grid no link
-32529,rejected,,,,,2026-05-29T10:32:59.207825+00:00,bulk_grid no link
+42946,approved,150571.0,100.0,Sundaram Flexi Cap Fund,Sundaram Flexicap Fund Direct Growth,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
+32026,approved,120662.0,100.0,UTI Flexi Cap Fund,UTI - Flexi Cap Fund-Growth Option - Direct,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
+44614,approved,152537.0,100.0,PGIM India Retirement Fund,PGIM India Retirement Fund - Direct Plan - Growth Option,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
+32529,approved,149669.0,100.0,Sundaram Multi Cap Fund,Sundaram Multi Cap Fund (Formerly Known as Principal Multi Cap Growth Fund)-Direct Plan - Growth Option,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
 1898,approved,120046.0,83.08,HSBC Flexi Cap Fund,HSBC Flexi Cap Fund - Direct Growth,2026-05-29T10:42:06.949645+00:00,manual_rework_review9
 1960,approved,120726.0,70.38,UTI Mid Cap Fund,UTI Mid Cap Fund-Growth Option- Direct,2026-05-29T10:42:07.061282+00:00,manual_rework_review9
 26816,approved,151138.0,83.08,HSBC Arbitrage Fund,HSBC Arbitrage Fund - Direct Growth,2026-05-29T10:42:07.168728+00:00,manual_rework_review9
 32397,approved,149601.0,66.88,Sundaram Aggressive Hybrid Fund,Sundaram Aggressive Hybrid Fund (Formerly Known as Principal Hybrid Equity Fund)- Direct Plan - Growth Option,2026-05-29T10:42:07.305021+00:00,manual_rework_review9
 41570,approved,148507.0,62.27,Sundaram Large Cap Fund,Sundaram Large Cap Fund (Formerly Known as Sundaram Blue Chip Fund)Direct Plan - Growth,2026-05-29T10:42:07.424789+00:00,manual_rework_review9
 45843,approved,153891.0,92.5,The Wealth Company Arbitrage Fund,THE WEALTH COMPANY ARBITRAGE FUND DIRECT GROWTH,2026-05-29T10:42:07.557458+00:00,manual_rework_review9
-45869,approved,154269.0,57.83,Samco Small Cap Fund,The Wealth Company Small Cap Fund- Direct-Growth,2026-05-29T10:42:07.667786+00:00,manual_rework_review9
+45869,approved,153868.0,100.0,Samco Small Cap Fund,Samco Small Cap Fund - Direct Plan,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601
+43350,approved,151165.0,100.0,360 ONE ELSS Tax Saver Nifty 50 Index Fund,360 ONE ELSS Tax Saver Nifty 50 Index Fund - Direct Plan - Growth,2026-06-01T03:28:29.239831+00:00,auto_name_house_20260601

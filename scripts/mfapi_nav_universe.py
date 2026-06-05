@@ -16,7 +16,11 @@ _LIQUID_WORD = re.compile(r"\bliquid\b", re.IGNORECASE)
 
 def is_equity_or_hybrid(scheme_category: str | None) -> bool:
     cat = (scheme_category or "").strip()
-    return cat.startswith("Equity Scheme") or cat.startswith("Hybrid Scheme")
+    return (
+        cat.startswith("Equity Scheme")
+        or cat.startswith("Hybrid Scheme")
+        or cat.startswith("Solution Oriented Scheme - Retirement Fund")
+    )
 
 
 def is_liquid_fund(scheme_category: str | None, scheme_name_raw: str | None) -> bool:

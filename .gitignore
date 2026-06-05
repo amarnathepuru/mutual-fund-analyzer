@@ -33,16 +33,18 @@ data/raw/
 # NAV time series (Batch 2+; large local DB)
 data/nav/
 
-# Dated master backups (local only)
-data/backups/
+# Dated master backups (local only; wipe with cleanup_data_artifacts.py)
+data/backups/*
+!data/backups/.gitkeep
 
-# Regenerated pipeline QC / scratch reports (keep match report + apply QC in git)
-data/reports/mfapi_batch1_qc.txt
-data/reports/mfapi_batch2_qc.txt
-data/reports/mfapi_batch3_qc.txt
-data/reports/mfapi_nav_prune_qc.txt
-data/reports/mfapi_direct_growth_ambiguous_base.csv
-data/reports/et_mfapi_needs_review.csv
+# Pipeline reports (regenerable; see data/reports/README.md)
+data/reports/*
+!data/reports/README.md
+!data/reports/.gitkeep
+
+# Optional export scratch
+data/mfapi_to_et_approved.csv
+data/processed/common_holdings.csv
 
 # Secrets / credentials
 *.env
