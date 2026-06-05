@@ -1109,6 +1109,7 @@ def render_tabbed_dashboard(
                         _plotly_dual_line(dual_f, p, height=380, fmt_inr=fmt_inr),
                         use_container_width=True,
                         config={"displayModeBar": False},
+                        key="fl_track_chart_ov_dual",
                     )
                 else:
                     st.caption("Need more history to plot portfolio value.")
@@ -1154,7 +1155,9 @@ def render_tabbed_dashboard(
                 with d1:
                     st.plotly_chart(
                         _donut_chart(by_cat, "By category", p, **_donut_kw),
-                        use_container_width=True, config={"displayModeBar": False},
+                        use_container_width=True,
+                        config={"displayModeBar": False},
+                        key="fl_track_donut_category",
                     )
                 with d2:
                     st.plotly_chart(
@@ -1165,12 +1168,16 @@ def render_tabbed_dashboard(
                             label_fn=_short_amc_label,
                             **_donut_kw,
                         ),
-                        use_container_width=True, config={"displayModeBar": False},
+                        use_container_width=True,
+                        config={"displayModeBar": False},
+                        key="fl_track_donut_fund_house",
                     )
                 with d3:
                     st.plotly_chart(
                         _donut_chart(by_acct, "By account", p, **_donut_kw),
-                        use_container_width=True, config={"displayModeBar": False},
+                        use_container_width=True,
+                        config={"displayModeBar": False},
+                        key="fl_track_donut_account",
                     )
         with _r2_side:
             st.markdown('<div class="fl-track-side-compact" aria-hidden="true"></div>', unsafe_allow_html=True)
@@ -1236,7 +1243,9 @@ def render_tabbed_dashboard(
                         curve_p.rename(columns={"value": "current_value"}).assign(invested_value=0),
                         p, height=300,
                     ),
-                    use_container_width=True, config={"displayModeBar": False},
+                    use_container_width=True,
+                    config={"displayModeBar": False},
+                    key="fl_track_chart_perf_curve",
                 )
             else:
                 st.caption("Need more history for this period.")
@@ -1254,7 +1263,12 @@ def render_tabbed_dashboard(
                     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                     font=dict(size=11, color=p["bd"]), xaxis_title="%",
                 )
-                st.plotly_chart(fig_bar, use_container_width=True, config={"displayModeBar": False})
+                st.plotly_chart(
+                    fig_bar,
+                    use_container_width=True,
+                    config={"displayModeBar": False},
+                    key="fl_track_chart_perf_bar",
+                )
 
     with tab_hold:
         with st.container(border=True):
