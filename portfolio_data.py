@@ -99,7 +99,7 @@ def _mfapi_nav_history(mf_scheme_code: int) -> tuple[tuple[str, float], ...]:
     url = MFAPI_DETAIL_URL.format(code=int(mf_scheme_code))
     req = urllib.request.Request(url, headers={"User-Agent": MFAPI_USER_AGENT})
     try:
-        with urllib.request.urlopen(req, timeout=90) as resp:
+        with urllib.request.urlopen(req, timeout=25) as resp:
             body = json.loads(resp.read().decode("utf-8"))
     except Exception:
         return ()

@@ -10621,6 +10621,19 @@ def _render_track_holdings_table(
     )
 
 
+def _track_scheme_codes_from_metrics(metrics: list) -> tuple[int, ...]:
+    codes: list[int] = []
+    for m in metrics:
+        raw = m.get("mf_scheme_code")
+        if raw is None or (isinstance(raw, float) and pd.isna(raw)):
+            continue
+        try:
+            codes.append(int(float(raw)))
+        except (TypeError, ValueError):
+            continue
+    return tuple(codes)
+
+
 def page_portfolio_track():
     from datetime import date as _date
 
@@ -10646,6 +10659,21 @@ def page_portfolio_track():
         if _fl_auth.is_logged_in() and _manage_selected_member_ids()
         else _saved_portfolio_meta()
     )
+
+    _track_ui.inject_track_dashboard_css(_track_ui._track_palette(t, t_name))
+    st.markdown('<div class="fl-track-page-sentinel" aria-hidden="true"></div>', unsafe_allow_html=True)
+
+    st.markdown(
+        f'<div class="fl-track-hero">'
+        f'<div><h2>Track my portfolio</h2>'
+        f"<p>Bird's-eye view of portfolio performance across all accounts and labels.</p></div>"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+    if _fl_auth.is_logged_in():
+        _render_track_filters_row(t)
+
     _pf = pd.DataFrame()
     _holdings = pd.DataFrame()
     _txns = pd.DataFrame()
@@ -10666,10 +10694,9 @@ def page_portfolio_track():
                 st.session_state.get("portfolio_df", pd.DataFrame()), ""
             )
         if not _pf.empty:
-            _holdings = _portfolio_holdings_only_df(_pf)
+            _holdings, _txns = _pf_labels.split_holdings_and_transactions(_pf)
             if _pf_data.mf_universe_path():
                 _holdings = _pf_data.enrich_portfolio_df(_holdings)
-            _holdings, _txns = _pf_labels.split_holdings_and_transactions(_pf)
             _as_of = st.session_state.get("fl_track_as_of_date") or _date.today()
             if hasattr(_as_of, "date"):
                 _as_of = _as_of.date()
@@ -10680,34 +10707,6 @@ def page_portfolio_track():
             _n_skip = _n_all - len(_metrics)
             if _metrics:
                 _totals = _pf_track.portfolio_totals(_metrics)
-
-    _nav_display = "—"
-    if _totals.get("nav_as_of"):
-        _nav_display = _pf_data._format_nav_refresh_date(str(_totals["nav_as_of"]))
-    elif _metrics:
-        _scheme_codes = tuple(
-            int(m["mf_scheme_code"])
-            for m in _metrics
-            if m.get("mf_scheme_code") is not None
-        )
-        _nav_display = _pf_data.nav_db_refresh_info(_scheme_codes).get("display_date", "—")
-
-    _track_ui.inject_track_dashboard_css(_track_ui._track_palette(t, t_name))
-    st.markdown('<div class="fl-track-page-sentinel" aria-hidden="true"></div>', unsafe_allow_html=True)
-
-    st.markdown(
-        f'<div class="fl-track-hero">'
-        f'<div><h2>Track my portfolio</h2>'
-        f"<p>Bird's-eye view of portfolio performance across all accounts and labels.</p></div>"
-        f'<div class="fl-track-hero-meta" title="Latest NAV date used across holdings for the selected As on date">'
-        f'NAV last updated'
-        f'<strong>{_html.escape(_nav_display)}</strong></div>'
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-
-    if _fl_auth.is_logged_in():
-        _render_track_filters_row(t)
 
     if _meta is None:
         st.markdown(
@@ -10748,15 +10747,41 @@ def page_portfolio_track():
         if not _metrics:
             st.warning("No trackable schemes in the current selection.")
         else:
-            _trackable = _holdings[_holdings["can_track"].astype(bool)]
-            _xirr = _pf_track.portfolio_xirr(
-                _trackable,
-                _txns,
-                float(_totals["current_value"] or 0),
-                _as_of,
+            _nav_display = "—"
+            if _totals.get("nav_as_of"):
+                _nav_display = _pf_data._format_nav_refresh_date(str(_totals["nav_as_of"]))
+            else:
+                _scheme_codes = _track_scheme_codes_from_metrics(_metrics)
+                if _scheme_codes:
+                    _nav_display = _pf_data.nav_db_refresh_info(_scheme_codes).get(
+                        "display_date", "—"
+                    )
+            st.markdown(
+                f'<div class="fl-track-hero-meta" style="text-align:right;font-size:0.72rem;'
+                f'color:{_sb};margin:-0.35rem 0 0.75rem;" title="Latest NAV date used across holdings">'
+                f'NAV last updated <strong style="color:{_hd};">{_html.escape(_nav_display)}</strong></div>',
+                unsafe_allow_html=True,
             )
-            _curve = _pf_track.portfolio_value_curve(_holdings, _txns, end_date=_as_of)
-            _dual = _pf_track.portfolio_dual_curves(_holdings, _txns, end_date=_as_of)
+
+            with st.spinner("Loading charts and performance metrics…"):
+                _nav_by_code = _pf_track.prefetch_nav_histories(_holdings, end_date=_as_of)
+                _trackable = _holdings[_holdings["can_track"].astype(bool)]
+                _xirr = _pf_track.portfolio_xirr(
+                    _trackable,
+                    _txns,
+                    float(_totals["current_value"] or 0),
+                    _as_of,
+                )
+                _curve = _pf_track.portfolio_value_curve(
+                    _holdings, _txns, end_date=_as_of, nav_by_code=_nav_by_code
+                )
+                _dual = _pf_track.portfolio_dual_curves(
+                    _holdings,
+                    _txns,
+                    end_date=_as_of,
+                    value_curve=_curve,
+                    nav_by_code=_nav_by_code,
+                )
             for m in _metrics:
                 if "invested_date" not in m:
                     m["invested_date"] = "—"
@@ -10772,6 +10797,7 @@ def page_portfolio_track():
                 txns=_txns,
                 as_of_date=_as_of,
                 dual_curve=_dual,
+                nav_by_code=_nav_by_code,
             )
             with st.expander("Full holdings detail", expanded=False):
                 _render_track_holdings_table(_metrics, _totals, t, t_name)

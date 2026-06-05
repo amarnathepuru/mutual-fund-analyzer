@@ -37,6 +37,71 @@ def _scheme_code(row) -> int | None:
         return None
 
 
+_NAV_SERIES_CACHE: dict[tuple[int, str], pd.DataFrame] = {}
+
+
+def _trackable_scheme_codes(holdings: pd.DataFrame) -> list[int]:
+    codes: list[int] = []
+    seen: set[int] = set()
+    if holdings is None or holdings.empty:
+        return codes
+    for _, h in holdings.iterrows():
+        if not h.get("can_track"):
+            continue
+        code = _scheme_code(h)
+        if code and code not in seen:
+            seen.add(code)
+            codes.append(code)
+    return codes
+
+
+def prefetch_nav_histories(
+    holdings: pd.DataFrame, *, end_date: date | None = None
+) -> dict[int, pd.DataFrame]:
+    """Load each scheme's NAV series once (avoids repeated MFAPI/db lookups)."""
+    end = end_date or date.today()
+    end_key = end.isoformat()
+    nav_by_code: dict[int, pd.DataFrame] = {}
+    for code in _trackable_scheme_codes(holdings):
+        cache_key = (code, end_key)
+        cached = _NAV_SERIES_CACHE.get(cache_key)
+        if cached is None:
+            cached = pf.get_nav_history(code, end_date=end)
+            _NAV_SERIES_CACHE[cache_key] = cached
+        nav_by_code[code] = cached
+    return nav_by_code
+
+
+def _nav_from_series(series: pd.DataFrame | None, on_date: date) -> float | None:
+    if series is None or series.empty:
+        return None
+    ts = pd.Timestamp(on_date)
+    sub = series[series["nav_date"] <= ts]
+    if sub.empty:
+        return None
+    try:
+        return float(sub.iloc[-1]["nav"])
+    except (TypeError, ValueError):
+        return None
+
+
+def _portfolio_month_ends(
+    holdings: pd.DataFrame, txns: pd.DataFrame, end_date: date
+) -> pd.DatetimeIndex:
+    start: date | None = None
+    for _, h in holdings.iterrows():
+        if not h.get("can_track"):
+            continue
+        for td, _ in cashflows_for_holding(h, txns):
+            start = td if start is None else min(start, td)
+    if start is None:
+        return pd.DatetimeIndex([])
+    month_ends = pd.date_range(pd.Timestamp(start), pd.Timestamp(end_date), freq="ME")
+    if month_ends.empty:
+        return pd.DatetimeIndex([pd.Timestamp(end_date)])
+    return month_ends
+
+
 def _txns_for_lot(txns: pd.DataFrame, lot_group_id: str) -> pd.DataFrame:
     if txns is None or txns.empty or not lot_group_id:
         return pd.DataFrame()
@@ -302,26 +367,19 @@ def portfolio_value_curve(
     txns: pd.DataFrame,
     *,
     end_date: date | None = None,
+    nav_by_code: dict[int, pd.DataFrame] | None = None,
 ) -> pd.DataFrame:
     """Month-end combined portfolio value (trackable holdings only)."""
     if holdings is None or holdings.empty:
         return pd.DataFrame(columns=["date", "value"])
 
-    start: date | None = None
-    for _, h in holdings.iterrows():
-        if not h.get("can_track"):
-            continue
-        for td, _ in cashflows_for_holding(h, txns):
-            start = td if start is None else min(start, td)
-    if start is None:
+    end = end_date or date.today()
+    month_ends = _portfolio_month_ends(holdings, txns, end)
+    if month_ends.empty:
         return pd.DataFrame(columns=["date", "value"])
 
-    end = end_date or date.today()
-    month_ends = pd.date_range(
-        pd.Timestamp(start), pd.Timestamp(end), freq="ME"
-    )
-    if month_ends.empty:
-        month_ends = pd.DatetimeIndex([pd.Timestamp(end)])
+    if nav_by_code is None:
+        nav_by_code = prefetch_nav_histories(holdings, end_date=end)
 
     values: list[float] = []
     dates_out: list[date] = []
@@ -337,7 +395,7 @@ def portfolio_value_curve(
             u = units_on_date(h, txns, d)
             if u <= 0:
                 continue
-            nav = pf.get_nav_on_or_before(code, d)
+            nav = _nav_from_series(nav_by_code.get(code), d)
             if nav:
                 total += u * nav
         dates_out.append(d)
@@ -449,10 +507,16 @@ def filter_curve_by_period(curve: pd.DataFrame, period: str) -> pd.DataFrame:
 
 
 def portfolio_value_on_date(
-    holdings: pd.DataFrame, txns: pd.DataFrame, on_date: date
+    holdings: pd.DataFrame,
+    txns: pd.DataFrame,
+    on_date: date,
+    *,
+    nav_by_code: dict[int, pd.DataFrame] | None = None,
 ) -> float:
     if holdings is None or holdings.empty:
         return 0.0
+    if nav_by_code is None:
+        nav_by_code = prefetch_nav_histories(holdings, end_date=on_date)
     total = 0.0
     for _, h in holdings.iterrows():
         if not h.get("can_track"):
@@ -463,7 +527,7 @@ def portfolio_value_on_date(
         u = units_on_date(h, txns, on_date)
         if u <= 0:
             continue
-        nav = pf.get_nav_on_or_before(code, on_date)
+        nav = _nav_from_series(nav_by_code.get(code), on_date)
         if nav:
             total += u * nav
     return total
@@ -511,8 +575,10 @@ def portfolio_invested_curve(
     txns: pd.DataFrame,
     *,
     end_date: date | None = None,
+    value_curve: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
-    value_curve = portfolio_value_curve(holdings, txns, end_date=end_date)
+    if value_curve is None:
+        value_curve = portfolio_value_curve(holdings, txns, end_date=end_date)
     if value_curve.empty:
         return pd.DataFrame(columns=["date", "invested_value"])
     rows: list[dict] = []
@@ -529,12 +595,20 @@ def portfolio_dual_curves(
     txns: pd.DataFrame,
     *,
     end_date: date | None = None,
+    value_curve: pd.DataFrame | None = None,
+    nav_by_code: dict[int, pd.DataFrame] | None = None,
 ) -> pd.DataFrame:
-    cur = portfolio_value_curve(holdings, txns, end_date=end_date)
-    inv = portfolio_invested_curve(holdings, txns, end_date=end_date)
-    if cur.empty:
+    end = end_date or date.today()
+    if nav_by_code is None:
+        nav_by_code = prefetch_nav_histories(holdings, end_date=end)
+    if value_curve is None:
+        value_curve = portfolio_value_curve(
+            holdings, txns, end_date=end, nav_by_code=nav_by_code
+        )
+    inv = portfolio_invested_curve(holdings, txns, end_date=end, value_curve=value_curve)
+    if value_curve.empty:
         return pd.DataFrame(columns=["date", "current_value", "invested_value"])
-    out = cur.rename(columns={"value": "current_value"})
+    out = value_curve.rename(columns={"value": "current_value"})
     if not inv.empty:
         out = out.merge(inv, on="date", how="left")
     else:
@@ -561,15 +635,20 @@ def performance_snapshot(
     curve: pd.DataFrame,
     *,
     as_of: date | None = None,
+    nav_by_code: dict[int, pd.DataFrame] | None = None,
 ) -> dict[str, float | None]:
     """1D–1Y simple returns; 3Y CAGR from month-end curve."""
     end = as_of or date.today()
-    cur_val = portfolio_value_on_date(holdings, txns, end)
+    if nav_by_code is None:
+        nav_by_code = prefetch_nav_histories(holdings, end_date=end)
+    cur_val = portfolio_value_on_date(holdings, txns, end, nav_by_code=nav_by_code)
     out: dict[str, float | None] = {}
 
     for label, days in (("1D", 1), ("1W", 7)):
         prior_d = end - timedelta(days=days)
-        prior_val = portfolio_value_on_date(holdings, txns, prior_d)
+        prior_val = portfolio_value_on_date(
+            holdings, txns, prior_d, nav_by_code=nav_by_code
+        )
         out[label] = round(_simple_return_pct(cur_val, prior_val) or 0.0, 2) if prior_val > 0 else None
 
     if curve is not None and not curve.empty:
@@ -606,13 +685,16 @@ def portfolio_cagr(
     txns: pd.DataFrame,
     *,
     as_of: date | None = None,
+    nav_by_code: dict[int, pd.DataFrame] | None = None,
 ) -> float | None:
     end = as_of or date.today()
     start = portfolio_earliest_investment_date(holdings, txns)
     if not start or start >= end:
         return None
-    begin = portfolio_value_on_date(holdings, txns, start)
-    end_val = portfolio_value_on_date(holdings, txns, end)
+    if nav_by_code is None:
+        nav_by_code = prefetch_nav_histories(holdings, end_date=end)
+    begin = portfolio_value_on_date(holdings, txns, start, nav_by_code=nav_by_code)
+    end_val = portfolio_value_on_date(holdings, txns, end, nav_by_code=nav_by_code)
     years = (end - start).days / 365.25
     return _cagr_pct(begin, end_val, years)
 

@@ -1035,6 +1035,7 @@ def render_tabbed_dashboard(
     txns: pd.DataFrame | None = None,
     as_of_date: date | None = None,
     dual_curve: pd.DataFrame | None = None,
+    nav_by_code: dict[int, pd.DataFrame] | None = None,
 ) -> None:
     p = _track_palette(t, t_name)
 
@@ -1048,12 +1049,14 @@ def render_tabbed_dashboard(
         else 0.0
     )
     cagr = (
-        pt.portfolio_cagr(holdings, txns, as_of=as_of)
+        pt.portfolio_cagr(holdings, txns, as_of=as_of, nav_by_code=nav_by_code)
         if holdings is not None and txns is not None
         else None
     )
     perf = (
-        pt.performance_snapshot(holdings, txns, curve, as_of=as_of)
+        pt.performance_snapshot(
+            holdings, txns, curve, as_of=as_of, nav_by_code=nav_by_code
+        )
         if holdings is not None and txns is not None
         else {}
     )
