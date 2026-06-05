@@ -6,9 +6,12 @@ Single portfolio upload validated against MFAPI; holdings analyse uses ET names.
 from __future__ import annotations
 
 import difflib
+import json
 import re
 import sqlite3
 import sys
+import urllib.request
+from datetime import date, datetime
 from functools import lru_cache
 from pathlib import Path
 
@@ -24,14 +27,137 @@ from mfapi_scheme_name import (  # noqa: E402
 )
 
 ROOT = Path(__file__).resolve().parent
-MF_UNIVERSE = ROOT / "data" / "raw" / "mfapi" / "nav_universe_schemes.csv"
+MF_UNIVERSE_RAW = ROOT / "data" / "raw" / "mfapi" / "nav_universe_schemes.csv"
+MF_UNIVERSE_PROCESSED = ROOT / "data" / "processed" / "nav_universe_schemes.csv"
+MF_UNIVERSE_PATHS = (MF_UNIVERSE_PROCESSED, MF_UNIVERSE_RAW)
+MF_UNIVERSE = MF_UNIVERSE_PROCESSED
 SCHEME_MAP = ROOT / "data" / "fund_scheme_map.csv"
 ET_MASTER = ROOT / "data" / "fund_master_auto.csv"
 NAV_DB = ROOT / "data" / "nav" / "nav.db"
+NAV_LATEST_CSV = ROOT / "data" / "processed" / "nav_latest.csv"
 HOLDINGS_NORM = ROOT / "data" / "processed" / "normalized_holdings.csv"
 SECTOR_ALLOC = ROOT / "data" / "processed" / "fund_sector_allocation.csv"
+MFAPI_DETAIL_URL = "https://api.mfapi.in/mf/{code}"
+MFAPI_USER_AGENT = "FundLens/1.0 (mutual-fund-analyzer; track)"
+NAV_MIN_HISTORY_DATE = date(2015, 1, 1)
 
 _LABEL_CODE_RE = re.compile(r"^(\d+)\s*\|")
+
+
+def mf_universe_path() -> Path | None:
+    for path in MF_UNIVERSE_PATHS:
+        if path.is_file():
+            return path
+    return None
+
+
+def nav_data_status() -> dict[str, str]:
+    """Which NAV source is available (local db, cloud CSV, or none)."""
+    if NAV_DB.is_file():
+        return {"source": "nav_db", "label": "local NAV database"}
+    if NAV_LATEST_CSV.is_file():
+        return {"source": "nav_latest_csv", "label": "cloud NAV snapshot"}
+    return {"source": "none", "label": "no NAV data"}
+
+
+def _parse_nav_date(raw: str) -> date | None:
+    raw = str(raw or "").strip()
+    for fmt in ("%d-%m-%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(raw, fmt).date()
+        except ValueError:
+            continue
+    try:
+        return pd.Timestamp(raw).date()
+    except Exception:
+        return None
+
+
+@lru_cache(maxsize=1)
+def _nav_latest_table() -> dict[int, tuple[float, str]]:
+    if not NAV_LATEST_CSV.is_file():
+        return {}
+    df = pd.read_csv(NAV_LATEST_CSV)
+    if df.empty:
+        return {}
+    out: dict[int, tuple[float, str]] = {}
+    for _, row in df.iterrows():
+        try:
+            code = int(row["mf_scheme_code"])
+            nav = float(row["nav"])
+            nd = str(row.get("nav_date") or "")[:10]
+        except (TypeError, ValueError, KeyError):
+            continue
+        if nd and nav > 0:
+            out[code] = (nav, nd)
+    return out
+
+
+@lru_cache(maxsize=256)
+def _mfapi_nav_history(mf_scheme_code: int) -> tuple[tuple[str, float], ...]:
+    """Fetch full NAV history from MFAPI (cached). Used when nav.db is absent."""
+    url = MFAPI_DETAIL_URL.format(code=int(mf_scheme_code))
+    req = urllib.request.Request(url, headers={"User-Agent": MFAPI_USER_AGENT})
+    try:
+        with urllib.request.urlopen(req, timeout=90) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        return ()
+    data = body.get("data") or []
+    if not isinstance(data, list):
+        return ()
+    rows: list[tuple[str, float]] = []
+    for item in data:
+        if isinstance(item, dict):
+            d_raw = item.get("date")
+            nav_raw = item.get("nav")
+        elif isinstance(item, (list, tuple)) and len(item) >= 2:
+            d_raw, nav_raw = item[0], item[1]
+        else:
+            continue
+        d = _parse_nav_date(str(d_raw))
+        if d is None or d < NAV_MIN_HISTORY_DATE:
+            continue
+        try:
+            rows.append((d.isoformat(), float(nav_raw)))
+        except (TypeError, ValueError):
+            continue
+    rows.sort(key=lambda x: x[0])
+    return tuple(rows)
+
+
+def _nav_from_mfapi_on_or_before(mf_scheme_code: int, on_date) -> tuple[float | None, str | None]:
+    try:
+        target = pd.Timestamp(on_date).date()
+    except Exception:
+        return None, None
+    hist = _mfapi_nav_history(int(mf_scheme_code))
+    if not hist:
+        return None, None
+    best: tuple[float, str] | None = None
+    for nd, nav in hist:
+        d = _parse_nav_date(nd)
+        if d is None or d > target:
+            continue
+        best = (nav, nd)
+    return best if best else (None, None)
+
+
+def _nav_from_latest_csv_on_or_before(
+    mf_scheme_code: int, on_date
+) -> tuple[float | None, str | None]:
+    try:
+        target = pd.Timestamp(on_date).date()
+    except Exception:
+        return None, None
+    hit = _nav_latest_table().get(int(mf_scheme_code))
+    if not hit:
+        return None, None
+    nav, nd = hit
+    d = _parse_nav_date(nd)
+    if d is None or d > target:
+        return None, None
+    return nav, nd
 
 
 def scheme_display_fields(
@@ -125,9 +251,10 @@ def _scheme_map_by_code() -> dict[int, dict]:
 @lru_cache(maxsize=1)
 def load_mfapi_universe() -> pd.DataFrame:
     """881-scheme NAV universe with picker labels and capability flags."""
-    if not MF_UNIVERSE.is_file():
+    path = mf_universe_path()
+    if path is None:
         return pd.DataFrame()
-    mf = pd.read_csv(MF_UNIVERSE)
+    mf = pd.read_csv(path)
     hold = _holdings_fund_names()
     sector = _sector_alloc_fund_names()
     smap = _scheme_map_by_code()
@@ -348,31 +475,34 @@ def portfolio_summary(df: pd.DataFrame) -> dict[str, int]:
 def get_nav_on_or_before_with_date(
     mf_scheme_code: int, on_date
 ) -> tuple[float | None, str | None]:
-    """Last NAV <= on_date from nav.db; returns (nav, nav_date ISO)."""
-    if not NAV_DB.is_file():
-        return None, None
+    """Last NAV <= on_date; nav.db, cloud CSV, then MFAPI."""
     try:
         d = pd.Timestamp(on_date).strftime("%Y-%m-%d")
     except Exception:
         return None, None
-    conn = sqlite3.connect(NAV_DB)
-    try:
-        row = conn.execute(
-            """
-            SELECT nav, nav_date FROM nav_prices
-            WHERE mf_scheme_code = ? AND nav_date <= ?
-            ORDER BY nav_date DESC LIMIT 1
-            """,
-            (int(mf_scheme_code), d),
-        ).fetchone()
-    finally:
-        conn.close()
-    if not row or row[0] is None:
-        return None, None
-    try:
-        return float(row[0]), str(row[1] or "")[:10] or None
-    except (TypeError, ValueError):
-        return None, None
+    code = int(mf_scheme_code)
+    if NAV_DB.is_file():
+        conn = sqlite3.connect(NAV_DB)
+        try:
+            row = conn.execute(
+                """
+                SELECT nav, nav_date FROM nav_prices
+                WHERE mf_scheme_code = ? AND nav_date <= ?
+                ORDER BY nav_date DESC LIMIT 1
+                """,
+                (code, d),
+            ).fetchone()
+        finally:
+            conn.close()
+        if row and row[0] is not None:
+            try:
+                return float(row[0]), str(row[1] or "")[:10] or None
+            except (TypeError, ValueError):
+                pass
+    nav, nd = _nav_from_latest_csv_on_or_before(code, on_date)
+    if nav is not None:
+        return nav, nd
+    return _nav_from_mfapi_on_or_before(code, on_date)
 
 
 def get_nav_on_or_before(mf_scheme_code: int, on_date) -> float | None:
@@ -387,36 +517,54 @@ def get_nav_history(
     end_date=None,
 ) -> pd.DataFrame:
     """Daily NAV series for a scheme (columns: nav_date, nav)."""
-    if not NAV_DB.is_file():
+    code = int(mf_scheme_code)
+    if NAV_DB.is_file():
+        clauses = ["mf_scheme_code = ?"]
+        params: list = [code]
+        if start_date is not None:
+            try:
+                clauses.append("nav_date >= ?")
+                params.append(pd.Timestamp(start_date).strftime("%Y-%m-%d"))
+            except Exception:
+                pass
+        if end_date is not None:
+            try:
+                clauses.append("nav_date <= ?")
+                params.append(pd.Timestamp(end_date).strftime("%Y-%m-%d"))
+            except Exception:
+                pass
+        sql = (
+            f"SELECT nav_date, nav FROM nav_prices WHERE {' AND '.join(clauses)} "
+            "ORDER BY nav_date"
+        )
+        conn = sqlite3.connect(NAV_DB)
+        try:
+            df = pd.read_sql_query(sql, conn, params=params)
+        finally:
+            conn.close()
+        if not df.empty:
+            df["nav_date"] = pd.to_datetime(df["nav_date"], errors="coerce")
+            df["nav"] = pd.to_numeric(df["nav"], errors="coerce")
+            return df.dropna(subset=["nav_date", "nav"])
+    hist = _mfapi_nav_history(code)
+    if not hist:
         return pd.DataFrame(columns=["nav_date", "nav"])
-    clauses = ["mf_scheme_code = ?"]
-    params: list = [int(mf_scheme_code)]
+    rows = [{"nav_date": nd, "nav": nav} for nd, nav in hist]
+    df = pd.DataFrame(rows)
+    df["nav_date"] = pd.to_datetime(df["nav_date"], errors="coerce")
+    df["nav"] = pd.to_numeric(df["nav"], errors="coerce")
+    df = df.dropna(subset=["nav_date", "nav"])
     if start_date is not None:
         try:
-            clauses.append("nav_date >= ?")
-            params.append(pd.Timestamp(start_date).strftime("%Y-%m-%d"))
+            df = df[df["nav_date"] >= pd.Timestamp(start_date)]
         except Exception:
             pass
     if end_date is not None:
         try:
-            clauses.append("nav_date <= ?")
-            params.append(pd.Timestamp(end_date).strftime("%Y-%m-%d"))
+            df = df[df["nav_date"] <= pd.Timestamp(end_date)]
         except Exception:
             pass
-    sql = (
-        f"SELECT nav_date, nav FROM nav_prices WHERE {' AND '.join(clauses)} "
-        "ORDER BY nav_date"
-    )
-    conn = sqlite3.connect(NAV_DB)
-    try:
-        df = pd.read_sql_query(sql, conn, params=params)
-    finally:
-        conn.close()
-    if df.empty:
-        return df
-    df["nav_date"] = pd.to_datetime(df["nav_date"], errors="coerce")
-    df["nav"] = pd.to_numeric(df["nav"], errors="coerce")
-    return df.dropna(subset=["nav_date", "nav"])
+    return df.sort_values("nav_date").reset_index(drop=True)
 
 
 @lru_cache(maxsize=1)
@@ -445,6 +593,18 @@ def nav_db_refresh_info(scheme_codes: tuple[int, ...] | None = None) -> dict[str
     Returns display_date (human), raw_date (ISO), source label.
     """
     if not NAV_DB.is_file():
+        latest = _nav_latest_table()
+        if scheme_codes:
+            dates = [latest[c][1] for c in scheme_codes if c in latest]
+        else:
+            dates = [v[1] for v in latest.values()]
+        if dates:
+            raw = max(dates)
+            return {
+                "display_date": _format_nav_refresh_date(raw),
+                "raw_date": raw,
+                "source": "nav_latest_csv",
+            }
         return {"display_date": "—", "raw_date": "", "source": "none"}
     conn = sqlite3.connect(NAV_DB)
     try:
@@ -506,7 +666,10 @@ def _format_nav_refresh_date(raw: str) -> str:
 
 def get_latest_nav(mf_scheme_code: int) -> tuple[float | None, str | None]:
     if not NAV_DB.is_file():
-        return None, None
+        hit = _nav_latest_table().get(int(mf_scheme_code))
+        if hit:
+            return hit[0], hit[1]
+        return _nav_from_mfapi_on_or_before(mf_scheme_code, date.today())
     conn = sqlite3.connect(NAV_DB)
     try:
         row = conn.execute(

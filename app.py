@@ -1332,7 +1332,7 @@ def _normalize_portfolio_df(
     for ncol in ("invested_amount", "units", "nav"):
         out[ncol] = pd.to_numeric(out[ncol], errors="coerce").fillna(0)
     out["mf_scheme_code"] = pd.to_numeric(out.get("mf_scheme_code"), errors="coerce")
-    if enrich and _pf_data.MF_UNIVERSE.is_file():
+    if enrich and _pf_data.mf_universe_path():
         out = _pf_data.enrich_portfolio_df(out)
     out = _pf_labels.attach_label_metadata(out, _portfolio_labels_list())
     return out[_PORTFOLIO_HOLDING_COLS]
@@ -10667,7 +10667,7 @@ def page_portfolio_track():
             )
         if not _pf.empty:
             _holdings = _portfolio_holdings_only_df(_pf)
-            if _pf_data.MF_UNIVERSE.is_file():
+            if _pf_data.mf_universe_path():
                 _holdings = _pf_data.enrich_portfolio_df(_holdings)
             _holdings, _txns = _pf_labels.split_holdings_and_transactions(_pf)
             _as_of = st.session_state.get("fl_track_as_of_date") or _date.today()
@@ -10732,9 +10732,18 @@ def page_portfolio_track():
         )
     else:
         if _n_skip:
-            st.caption(
-                f"{_n_skip} holding(s) skipped — not in NAV database (Track requires MFAPI Direct–Growth)."
-            )
+            _nav_src = _pf_data.nav_data_status()
+            if _nav_src["source"] == "none" and not _pf_data.mf_universe_path():
+                st.warning(
+                    "Track NAV files are missing on this deployment. "
+                    "Run `python scripts/export_nav_cloud_bundle.py` and redeploy, "
+                    "or use the app locally with `data/nav/nav.db`."
+                )
+            else:
+                st.caption(
+                    f"{_n_skip} holding(s) skipped — not in the MFAPI Direct–Growth "
+                    f"universe or missing `mf_scheme_code` in Manage."
+                )
 
         if not _metrics:
             st.warning("No trackable schemes in the current selection.")
