@@ -1838,17 +1838,23 @@ def _render_portfolio_holdings_table(
 
         _muted = f"color:{_sb};font-size:0.8rem;"
         _amt_style = f"font-weight:700;font-size:0.85rem;color:{_hd};font-variant-numeric:tabular-nums;"
+        _acct_cell = f'<span style="font-size:0.78rem;color:{_bd};">{_acct}</span>'
+        _period_cell = f'<span style="font-size:0.78rem;color:{_sb};">{_period}</span>'
+        _inv_cell = f'<span style="{_amt_style}">{_inv}</span>'
+        _date_cell = f'<span style="{_muted}">{_date}</span>'
+        _units_cell = f'<span style="{_muted}">{_units}</span>'
+        _nav_cell = f'<span style="{_muted}">{_nav}</span>'
         _rows_html.append(
             f'<tr style="background:{_zebra};border-bottom:1px solid {_bdr};">'
             f"{_td(_fund_cell)}"
-            f"{_td(f'<span style=\"font-size:0.78rem;color:{_bd};\">{_acct}</span>')}"
+            f"{_td(_acct_cell)}"
             f"{_td(_plan)}"
             f"{_td(_option)}"
-            f'{_td(f"<span style=\"font-size:0.78rem;color:{_sb};\">{_period}</span>")}'
-            f'{_td(f"<span style=\"{_amt_style}\">{_inv}</span>", "right")}'
-            f'{_td(f"<span style=\"{_muted}\">{_date}</span>", "center")}'
-            f'{_td(f"<span style=\"{_muted}\">{_units}</span>", "right")}'
-            f'{_td(f"<span style=\"{_muted}\">{_nav}</span>", "right")}'
+            f"{_td(_period_cell)}"
+            f'{_td(_inv_cell, "right")}'
+            f'{_td(_date_cell, "center")}'
+            f'{_td(_units_cell, "right")}'
+            f'{_td(_nav_cell, "right")}'
             f"</tr>"
         )
 
